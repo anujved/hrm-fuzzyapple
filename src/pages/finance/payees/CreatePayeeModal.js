@@ -32,7 +32,7 @@ const CreatePayeeModal = ({ open, onCloseClickListener, onSubmitClickListener })
     onSubmit: (values) => {
       const data = {
         payee_name: values.name,
-        account_number: values.contactNumber,
+        contact_number: values.contactNumber,
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
@@ -65,7 +65,7 @@ const CreatePayeeModal = ({ open, onCloseClickListener, onSubmitClickListener })
                 helperText={formik.errors.nameError}
                 error={formik.errors.nameError && true}
                 onChange={formik.handleChange}
-                nam="name"
+                name="name"
               />
             </Grid>
             <Grid item xs={12} md={12}>

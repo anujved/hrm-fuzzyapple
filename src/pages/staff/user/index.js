@@ -28,7 +28,7 @@ const User = (props) => {
       setUserToEdit(user);
       setShowModal(true);
     } else if (option === "Delete") {
-      const endpoint = process.env.REACT_APP_BASE_URL+"/delete-user/"+ user._id;
+      const endpoint = "https://api.driftacademy.in/delete-user/"+ user._id;
     axios
       .delete(endpoint)
       .then((res) => {
@@ -47,7 +47,7 @@ const User = (props) => {
   }, []);
 
   const getRoles = () => {
-    const endpoint = "/roles";
+    const endpoint = "https://api.driftacademy.in/roles";
     axios
       .get(endpoint)
       .then((res) => {
@@ -60,7 +60,7 @@ const User = (props) => {
   };
 
   const getUsers = () => {
-    const endpoint = "/users";
+    const endpoint = "https://api.driftacademy.in/users";
     axios
       .get(endpoint)
       .then((res) => {

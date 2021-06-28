@@ -24,33 +24,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateDepositModal from "./CreateDepositModal";
-
-const payslips = [
-  {
-    id: 1,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Approal",
-  },
-  {
-    id: 2,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Pending",
-  },
-];
+import FinanceService from "src/webservices/financeService";
+import ConfirmDialog from "src/common/confirm-dialog";
+import SimpleBackdrop from "src/common/backdrop";
 
 const Deposit = (props) => {
   const navigate = useNavigate();
@@ -58,6 +34,12 @@ const Deposit = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [payers, setPayers] = React.useState([]);
+  const [accounts, setAccounts] = React.useState([]);
+  const [deposits, setDeposits] = React.useState([]);
+  const [deposit, setDeposit] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -65,7 +47,7 @@ const Deposit = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -74,6 +56,69 @@ const Deposit = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  const getAccounts = async () => {
+    try {
+      const response = await FinanceService.fetchAllAccountList();
+      setAccounts(response);
+    } catch (e) {}
+  };
+
+  const getPayers = async () => {
+    try {
+      const response = await FinanceService.fetchAllPayers();
+      setPayers(response);
+    } catch (e) {}
+  };
+
+  const getDeposits = async () => {
+    try {
+      const response = await FinanceService.fetchAllDeposits();
+      setDeposits(response);
+    } catch (e) {}
+  };
+
+  const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
+    try {
+      const response = await FinanceService.createDeposit(data);
+      //TODO: send email to respetive employee, branch and department here
+      getDeposits();
+    } catch (error) {}
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (data) => {
+    setDeposit(data);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await FinanceService.deleteDeposit(deposit._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getDeposits();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  React.useEffect(() => {
+    getAccounts();
+    getPayers();
+    getDeposits();
+  }, []);
 
   return (
     <React.Fragment>
@@ -99,67 +144,64 @@ const Deposit = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Employee</TableCell>
-                      <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
-                      <TableCell>Start Date</TableCell>
-                      <TableCell>End Date</TableCell>
-                      <TableCell>Total Days</TableCell>
-                      <TableCell>Leave Reason</TableCell>
-                      <TableCell>Status</TableCell>
+                      <TableCell>Account</TableCell>
+                      <TableCell>Payer</TableCell>
+                      <TableCell>Amount</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell>Ref#</TableCell>
+                      <TableCell>Payment</TableCell>
+                      <TableCell>Date</TableCell>
                       <TableCell>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {deposits &&
+                      deposits.slice(0, limit).map((deposit) => (
+                        <TableRow hover>
+                          <TableCell>{deposit.account.account_name}</TableCell>
+                          <TableCell>{deposit.Payer}</TableCell>
+                          <TableCell>{deposit.amount}</TableCell>
+                          <TableCell>{deposit.category}</TableCell>
+                          <TableCell>{deposit.ref}</TableCell>
+                          <TableCell>{deposit.payment_method}</TableCell>
+                          <TableCell>{deposit.date}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() =>
+                                      onDeleteClickListener(deposit)
+                                    }
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={deposits.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -169,7 +211,19 @@ const Deposit = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateDepositModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateDepositModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
+        payers={payers}
+        accounts={accounts}
+        onSubmitClickListener={onSubmitClickListener}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };

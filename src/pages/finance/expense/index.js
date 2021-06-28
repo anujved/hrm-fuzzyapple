@@ -24,6 +24,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateExpenseModal from "./CreateExpenseModal";
+import FinanceService from "src/webservices/financeService";
+import ConfirmDialog from "src/common/confirm-dialog";
+import SimpleBackdrop from "src/common/backdrop";
 
 const payslips = [
   {
@@ -58,6 +61,12 @@ const Expense = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [payees, setPayees] = React.useState([]);
+  const [accounts, setAccounts] = React.useState([]);
+  const [expenses, setExpenses] = React.useState([]);
+  const [expense, setExpense] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -65,7 +74,7 @@ const Expense = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -74,6 +83,69 @@ const Expense = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  const getAccounts = async () => {
+    try {
+      const response = await FinanceService.fetchAllAccountList();
+      setAccounts(response);
+    } catch (e) {}
+  };
+
+  const getPayees = async () => {
+    try {
+      const response = await FinanceService.fetchAllPayee();
+      setPayees(response);
+    } catch (e) {}
+  };
+
+  const getExpenses = async () => {
+    try {
+      const response = await FinanceService.fetchAllExpenses();
+      setExpenses(response);
+    } catch (e) {}
+  };
+
+  const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
+    try {
+      const response = await FinanceService.createExpense(data);
+      //TODO: send email to respetive employee, branch and department here
+      getExpenses();
+    } catch (error) {}
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (data) => {
+    setExpense(data);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await FinanceService.deleteExpense(expense._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getExpenses();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  React.useEffect(() => {
+    getAccounts();
+    getPayees();
+    getExpenses();
+  }, []);
 
   return (
     <React.Fragment>
@@ -99,67 +171,64 @@ const Expense = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Employee</TableCell>
-                      <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
-                      <TableCell>Start Date</TableCell>
-                      <TableCell>End Date</TableCell>
-                      <TableCell>Total Days</TableCell>
-                      <TableCell>Leave Reason</TableCell>
-                      <TableCell>Status</TableCell>
+                      <TableCell>Account</TableCell>
+                      <TableCell>Payee</TableCell>
+                      <TableCell>Amount</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell>Ref#</TableCell>
+                      <TableCell>Payment</TableCell>
+                      <TableCell>Date</TableCell>
                       <TableCell>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {expenses &&
+                      expenses.slice(0, limit).map((expense) => (
+                        <TableRow hover>
+                          <TableCell>{expense?.account?.account_name}</TableCell>
+                          <TableCell>{expense.Payee?.payee_name}</TableCell>
+                          <TableCell>{expense.amount}</TableCell>
+                          <TableCell>{expense.category}</TableCell>
+                          <TableCell>{expense.ref}</TableCell>
+                          <TableCell>{expense.payment_method}</TableCell>
+                          <TableCell>{expense.date}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() =>
+                                      onDeleteClickListener(expense)
+                                    }
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={expenses.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -169,7 +238,19 @@ const Expense = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateExpenseModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateExpenseModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+        accounts={accounts}
+        payees={payees}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };
