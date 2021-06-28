@@ -12,13 +12,53 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreatePromotionModal = ({ open, onCloseClickListener }) => {
+const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListener, employees, designations }) => {
+  const [promotionDate, setPromotionDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      employee: "",
+      designation: "",
+      promotionTitle: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.employee.length === 0) {
+        errors.employeeError = "required";
+      }
+      if (values.designation.length === 0) {
+        errors.designationError = "required";
+      }
+      if (values.promotionTitle.length === 0) {
+        errors.promotionTitleError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        employee: values.employee,
+        designation: values.designation,
+        promotion_title: values.promotionTitle,
+        description: values.description,
+        promotion_date: promotionDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+  
   return (
     <div>
       <Dialog
@@ -27,6 +67,7 @@ const CreatePromotionModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Promotion</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -39,14 +80,11 @@ const CreatePromotionModal = ({ open, onCloseClickListener }) => {
                 label="Employee"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="employee"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -58,14 +96,11 @@ const CreatePromotionModal = ({ open, onCloseClickListener }) => {
                 label="Designation"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="designation"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {designations &&
+                    designations.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -77,46 +112,43 @@ const CreatePromotionModal = ({ open, onCloseClickListener }) => {
                 label="Promotion Title"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.promotionTitleError}
+                error={formik.errors.promotionTitleError && true}
+                onChange={formik.handleChange}
+                name="promotionTitle"
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="End Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
+            <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Promotion Date"
+                  fullWidth
+                  onChange={(value) => setPromotionDate(value)}
+                />
             </Grid>
             <Grid item xs={12} md={12}>
               <TextField
                 label="Description"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.descriptionError}
+                error={formik.errors.descriptionError && true}
+                onChange={formik.handleChange}
+                name="description"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

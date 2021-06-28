@@ -28,17 +28,22 @@ import ReplyIcon from "@material-ui/icons/Reply";
 import EmployeeService from "src/webservices/employeeService";
 import Progress from "src/common/loader";
 import TicketService from "src/webservices/ticketService";
-import moment from 'moment';
+import moment from "moment";
+import ConfirmDialog from "../../common/confirm-dialog";
+import SimpleBackdrop from "../../common/backdrop";
 
 const Ticket = (props) => {
   const navigate = useNavigate();
 
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const [openDialog, setOpenDialog] = React.useState(false);
   const [employees, setEmployees] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [tickets, setTickets] = React.useState([]);
+  const [ticket, setTicket] = React.useState(null);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -81,10 +86,46 @@ const Ticket = (props) => {
     try {
       const response = await TicketService.createTicket(values);
       console.log("-Create-Success-", response);
+      //TODO: Send Email to respect Branch and Employee after ticket is created.
       getTickets();
     } catch (error) {
       console.log("-Create-Error-", error);
     }
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (ticket) => {
+    setTicket(ticket);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await TicketService.deleteTicket(ticket._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getTickets();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  /**
+   * Listener to reply on a ticket
+   * @param {*} ticket - to reply
+   */
+  const onReplyClickListener = (ticket) => {
+    navigate("/dashboard/ticket/reply");
   };
 
   React.useEffect(() => {
@@ -131,13 +172,15 @@ const Ticket = (props) => {
                     <TableBody>
                       {tickets?.slice(0, limit).map((ticket, index) => (
                         <TableRow hover key={index}>
-                          <TableCell>{ticket.newTicket ? 'Yes' : 'No'}</TableCell>
+                          <TableCell>
+                            {ticket.newTicket ? "Yes" : "No"}
+                          </TableCell>
                           <TableCell>{ticket.subject}</TableCell>
                           <TableCell>{ticket.ticketCode}</TableCell>
                           <TableCell>{ticket.employee}</TableCell>
                           <TableCell>{ticket.priority}</TableCell>
                           <TableCell>
-                          {moment(ticket.endDate).format("DD/MM/YYYY")}
+                            {moment(ticket.endDate).format("DD/MM/YYYY")}
                           </TableCell>
                           <TableCell>{ticket.description}</TableCell>
                           <TableCell>
@@ -146,7 +189,7 @@ const Ticket = (props) => {
                                 <Tooltip title="Reply" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={() => onReplyClickListener(ticket)}
                                     color="primary"
                                   >
                                     <ReplyIcon />
@@ -157,7 +200,9 @@ const Ticket = (props) => {
                                 <Tooltip title="Delete" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={() =>
+                                      onDeleteClickListener(ticket)
+                                    }
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -191,6 +236,12 @@ const Ticket = (props) => {
         onSubmitClickListener={onSubmitClickListener}
         employees={employees}
       />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };

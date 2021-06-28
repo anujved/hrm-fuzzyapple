@@ -90,6 +90,7 @@ import JobCategory from './pages/constant/job-category';
 import MonthlyAttendance from './pages/report/monthly-attendance';
 import Leave from './pages/report/leave';
 import Event from './pages/event';
+import TicketReply from './pages/ticket/TicketReply';
 
 
 const Routes = props => {
@@ -172,7 +173,7 @@ const Routes = props => {
 
         /** Ticket */
         { path: '/dashboard/ticket', element: requireAuthRoute(Ticket) },
-
+        { path: '/dashboard/ticket/reply', element: requireAuthRoute(TicketReply) },
         /** Meeting */
         { path: '/dashboard/meeting', element: requireAuthRoute(Meeting) },
 

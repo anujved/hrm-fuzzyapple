@@ -12,13 +12,55 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateTripModal = ({ open, onCloseClickListener }) => {
+const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, employees }) => {
+  const [startDate, setStartDate] = React.useState(Date.now);
+  const [endDate, setEndDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      employee: "",
+      purposeOfVisit: "",
+      placeOfVisit: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.employee.length === 0) {
+        errors.employeeError = "required";
+      }
+      if (values.purposeOfVisit.length === 0) {
+        errors.purposeOfVisitError = "required";
+      }
+      if (values.placeOfVisit.length === 0) {
+        errors.placeOfVisitError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        employee: values.employee,
+        purpose_of_visit: values.purposeOfVisit,
+        place_of_visit: values.placeOfVisit,
+        description: values.description,
+        start_date: startDate._d,
+        end_date: endDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
     <div>
       <Dialog
@@ -27,6 +69,7 @@ const CreateTripModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Trip</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -39,14 +82,11 @@ const CreateTripModal = ({ open, onCloseClickListener }) => {
                 label="Employee"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="employee"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -54,44 +94,36 @@ const CreateTripModal = ({ open, onCloseClickListener }) => {
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Start Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
+            <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Start Date"
+                  fullWidth
+                  onChange={(value) => setStartDate(value)}
+                />
             </Grid>
             <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="End Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
+            <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="End Date"
+                  fullWidth
+                  onChange={(value) => setEndDate(value)}
+                />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 label="Purpose of Visit"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.purposeOfVisitError}
+                error={formik.errors.purposeOfVisitError && true}
+                onChange={formik.handleChange}
+                name="purposeOfVisit"
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -99,10 +131,10 @@ const CreateTripModal = ({ open, onCloseClickListener }) => {
                 label="Place of Visit"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.placeOfVisitError}
+                error={formik.errors.placeOfVisitError && true}
+                onChange={formik.handleChange}
+                name="placeOfVisit"
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -110,20 +142,21 @@ const CreateTripModal = ({ open, onCloseClickListener }) => {
                 label="Description"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.descriptionError}
+                error={formik.errors.descriptionError && true}
+                onChange={formik.handleChange}
+                name="description"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

@@ -12,13 +12,64 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
+const CreateTransferBalanceModal = ({ open, onCloseClickListener, onSubmitClickListener, fromAccounts, toAccounts }) => {
+  const [transferDate, setTransferDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      fromAccount: "",
+      toAccount: "",
+      amount: "",
+      paymentMethod: "",
+      RefNumber: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.fromAccount.length === 0) {
+        errors.fromAccountError = "required";
+      }
+      if (values.toAccount.length === 0) {
+        errors.toAccountError = "required";
+      }
+      if (values.amount.length === 0) {
+        errors.amountError = "required";
+      }
+      if (values.paymentMethod.length === 0) {
+        errors.paymentMethodError = "required";
+      }
+      if (values.RefNumber.length === 0) {
+        errors.RefNumberError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        from_account: values.fromAccount,
+        to_account: values.toAccount,
+        amount: values.amount,
+        payment_method: values.paymentMethod,
+        ref_number: values.RefNumber,
+        description: values.description,
+        transfer_date: transferDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
+  
   return (
     <div>
       <Dialog
@@ -27,6 +78,7 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Transfer Balance</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -39,14 +91,11 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
                 label="From Account"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="fromAccount"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {fromAccounts &&
+                    fromAccounts.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -58,14 +107,11 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
                 label="To Account"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="toAccount"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {toAccounts &&
+                    toAccounts.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -74,18 +120,14 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
             </Grid>
             
             <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
+            <KeyboardDatePicker
                 disableToolbar
+                autoOk
                 variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Date"
-                value={new Date()}
+                format="DD/MM/yyyy"
+                label="Transfer Date"
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setTransferDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -93,10 +135,10 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
                 label="Amount"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.amountError}
+                error={formik.errors.amountError && true}
+                onChange={formik.handleChange}
+                name="amount"
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -104,10 +146,7 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
                 label="Payment Method"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="paymentMethod"
                 select
               >
                   {leaveTypes &&
@@ -124,10 +163,10 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
                 label="Ref#"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.RefNumberError}
+                error={formik.errors.RefNumberError && true}
+                onChange={formik.handleChange}
+                name="RefNumber"
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -135,20 +174,21 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener }) => {
                 label="Description"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.descriptionError}
+                error={formik.errors.descriptionError && true}
+                onChange={formik.handleChange}
+                name="description"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

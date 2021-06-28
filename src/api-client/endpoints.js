@@ -48,9 +48,19 @@ export const DELETE_EMPLOYEE = '/delete-employee/:id';
 // ****** Ticket *********
 export const CREATE_TICKET = '/create-ticket';
 export const FETCH_TICKET = '/tickets';
-export const DELETE_TICKET = '/delete-ticket/:id';
+export const DELETE_TICKET = '/delete-ticket/';
 
 // ****** Timesheet *********
 export const CREATE_TIMESHEET = '/create-timesheet';
 export const FETCH_TIMESHEET = '/timesheets';
 export const DELETE_TIMESHEET = '/delete-timesheet/:id';
+
+// ****** Meeting *********
+export const CREATE_MEETING = '/create-meeting';
+export const FETCH_MEETING = '/meetings';
+export const DELETE_MEETING = '/delete-meeting/';
+
+// ****** Assets *********
+export const CREATE_ASSET = '/create-asset';
+export const FETCH_ASSETS = '/assets';
+export const DELETE_ASSET = '/delete-asset/';

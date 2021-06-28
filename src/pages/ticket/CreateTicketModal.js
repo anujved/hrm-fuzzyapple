@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import {
   Grid,
@@ -13,13 +13,8 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 import { APP_STRINGS } from "src/utils/strings";
-import EmployeeService from "src/webservices/employeeService";
 import TicketService from "src/webservices/ticketService";
 
-const departments = [
-  { id: 1, option: "PHP" },
-  { id: 2, option: "JAva" },
-];
 
 const CreateTicketModal = ({
   open,

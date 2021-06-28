@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import {
   Grid,
@@ -11,128 +11,125 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
+const CreateAssetsModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
+  const [purchaseDate, setPurchaseDate] = useState(Date.now);
+  const [supportUntilDate, setSupportUntilDate] = useState(Date.now);
 
-const branches = [
-  { id: 1, option: "Shantanu" },
-  { id: 2, option: "Wage Curve" },
-];
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      amount: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.name.length === 0) {
+        errors.nameError = "required";
+      }
+      if (values.amount.length === 0) {
+        errors.amountError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        name: values.name,
+        amount: values.amount,
+        description: values.description,
+        purchase_date: purchaseDate._d,
+        support_until_date: supportUntilDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
 
-const departments = [
-  { id: 1, option: "PHP" },
-  { id: 2, option: "JAva" },
-];
-
-const designations = [
-  { id: 1, option: "Manager" },
-  { id: 2, option: "Director" },
-];
-
-const technicalCompentencies = [
-  { id: 1, option: "None" },
-  { id: 2, option: "Beginner" },
-  { id: 3, option: "Intermediate" },
-  { id: 4, option: "Advanced" },
-  { id: 5, option: "Expert / Leader" },
-];
-
-const organizationalCompentencies = [
-  { id: 1, option: "None" },
-  { id: 2, option: "Beginner" },
-  { id: 3, option: "Intermediate" },
-  { id: 4, option: "Advanced" },
-];
-
-const CreateAssetsModal = ({ open, onCloseClickListener }) => {
   return (
     <div>
-      <Dialog
-        open={open}
-        onClose={onCloseClickListener}
-      >
+      <Dialog open={open} onClose={onCloseClickListener}>
         <Box py={2} px={4}>
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create Asset</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Name"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-              />
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create Asset</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Amount"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-              />
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Name"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.nameError}
+                  error={formik.errors.nameError && true}
+                  onChange={formik.handleChange}
+                  name="name"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Amount"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.amountError}
+                  error={formik.errors.amountError && true}
+                  onChange={formik.handleChange}
+                  name="amount"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Purchase Date"
+                  fullWidth
+                  onChange={(value) => setPurchaseDate(value)}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Support Until"
+                  fullWidth
+                  onChange={(value) => setSupportUntilDate(value)}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  name="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Purchase Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Support Until"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button>Cancel</Button>
-            </Grid>
-          </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

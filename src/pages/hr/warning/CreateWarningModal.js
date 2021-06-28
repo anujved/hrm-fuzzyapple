@@ -12,13 +12,47 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateWarningModal = ({ open, onCloseClickListener }) => {
+const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener, employees }) => {
+  const [warningDate, setWarningDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      warningBy: "",
+      warningTo: "",
+      subject: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.subject.length === 0) {
+        errors.subjectError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        warning_by: values.warningBy,
+        warning_to: values.warningTo,
+        subject: values.subject,
+        description: values.description,
+        warning_date: warningDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
     <div>
       <Dialog
@@ -27,6 +61,7 @@ const CreateWarningModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Warning</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -39,14 +74,11 @@ const CreateWarningModal = ({ open, onCloseClickListener }) => {
                 label="Warning By"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="warningBy"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -58,14 +90,11 @@ const CreateWarningModal = ({ open, onCloseClickListener }) => {
                 label="Warning To"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="warningTo"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -77,46 +106,43 @@ const CreateWarningModal = ({ open, onCloseClickListener }) => {
                 label="Subject"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.subjectError}
+                error={formik.errors.subjectError && true}
+                onChange={formik.handleChange}
+                name="subject"
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Warning Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
+            <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Warning Date"
+                  fullWidth
+                  onChange={(value) => setWarningDate(value)}
+                />
             </Grid>
             <Grid item xs={12} md={12}>
               <TextField
                 label="Description"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.descriptionError}
+                error={formik.errors.descriptionError && true}
+                onChange={formik.handleChange}
+                id="description"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

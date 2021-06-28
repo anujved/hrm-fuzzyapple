@@ -24,21 +24,11 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateMeetingModal from "./CreateMeetingModal";
-
-const payslips = [
-  {
-    id: 1,
-    title: 'Work Related',
-    date: 'MAR 4, 2020',
-    time: '4:30PM',
-  },
-  {
-    id: 2,
-    title: 'Work Related',
-    date: 'MAR 4, 2020',
-    time: '5:30PM',
-  },
-];
+import ConstantService from "src/webservices/constantsService";
+import EmployeeService from "src/webservices/employeeService";
+import MeetingService from "src/webservices/meetingService";
+import ConfirmDialog from "../../common/confirm-dialog";
+import SimpleBackdrop from "../../common/backdrop";
 
 const Meeting = (props) => {
   const navigate = useNavigate();
@@ -46,6 +36,39 @@ const Meeting = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [branches, setBranches] = React.useState([]);
+  const [employees, setEmployees] = React.useState([]);
+  const [departments, setDepartments] = React.useState([]);
+  const [meetings, setMeetings] = React.useState([]);
+  const [meeting, setMeeting] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+
+  const getBranches = async () => {
+    try {
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    } catch (error) {}
+  };
+  const getEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch (error) {}
+  };
+  const getDepartments = async () => {
+    try {
+      const response = await ConstantService.fetchAllDepartment();
+      setDepartments(response);
+    } catch (error) {}
+  };
+
+  const getMeetings = async () => {
+    try {
+      const response = await MeetingService.fetchAllMeeting();
+      setMeetings(response);
+    } catch (error) {}
+  };
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -53,7 +76,7 @@ const Meeting = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -63,9 +86,52 @@ const Meeting = (props) => {
     setLimit(event.target.value);
   };
 
+  const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
+    try {
+      const response = await MeetingService.createMeeting(data);
+      //TODO: send email to respetive employee, branch and department here
+      getMeetings();
+    } catch (error) {}
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (meeting) => {
+    setMeeting(meeting);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await MeetingService.deleteMeeting(meeting._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getMeetings();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  React.useEffect(() => {
+    getBranches();
+    getEmployees();
+    getDepartments();
+    getMeetings();
+  }, []);
+
   return (
     <React.Fragment>
-      <Helmet>Training List</Helmet>
+      <Helmet>Meeting List</Helmet>
       <Box
         sx={{
           backgroundColor: "background.default",
@@ -94,50 +160,53 @@ const Meeting = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.title}</TableCell>
-                        <TableCell>{payslip.date}</TableCell>
-                        <TableCell>{payslip.time}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {meetings &&
+                      meetings.slice(0, limit).map((meeting) => (
+                        <TableRow
+                          hover
+                          key={meeting._id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>{meeting.meeting_title}</TableCell>
+                          <TableCell>{meeting.meeting_date}</TableCell>
+                          <TableCell>{meeting.meeting_time}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() =>
+                                      onDeleteClickListener(meeting)
+                                    }
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={meetings.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -147,7 +216,20 @@ const Meeting = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateMeetingModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateMeetingModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
+        branches={branches}
+        employees={employees}
+        departments={departments}
+        onSubmitClickListener={onSubmitClickListener}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };

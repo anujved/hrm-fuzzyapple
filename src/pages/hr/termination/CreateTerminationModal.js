@@ -12,13 +12,14 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateTerminationModal = ({ open, onCloseClickListener }) => {
+const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
   return (
     <div>
       <Dialog

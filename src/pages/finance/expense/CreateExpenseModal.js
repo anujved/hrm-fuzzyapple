@@ -12,13 +12,69 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateExpenseModal = ({ open, onCloseClickListener }) => {
+const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener, payees, accounts }) => {
+  const [expenseDate, setExpenseDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      account: "",
+      amount: "",
+      category: "",
+      payee: "",
+      paymentMethod: "",
+      RefNumber: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.name.length === 0) {
+        errors.nameError = "required";
+      }
+      if (values.amount.length === 0) {
+        errors.amountError = "required";
+      }
+      if (values.category.length === 0) {
+        errors.categoryError = "required";
+      }
+      if (values.payee.length === 0) {
+        errors.payeeError = "required";
+      }
+      if (values.paymentMethod.length === 0) {
+        errors.paymentMethodError = "required";
+      }
+      if (values.RefNumber.length === 0) {
+        errors.RefNumberError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        name: values.name,
+        amount: values.amount,
+        category: values.category,
+        payment_method: values.paymentMethod,
+        payee: values.payee,
+        ref_number: values.RefNumber,
+        description: values.description,
+        deposit_date: expenseDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
+  
   return (
     <div>
       <Dialog
@@ -27,6 +83,7 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Expense</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -39,14 +96,11 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Account"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="account"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {accounts &&
+                    accounts.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -58,25 +112,21 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Amount"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.amountError}
+                error={formik.errors.amountError && true}
+                onChange={formik.handleChange}
+                name="amount"
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
+            <KeyboardDatePicker
                 disableToolbar
+                autoOk
                 variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Date"
-                value={new Date()}
+                format="DD/MM/yyyy"
+                label="Expense Date"
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setExpenseDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -84,10 +134,7 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Category"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="category"
                 select
               >
                   {leaveTypes &&
@@ -103,14 +150,14 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Payee"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.payeeError}
+                error={formik.errors.payeeError && true}
+                onChange={formik.handleChange}
+                name="payee"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {payees &&
+                    payees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -122,10 +169,7 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Payment Method"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="paymentMethod"
                 select
               >
                   {leaveTypes &&
@@ -142,10 +186,10 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Ref#"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.RefNumberError}
+                error={formik.errors.RefNumberError && true}
+                onChange={formik.handleChange}
+                name="RefNumber"
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -153,20 +197,21 @@ const CreateExpenseModal = ({ open, onCloseClickListener }) => {
                 label="Description"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.descriptionError}
+                error={formik.errors.descriptionError && true}
+                onChange={formik.handleChange}
+                name="description"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

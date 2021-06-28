@@ -12,13 +12,54 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateTransferModal = ({ open, onCloseClickListener }) => {
+const CreateTransferModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  employees,
+  branches,
+  departments,
+}) => {
+  const [transferDate, setTransferDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      employee: "",
+      branch: "",
+      department: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.employee.length === 0) {
+        errors.employeeError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        employee: values.employee,
+        branch: values.awardType,
+        department: values.department,
+        description: values.description,
+        transfer_date: transferDate._d,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
     <div>
       <Dialog
@@ -27,104 +68,97 @@ const CreateTransferModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Transfer</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Transfer</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Employee"
+                  variant="outlined"
+                  fullWidth
+                  name="employee"
+                  select
+                >
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Branch"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Branch"
+                  variant="outlined"
+                  fullWidth
+                  name="branch"
+                  select
+                >
+                  {branches &&
+                    branches.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Department"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Department"
+                  variant="outlined"
+                  fullWidth
+                  name="department"
+                  select
+                >
+                  {departments &&
+                    departments.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Transfer Date"
+                  fullWidth
+                  onChange={(value) => setTransferDate(value)}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  name="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Transfer Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button>Cancel</Button>
-            </Grid>
-          </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

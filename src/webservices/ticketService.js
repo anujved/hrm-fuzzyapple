@@ -16,6 +16,7 @@ export default class TicketService {
     }
 
     static deleteTicket = async (params) => {
-        return await ApiClient.call(ApiClient.requestMethod.DELETE, DELETE_TICKET, null, params, null, false);
+        const updatedURL = `${DELETE_TICKET}${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);
     }
 }

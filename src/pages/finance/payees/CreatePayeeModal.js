@@ -9,8 +9,38 @@ import {
   IconButton,
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
+import { useFormik } from "formik";
 
-const CreatePayeeModal = ({ open, onCloseClickListener }) => {
+const CreatePayeeModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      contactNumber: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.name.length === 0) {
+        errors.nameError = "required";
+      }
+      if (values.contactNumber.length === 0) {
+        errors.contactNumberError = "required";
+      }
+      
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        payee_name: values.name,
+        account_number: values.contactNumber,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
+  
   return (
     <div>
       <Dialog
@@ -19,6 +49,7 @@ const CreatePayeeModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Payee</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -31,10 +62,10 @@ const CreatePayeeModal = ({ open, onCloseClickListener }) => {
                 label="Payee Name"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.nameError}
+                error={formik.errors.nameError && true}
+                onChange={formik.handleChange}
+                nam="name"
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -42,19 +73,20 @@ const CreatePayeeModal = ({ open, onCloseClickListener }) => {
                 label="Contact Number"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                helperText={formik.errors.contactNumberError}
+                error={formik.errors.contactNumberError && true}
+                onChange={formik.handleChange}
+                name="contactNumber"
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>
