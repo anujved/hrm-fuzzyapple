@@ -27,7 +27,7 @@ export default class ApiClient {
             headers["Authorization"] = "Bearer " + token;
         }
 
-        let axiosInstance = axios.create({baseURL: process.env.REACT_APP_BASE_URL});
+        let axiosInstance = axios.create({baseURL: "https://api.driftacademy.in"});
 
         try {
             let response = await axiosInstance.request({

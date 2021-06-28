@@ -42,7 +42,7 @@ const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener 
     },
     onSubmit: (values) => {
       const data = {
-        name: values.accountName,
+        account_name: values.accountName,
         initial_balance: values.initialBalance,
         account_number: values.accountNumber,
         branch_code: values.branchCode,
@@ -129,7 +129,7 @@ const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener 
               <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
-              <Button>Cancel</Button>
+              <Button onClick={onCloseClickListener}>Cancel</Button>
             </Grid>
           </Grid>
           </form>

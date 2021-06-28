@@ -22,6 +22,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateAccountModal from "./CreateAccountModal";
+import FinanceService from "src/webservices/financeService";
+import ConfirmDialog from "src/common/confirm-dialog";
+import SimpleBackdrop from "src/common/backdrop";
 
 const payslips = [
   {
@@ -56,6 +59,10 @@ const Account = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [accounts, setAccounts] = React.useState([]);
+  const [account, setAccount] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -63,7 +70,7 @@ const Account = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -72,6 +79,53 @@ const Account = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  const getAccounts = async () => {
+    try {
+      const response = await FinanceService.fetchAllAccountList();
+      setAccounts(response);
+    } catch (e) {}
+  };
+
+  const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
+    try {
+      const response = await FinanceService.createAccountList(data);
+      //TODO: send email to respetive employee, branch and department here
+      getAccounts();
+    } catch (error) {}
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (account) => {
+    setAccount(account);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await FinanceService.deleteAccountList(account._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getAccounts();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  React.useEffect(() => {
+    getAccounts();
+  }, []);
 
   return (
     <React.Fragment>
@@ -97,67 +151,59 @@ const Account = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Employee</TableCell>
-                      <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
-                      <TableCell>Start Date</TableCell>
-                      <TableCell>End Date</TableCell>
-                      <TableCell>Total Days</TableCell>
-                      <TableCell>Leave Reason</TableCell>
-                      <TableCell>Status</TableCell>
+                      <TableCell>Account Name</TableCell>
+                      <TableCell>Initial Balance</TableCell>
+                      <TableCell>Account Number</TableCell>
+                      <TableCell>Branch Code</TableCell>
+                      <TableCell>Bank Branch</TableCell>
                       <TableCell>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {accounts &&
+                      accounts.slice(0, limit).map((account) => (
+                        <TableRow hover>
+                          <TableCell>{account.account_name}</TableCell>
+                          <TableCell>{account.initial_balance}</TableCell>
+                          <TableCell>{account.account_number}</TableCell>
+                          <TableCell>{account.branch_code}</TableCell>
+                          <TableCell>{account.bank_branch}</TableCell>
+                          <TableCell>{account.status}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => onDeleteClickListener(account)}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={accounts.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -167,7 +213,17 @@ const Account = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateAccountModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateAccountModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };

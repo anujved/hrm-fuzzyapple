@@ -130,3 +130,27 @@ export const DELETE_ANNOUNCEMENT = '/delete-announcement';
 export const CREATE_HOLIDAY = '/create-holiday';
 export const FETCH_HOLIDAYS = '/holidays';
 export const DELETE_HOLIDAY = '/delete-holiday';
+// ****** Account List *********
+export const CREATE_ACCOUNTLIST = '/create-account-list';
+export const FETCH_ACCOUNTS = '/account-list';
+export const DELETE_ACCOUNT = '/delete-account/';
+
+export const CREATE_PAYEE = '/create-payee';
+export const FETCH_PAYEES = '/payee-list';
+export const DELETE_PAYEE = '/delete-payee/';
+
+export const CREATE_PAYER = '/create-payer';
+export const FETCH_PAYERS = '/payer-list';
+export const DELETE_PAYER = '/delete-payer/';
+
+export const CREATE_DEPOSIT = '/create-deposit';
+export const FETCH_DEPOSITS = '/Deposits';
+export const DELETE_DEPOSIT = '/delete-deposit/';
+
+export const CREATE_EXPENSE = '/create-expense';
+export const FETCH_EXPENSES = '/expenses';
+export const DELETE_EXPENSE = '/delete-expense/';
+
+export const CREATE_TRANSFER_BALANCE = '/create-transfer';
+export const FETCH_TRANSFER_BALANCES = '/transfers';
+export const DELETE_TRNASFER_BALANCE = '/delete-transfer/';

@@ -14,9 +14,14 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
+const categories = [
+  { id: 1, option: "Project" },
+  { id: 2, option: "Extra Income" },
+];
+
+const paymentMethods = [
+  { id: 1, option: "Cash" },
+  { id: 2, option: "Bank" },
 ];
 
 const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener, payees, accounts }) => {
@@ -34,20 +39,9 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
     },
     validate: (values) => {
       const errors = {};
-      if (values.name.length === 0) {
-        errors.nameError = "required";
-      }
+     
       if (values.amount.length === 0) {
         errors.amountError = "required";
-      }
-      if (values.category.length === 0) {
-        errors.categoryError = "required";
-      }
-      if (values.payee.length === 0) {
-        errors.payeeError = "required";
-      }
-      if (values.paymentMethod.length === 0) {
-        errors.paymentMethodError = "required";
       }
       if (values.RefNumber.length === 0) {
         errors.RefNumberError = "required";
@@ -59,14 +53,14 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
     },
     onSubmit: (values) => {
       const data = {
-        name: values.name,
+        account: values.account,
         amount: values.amount,
         category: values.category,
         payment_method: values.paymentMethod,
-        payee: values.payee,
-        ref_number: values.RefNumber,
+        Payee: values.payee,
+        ref: values.RefNumber,
         description: values.description,
-        deposit_date: expenseDate._d,
+        date: expenseDate._d,
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
@@ -101,8 +95,8 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
               >
                   {accounts &&
                     accounts.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                      <MenuItem key={option._id} value={option}>
+                        {option.account_name}
                       </MenuItem>
                     ))}
               </TextField>
@@ -125,6 +119,7 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
                 variant="inline"
                 format="DD/MM/yyyy"
                 label="Expense Date"
+                value={expenseDate}
                 fullWidth
                 onChange={(value) => setExpenseDate(value)}
               />
@@ -137,8 +132,8 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
                 name="category"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {categories &&
+                    categories.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -158,8 +153,8 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
               >
                   {payees &&
                     payees.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                      <MenuItem key={option.id} value={option}>
+                        {option.payee_name}
                       </MenuItem>
                     ))}
               </TextField>
@@ -172,8 +167,8 @@ const CreateExpenseModal = ({ open, onCloseClickListener, onSubmitClickListener,
                 name="paymentMethod"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {paymentMethods &&
+                    paymentMethods.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>

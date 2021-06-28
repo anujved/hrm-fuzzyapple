@@ -14,9 +14,14 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
+const categories = [
+  { id: 1, option: "Project" },
+  { id: 2, option: "Extra Income" },
+];
+
+const paymentMethods = [
+  { id: 1, option: "Cash" },
+  { id: 2, option: "Bank" },
 ];
 
 const CreateDepositModal = ({
@@ -30,7 +35,7 @@ const CreateDepositModal = ({
 
   const formik = useFormik({
     initialValues: {
-      account: "",
+      name: "",
       amount: "",
       category: "",
       payer: "",
@@ -40,20 +45,9 @@ const CreateDepositModal = ({
     },
     validate: (values) => {
       const errors = {};
-      if (values.name.length === 0) {
-        errors.nameError = "required";
-      }
+     
       if (values.amount.length === 0) {
         errors.amountError = "required";
-      }
-      if (values.category.length === 0) {
-        errors.categoryError = "required";
-      }
-      if (values.payer.length === 0) {
-        errors.payerError = "required";
-      }
-      if (values.paymentMethod.length === 0) {
-        errors.paymentMethodError = "required";
       }
       if (values.RefNumber.length === 0) {
         errors.RefNumberError = "required";
@@ -65,15 +59,16 @@ const CreateDepositModal = ({
     },
     onSubmit: (values) => {
       const data = {
-        name: values.name,
+        account: values.name,
         amount: values.amount,
         category: values.category,
         payment_method: values.paymentMethod,
-        payer: values.payer,
-        ref_number: values.RefNumber,
+        Payer: values.payer,
+        ref: values.RefNumber,
         description: values.description,
-        deposit_date: depositDate._d,
+        date: depositDate._d,
       };
+      console.log('--DATA---DATA---', data);
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
     },
@@ -101,16 +96,14 @@ const CreateDepositModal = ({
                 label="Account"
                 variant="outlined"
                 fullWidth
-                helperText={formik.errors.nameError}
-                error={formik.errors.nameError && true}
                 onChange={formik.handleChange}
-                name="account"
+                name="name"
                 select
               >
                 {accounts &&
                   accounts.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                    <MenuItem key={option.id} value={option}>
+                      {option.account_name}
                     </MenuItem>
                   ))}
               </TextField>
@@ -133,6 +126,7 @@ const CreateDepositModal = ({
                 variant="inline"
                 format="DD/MM/yyyy"
                 label="Deposit Date"
+                value={depositDate}
                 fullWidth
                 onChange={(value) => setDepositDate(value)}
               />
@@ -145,8 +139,8 @@ const CreateDepositModal = ({
                 name="category"
                 select
               >
-                {leaveTypes &&
-                  leaveTypes.map((option) => (
+                {categories &&
+                  categories.map((option) => (
                     <MenuItem key={option.id} value={option.option}>
                       {option.option}
                     </MenuItem>
@@ -163,8 +157,8 @@ const CreateDepositModal = ({
               >
                 {payers &&
                   payers.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                    <MenuItem key={option._id} value={option}>
+                      {option.payer_name}
                     </MenuItem>
                   ))}
               </TextField>
@@ -177,8 +171,8 @@ const CreateDepositModal = ({
                 name="paymentMethod"
                 select
               >
-                {leaveTypes &&
-                  leaveTypes.map((option) => (
+                {paymentMethods &&
+                  paymentMethods.map((option) => (
                     <MenuItem key={option.id} value={option.option}>
                       {option.option}
                     </MenuItem>
