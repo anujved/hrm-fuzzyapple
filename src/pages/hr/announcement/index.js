@@ -24,27 +24,13 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateAnnouncementModal from "./CreateAnnouncementModal";
+import HrServices from "src/webservices/hrServices";
 
-const payslips = [
-  {
-    id: 1,
-    title: "Meeting",
-    startDate: "MAR 4, 2020",
-    endDate: "MAR 4, 2020",
-    description: 'Loreum Ipsum'
-  },
-  {
-    id: 2,
-    title: "Meeting",
-    startDate: "MAR 4, 2020",
-    endDate: "MAR 4, 2020",
-    description: 'Loreum Ipsum'
-  },
-];
 
 const Announcement = (props) => {
   const navigate = useNavigate();
 
+  const [values, setValues] = React.useState([])
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -64,6 +50,44 @@ const Announcement = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await HrServices.createAnnouncement(data);
+      setValues(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await HrServices.deleteAnnouncement(id);
+      // console.log("this is delete res : ", response)
+      if (response.ok) {
+        setValues(pre => {
+          return pre.filter(obj => obj._id !== id)
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchData = async () => {
+    try {
+      const response = await HrServices.fetchAnnouncements();
+      console.log('-response-', response);
+      setValues(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchData()
+  }, [])
 
   return (
     <React.Fragment>
@@ -97,15 +121,15 @@ const Announcement = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
                       <TableRow
                         hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={payslip._id}
+                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
-                        <TableCell>{payslip.title}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
+                        <TableCell>{payslip.announcement_title}</TableCell>
+                        <TableCell>{payslip.announcement_start_date}</TableCell>
+                        <TableCell>{payslip.announcement_end_date}</TableCell>
                         <TableCell>{payslip.description}</TableCell>
                         <TableCell>
                           <Grid container>
@@ -113,7 +137,7 @@ const Announcement = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <EditRoundedIcon />
@@ -124,7 +148,7 @@ const Announcement = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={handleDelete.bind(this, payslip._id)}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -141,7 +165,7 @@ const Announcement = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={values ? values.length : 10}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -151,7 +175,7 @@ const Announcement = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateAnnouncementModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateAnnouncementModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
     </React.Fragment>
   );
 };

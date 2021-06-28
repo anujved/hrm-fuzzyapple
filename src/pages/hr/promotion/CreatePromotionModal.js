@@ -51,14 +51,15 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
         designation: values.designation,
         promotion_title: values.promotionTitle,
         description: values.description,
-        promotion_date: promotionDate._d,
+        promotion_date: new Date(promotionDate),
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
+      setTimeout(onCloseClickListener, 1000)
     },
-    validateOnChange: false,
+    validateOnChange: true,
   });
-  
+
   return (
     <div>
       <Dialog
@@ -67,59 +68,65 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Promotion</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                name="employee"
-                select
-              >
-                  {employees &&
-                    employees.map((option) => (
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Promotion</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Employee"
+                  variant="outlined"
+                  fullWidth
+                  id="employee"
+                  helperText={formik.errors.promotionTitleError}
+                  error={formik.errors.promotionTitleError && true}
+                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  select
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Designation"
-                variant="outlined"
-                fullWidth
-                name="designation"
-                select
-              >
-                  {designations &&
-                    designations.map((option) => (
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Designation"
+                  variant="outlined"
+                  fullWidth
+                  id="designation"
+                  helperText={formik.errors.promotionTitleError}
+                  error={formik.errors.promotionTitleError && true}
+                  onChange={e => formik.setFieldValue("designation", e.target.value)}
+                  select
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Promotion Title"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.promotionTitleError}
-                error={formik.errors.promotionTitleError && true}
-                onChange={formik.handleChange}
-                name="promotionTitle"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Promotion Title"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.promotionTitleError}
+                  error={formik.errors.promotionTitleError && true}
+                  onChange={formik.handleChange}
+                  id="promotionTitle"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
                   disableToolbar
                   autoOk
                   variant="inline"
@@ -128,26 +135,26 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
                   fullWidth
                   onChange={(value) => setPromotionDate(value)}
                 />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  id="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.descriptionError}
-                error={formik.errors.descriptionError && true}
-                onChange={formik.handleChange}
-                name="description"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button onClick={onCloseClickListener}>Cancel</Button>
-            </Grid>
-          </Grid>
           </form>
         </Box>
       </Dialog>

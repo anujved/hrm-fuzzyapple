@@ -52,13 +52,14 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
         purpose_of_visit: values.purposeOfVisit,
         place_of_visit: values.placeOfVisit,
         description: values.description,
-        start_date: startDate._d,
-        end_date: endDate._d,
+        start_date: new Date(startDate),
+        end_date: new Date(endDate),
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
+      setTimeout(onCloseClickListener, 1000)
     },
-    validateOnChange: false,
+    validateOnChange: true,
   });
 
   return (
@@ -69,32 +70,33 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Trip</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={12}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                name="employee"
-                select
-              >
-                  {employees &&
-                    employees.map((option) => (
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Trip</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Employee"
+                  variant="outlined"
+                  fullWidth
+                  id="employee"
+                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  select
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
                   disableToolbar
                   autoOk
                   variant="inline"
@@ -103,9 +105,9 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
                   fullWidth
                   onChange={(value) => setStartDate(value)}
                 />
-            </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
                   disableToolbar
                   autoOk
                   variant="inline"
@@ -114,48 +116,48 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
                   fullWidth
                   onChange={(value) => setEndDate(value)}
                 />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Purpose of Visit"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.purposeOfVisitError}
+                  error={formik.errors.purposeOfVisitError && true}
+                  onChange={formik.handleChange}
+                  id="purposeOfVisit"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Place of Visit"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.placeOfVisitError}
+                  error={formik.errors.placeOfVisitError && true}
+                  onChange={formik.handleChange}
+                  id="placeOfVisit"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  id="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Purpose of Visit"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.purposeOfVisitError}
-                error={formik.errors.purposeOfVisitError && true}
-                onChange={formik.handleChange}
-                name="purposeOfVisit"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Place of Visit"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.placeOfVisitError}
-                error={formik.errors.placeOfVisitError && true}
-                onChange={formik.handleChange}
-                name="placeOfVisit"
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.descriptionError}
-                error={formik.errors.descriptionError && true}
-                onChange={formik.handleChange}
-                name="description"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button onClick={onCloseClickListener}>Cancel</Button>
-            </Grid>
-          </Grid>
           </form>
         </Box>
       </Dialog>

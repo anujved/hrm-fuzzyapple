@@ -24,6 +24,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateTerminationModal from "./CreateTerminationModal";
+import HrServices from "src/webservices/hrServices";
+
 
 const payslips = [
   {
@@ -47,6 +49,9 @@ const payslips = [
 const Termination = (props) => {
   const navigate = useNavigate();
 
+
+  const [values, setValues] = React.useState([])
+  const [counter, setCounter] = React.useState([])
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -66,6 +71,42 @@ const Termination = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await HrServices.createTermination(data);
+      setCounter(pre => pre + 1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await HrServices.deleteTermination(id);
+      if (response.ok) {
+        setValues(pre => {
+          return pre.filter(obj => obj._id !== id)
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchData = async () => {
+    try {
+      const response = await HrServices.fetchTerminations();
+      setValues(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchData()
+  }, [counter])
 
   return (
     <React.Fragment>
@@ -100,16 +141,16 @@ const Termination = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
                       <TableRow
                         hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={payslip._id}
+                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
                         <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.terminationType}</TableCell>
-                        <TableCell>{payslip.noticeDate}</TableCell>
-                        <TableCell>{payslip.terminationDate}</TableCell>
+                        <TableCell>{payslip.termination_type}</TableCell>
+                        <TableCell>{payslip.notice_date}</TableCell>
+                        <TableCell>{payslip.termination_date}</TableCell>
                         <TableCell>{payslip.description}</TableCell>
                         <TableCell>
                           <Grid container>
@@ -117,7 +158,7 @@ const Termination = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <EditRoundedIcon />
@@ -128,7 +169,7 @@ const Termination = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={handleDelete.bind(this, payslip._id)}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -155,7 +196,7 @@ const Termination = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTerminationModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateTerminationModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
     </React.Fragment>
   );
 };

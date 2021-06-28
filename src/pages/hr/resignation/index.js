@@ -24,6 +24,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateResignationModal from "./CreateResignationModal";
+import HrServices from "src/webservices/hrServices";
+
 
 const payslips = [
   {
@@ -45,6 +47,8 @@ const payslips = [
 const Resignation = (props) => {
   const navigate = useNavigate();
 
+  const [values, setValues] = React.useState([])
+  const [counter, setCounter] = React.useState([])
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -64,6 +68,42 @@ const Resignation = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await HrServices.createResignation(data);
+      setCounter(pre => pre + 1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await HrServices.deleteResignation(id);
+      if (response.ok) {
+        setValues(pre => {
+          return pre.filter(obj => obj._id !== id)
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchData = async () => {
+    try {
+      const response = await HrServices.fetchResignations();
+      setValues(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchData()
+  }, [counter])
 
   return (
     <React.Fragment>
@@ -97,15 +137,15 @@ const Resignation = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
                       <TableRow
                         hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={payslip._id}
+                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
                         <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.noticeDate}</TableCell>
-                        <TableCell>{payslip.resignationDate}</TableCell>
+                        <TableCell>{payslip.notice_date}</TableCell>
+                        <TableCell>{payslip.resignation_date}</TableCell>
                         <TableCell>{payslip.description}</TableCell>
                         <TableCell>
                           <Grid container>
@@ -113,7 +153,7 @@ const Resignation = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <EditRoundedIcon />
@@ -124,7 +164,7 @@ const Resignation = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={handleDelete.bind(this, payslip._id)}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -151,7 +191,7 @@ const Resignation = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateResignationModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateResignationModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
     </React.Fragment>
   );
 };

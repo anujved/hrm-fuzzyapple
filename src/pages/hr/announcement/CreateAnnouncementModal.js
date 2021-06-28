@@ -20,6 +20,45 @@ const leaveTypes = [
 ];
 
 const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
+
+  const formik = useFormik({
+    initialValues: {
+      announcement_title: "",
+      branch: "",
+      department: "",
+      description: "",
+      employee: "",
+      announcement_start_date: new Date(),
+      announcement_end_date: new Date(),
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.announcement_title.length === 0) {
+        errors.announcement_title_Error = "required";
+      }
+      if (values.branch.length === 0) {
+        errors.branchError = "required";
+      }
+      if (values.department.length === 0) {
+        errors.departmentError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      if (values.employee.length === 0) {
+        errors.employeeError = "required";
+      }
+      return errors;
+    },
+    validateOnChange: false,
+    onSubmit: (values) => {
+      formik.validateForm(values)
+        .then(() => {
+          onSubmitClickListener(values)
+        })
+    },
+  });
+
   return (
     <div>
       <Dialog
@@ -27,140 +66,141 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
         onClose={onCloseClickListener}
         aria-labelledby="form-dialog-title"
       >
-        <Box py={2} px={4}>
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Announcement</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-              <TextField
-                label="Announcement Title"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
+        <form onSubmit={formik.handleSubmit}>
+          <Box py={2} px={4}>
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Announcement</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Announcement Title"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.titleError}
+                  error={formik.errors.titleError}
+                  onChange={e => formik.setFieldValue("announcement_title", e.target.value)}
+                  id="announcement_title"
+                  select
+                >
                   {leaveTypes &&
                     leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Branch"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Branch"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.branchError}
+                  error={formik.errors.branchError && true}
+                  onChange={e => formik.setFieldValue("branch", e.target.value)}
+                  id="branch"
+                  select
+                >
                   {leaveTypes &&
                     leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Department"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Department"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.departmentError}
+                  error={formik.errors.departmentError}
+                  onChange={e => formik.setFieldValue("department", e.target.value)}
+                  id="department"
+                  select
+                >
                   {leaveTypes &&
                     leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Employee"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.employeeError}
+                  error={formik.errors.employeeError}
+                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  id="employee"
+                  select
+                >
                   {leaveTypes &&
                     leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="MM/dd/yyyy"
+                  id="date-picker"
+                  label="Announcement Start Date"
+                  value={formik.values.announcement_start_date}
+                  fullWidth
+                  onChange={(date) => formik.setFieldValue("announcement_start_date", date)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="MM/dd/yyyy"
+                  id="date-picker"
+                  label="Announcement End Date"
+                  value={formik.values.announcement_end_date}
+                  fullWidth
+                  onChange={(date) => formik.setFieldValue("announcement_end_date", date)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Announcement Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  id="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant="contained" type={"submit"} style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Announcement Start Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Announcement End Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Announcement Description"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button>Cancel</Button>
-            </Grid>
-          </Grid>
-        </Box>
+          </Box>
+        </form>
       </Dialog>
     </div>
   );

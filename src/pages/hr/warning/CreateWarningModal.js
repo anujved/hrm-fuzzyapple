@@ -45,12 +45,13 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
         warning_to: values.warningTo,
         subject: values.subject,
         description: values.description,
-        warning_date: warningDate._d,
+        warning_date: new Date(warningDate),
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
+      setTimeout(onCloseClickListener, 1000)
     },
-    validateOnChange: false,
+    validateOnChange: true,
   });
 
   return (
@@ -61,59 +62,61 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Warning</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-              <TextField
-                label="Warning By"
-                variant="outlined"
-                fullWidth
-                name="warningBy"
-                select
-              >
-                  {employees &&
-                    employees.map((option) => (
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Warning</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Warning By"
+                  variant="outlined"
+                  fullWidth
+                  id="warningBy"
+                  onChange={e => formik.setFieldValue("warningBy", e.target.value)}
+                  select
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Warning To"
-                variant="outlined"
-                fullWidth
-                name="warningTo"
-                select
-              >
-                  {employees &&
-                    employees.map((option) => (
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Warning To"
+                  variant="outlined"
+                  fullWidth
+                  id="warningTo"
+                  onChange={e => formik.setFieldValue("warningTo", e.target.value)}
+                  select
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Subject"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.subjectError}
-                error={formik.errors.subjectError && true}
-                onChange={formik.handleChange}
-                name="subject"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Subject"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.subjectError}
+                  error={formik.errors.subjectError && true}
+                  onChange={formik.handleChange}
+                  id="subject"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
                   disableToolbar
                   autoOk
                   variant="inline"
@@ -122,26 +125,26 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
                   fullWidth
                   onChange={(value) => setWarningDate(value)}
                 />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  id="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.descriptionError}
-                error={formik.errors.descriptionError && true}
-                onChange={formik.handleChange}
-                id="description"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button onClick={onCloseClickListener}>Cancel</Button>
-            </Grid>
-          </Grid>
           </form>
         </Box>
       </Dialog>

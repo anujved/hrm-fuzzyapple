@@ -19,6 +19,7 @@ const leaveTypes = [
   { id: 2, option: "Medical Leave" },
 ];
 
+
 const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, employees, awardTypes }) => {
 
   const [awardDate, setAwardDate] = React.useState(Date.now);
@@ -51,12 +52,16 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
         employee: values.employee,
         award_type: values.awardType,
         description: values.description,
-        award_date: awardDate._d,
+        date: new Date(awardDate),
+        gift: values.gift
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
+      setTimeout(() => {
+        onCloseClickListener()
+      }, 1000);
     },
-    validateOnChange: false,
+    validateOnChange: true,
   });
 
   return (
@@ -67,48 +72,54 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Award</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                name="employee"
-                select
-              >
-                  {employees &&
-                    employees.map((option) => (
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Award</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Employee"
+                  variant="outlined"
+                  fullWidth
+                  id="employee"
+                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  select
+                  error={formik.errors.employeeError}
+                  helperText={formik.errors.employeeError ? formik.errors.employeeError : null}
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Award Type"
-                variant="outlined"
-                fullWidth
-                name="awardType"
-                select
-              >
-                  {awardTypes &&
-                    awardTypes.map((option) => (
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Award Type"
+                  variant="outlined"
+                  fullWidth
+                  id="awardType"
+                  onChange={e => formik.setFieldValue("awardType", e.target.value)}
+                  error={formik.errors.awardTypeError}
+                  helperText={formik.errors.awardTypeError ? formik.errors.employeeError : null}
+                  select
+                >
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
                   disableToolbar
                   autoOk
                   variant="inline"
@@ -117,37 +128,37 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
                   fullWidth
                   onChange={(value) => setAwardDate(value)}
                 />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Gift"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.giftError ? formik.errors.giftError : null}
+                  error={formik.errors.giftError && true}
+                  onChange={formik.handleChange}
+                  id="gift"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError ? formik.errors.descriptionError : null}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  id="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Gift"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.giftError}
-                error={formik.errors.giftError && true}
-                onChange={formik.handleChange}
-                name="gift"
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.descriptionError}
-                error={formik.errors.descriptionError && true}
-                onChange={formik.handleChange}
-                name="description"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button onClick={onCloseClickListener}>Cancel</Button>
-            </Grid>
-          </Grid>
           </form>
         </Box>
       </Dialog>

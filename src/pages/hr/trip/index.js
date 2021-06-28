@@ -24,6 +24,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateTripModal from "./CreateTripModal";
+import HrServices from "src/webservices/hrServices";
+
 
 const payslips = [
   {
@@ -49,6 +51,8 @@ const payslips = [
 const Trip = (props) => {
   const navigate = useNavigate();
 
+  const [values, setValues] = React.useState([])
+  const [counter, setCounter] = React.useState([])
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -68,6 +72,44 @@ const Trip = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await HrServices.createTrip(data);
+      setCounter(pre => pre + 1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await HrServices.deleteTrip(id);
+      console.log("this is delete res : ", response)
+      if (response.ok) {
+        setValues(pre => {
+          return pre.filter(obj => obj._id !== id)
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchData = async () => {
+    try {
+      const response = await HrServices.fetchTrips();
+      setValues(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchData()
+  }, [counter])
 
   return (
     <React.Fragment>
@@ -103,15 +145,15 @@ const Trip = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
                       <TableRow
                         hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={payslip._id}
+                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
                         <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
+                        <TableCell>{payslip.start_date}</TableCell>
+                        <TableCell>{payslip.end_date}</TableCell>
                         <TableCell>{payslip.purposeOfVisit}</TableCell>
                         <TableCell>{payslip.placeOfVisit}</TableCell>
                         <TableCell>{payslip.description}</TableCell>
@@ -121,7 +163,7 @@ const Trip = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <EditRoundedIcon />
@@ -132,7 +174,7 @@ const Trip = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={handleDelete.bind(this, payslip._id)}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -159,7 +201,7 @@ const Trip = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTripModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateTripModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
     </React.Fragment>
   );
 };

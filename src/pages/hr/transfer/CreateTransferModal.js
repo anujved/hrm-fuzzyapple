@@ -9,6 +9,7 @@ import {
   IconButton,
   MenuItem,
   Menu,
+  FormHelperText
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
@@ -49,15 +50,16 @@ const CreateTransferModal = ({
     onSubmit: (values) => {
       const data = {
         employee: values.employee,
-        branch: values.awardType,
+        branch: values.branch,
         department: values.department,
         description: values.description,
         transfer_date: transferDate._d,
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
+      setTimeout(onCloseClickListener, 1000)
     },
-    validateOnChange: false,
+    validateOnChange: true,
   });
 
   return (
@@ -81,11 +83,12 @@ const CreateTransferModal = ({
                   label="Employee"
                   variant="outlined"
                   fullWidth
-                  name="employee"
+                  id="employee"
+                  onChange={e => formik.setFieldValue("employee", e.target.value)}
                   select
                 >
-                  {employees &&
-                    employees.map((option) => (
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -97,11 +100,12 @@ const CreateTransferModal = ({
                   label="Branch"
                   variant="outlined"
                   fullWidth
-                  name="branch"
+                  id="branch"
+                  onChange={e => formik.setFieldValue("branch", e.target.value)}
                   select
                 >
-                  {branches &&
-                    branches.map((option) => (
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
@@ -113,11 +117,12 @@ const CreateTransferModal = ({
                   label="Department"
                   variant="outlined"
                   fullWidth
-                  name="department"
+                  id="department"
+                  onChange={e => formik.setFieldValue("department", e.target.value)}
                   select
                 >
-                  {departments &&
-                    departments.map((option) => (
+                  {leaveTypes &&
+                    leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>

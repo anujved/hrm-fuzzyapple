@@ -27,6 +27,7 @@ import EmployeeService from "src/webservices/employeeService";
 import Progress from "src/common/loader";
 import TimesheetService from "src/webservices/timesheetService";
 import moment from 'moment';
+import { SignalCellularNullSharp } from "@material-ui/icons";
 
 const ManageTimesheet = (props) => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const ManageTimesheet = (props) => {
   const [employees, setEmployees] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [timesheets, setTimesheets] = React.useState([]);
+  const [updateTimeSheet, setUpdateTimeSheet] = React.useState(null);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -68,19 +70,60 @@ const ManageTimesheet = (props) => {
     try {
       const response = await TimesheetService.fetchAllTimesheet();
       setTimesheets(response);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const onSubmitClickListener = async (values) => {
     setOpenDialog(false);
     try {
       const response = await TimesheetService.createTimesheet(values);
-      console.log("-Create-Success-", response);
       fetchTimesheets();
     } catch (error) {
       console.log("-Create-Error-", error);
     }
   };
+
+  const handleEdit = (id, e) => {
+    const { date, employee, hours, remark } = timesheets.find(obj => obj._id === id)
+    const updateTimesheetObject = {
+      initialValues: { date: date.valueOf(), employee, hours, remark },
+      onUpdate: async () => {
+        try {
+          // const response = await TimesheetService.updateTimeSheet(values);
+          const response = null
+          // setTimesheets(response)
+          console.log("submitting the form")
+
+        } catch (error) {
+          console.log("-Create-Error-", error);
+        } finally {
+          setUpdateTimeSheet(null)
+        }
+
+      },
+      onClose: () => {
+        setUpdateTimeSheet(null)
+      }
+    }
+    setUpdateTimeSheet(updateTimesheetObject)
+    setOpenDialog(true);
+  }
+
+  const handleDelete = async (id, e) => {
+    try {
+      const response = await TimesheetService.deleteTimesheet({ id: id });
+      if (response.ok) {
+        setTimesheets((pre) => {
+          const filteredArray = pre.filter(obj => obj._id !== id)
+          return filteredArray
+        })
+      } else {
+        throw new Error("Error occured!")
+      }
+    } catch (error) {
+      console.log("-delete-Error-", error);
+    }
+  }
 
   React.useEffect(() => {
     fetchEmployees();
@@ -126,7 +169,7 @@ const ManageTimesheet = (props) => {
                           <TableRow hover key={index}>
                             <TableCell>{timesheet.employee}</TableCell>
                             <TableCell>
-                            {moment(timesheet.created_at).format("DD/MM/YYYY")}
+                              {moment(timesheet.created_at).format("DD/MM/YYYY")}
                             </TableCell>
                             <TableCell>{timesheet.hours}</TableCell>
                             <TableCell>{timesheet.remark}</TableCell>
@@ -135,7 +178,7 @@ const ManageTimesheet = (props) => {
                                 <Grid>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={handleEdit.bind(this, timesheet._id)}
                                     color="primary"
                                   >
                                     <EditRoundedIcon />
@@ -144,7 +187,8 @@ const ManageTimesheet = (props) => {
                                 <Grid>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={handleDelete.bind(this, timesheet.
+                                      _id)}
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -176,6 +220,7 @@ const ManageTimesheet = (props) => {
         onCloseClickListener={onDialogCloseClickListener}
         employees={employees}
         onSubmitClickListener={onSubmitClickListener}
+        updateTimeSheet={updateTimeSheet}
       />
     </React.Fragment>
   );

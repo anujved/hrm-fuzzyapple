@@ -64,3 +64,69 @@ export const DELETE_MEETING = '/delete-meeting/';
 export const CREATE_ASSET = '/create-asset';
 export const FETCH_ASSETS = '/assets';
 export const DELETE_ASSET = '/delete-asset/';
+
+
+// ****** Awards *********
+export const CREATE_AWARD = '/create-award';
+export const FETCH_AWARDS = '/awards';
+export const DELETE_AWARD = '/delete-award';
+
+
+// ****** Transfer *********
+export const CREATE_TRANSFER = '/create-transfer';
+export const FETCH_TRANSFERS = '/transfers';
+export const DELETE_TRANSFER = '/delete-transfer';
+
+
+
+// ****** Resignation *********
+export const CREATE_RESIGNATION = '/create-resignation';
+export const FETCH_RESIGNATIONS = '/resignations';
+export const DELETE_RESIGNATION = '/delete-resignation';
+
+
+
+// ****** Trip *********
+export const CREATE_TRIP = '/create-trip';
+export const FETCH_TRIPS = '/trips';
+export const DELETE_TRIP = '/delete-trip';
+
+
+// ****** Promotion *********
+export const CREATE_PROMOTION = '/create-promotion';
+export const FETCH_PROMOTIONS = '/promotions';
+export const DELETE_PROMOTION = '/delete-promotion';
+
+
+
+// ****** Complaints *********
+export const CREATE_COMPLAINT = '/create-complaint';
+export const FETCH_COMPLAINTS = '/complaints';
+export const DELETE_COMPLAINT = '/delete-complaint';
+
+
+// ****** WARNING *********
+export const CREATE_WARNING = '/create-warning';
+export const FETCH_WARNINGS = '/warnings';
+export const DELETE_WARNING = '/delete-warning';
+
+
+
+// ****** Termination *********
+export const CREATE_TERMINATION = '/create-termination';
+export const FETCH_TERMINATIONS = '/terminations';
+export const DELETE_TERMINATION = '/delete-termination';
+
+
+
+// ****** Announcement *********
+export const CREATE_ANNOUNCEMENT = '/create-announcement';
+export const FETCH_ANNOUNCEMENTS = '/announcements';
+export const DELETE_ANNOUNCEMENT = '/delete-announcement';
+
+
+
+// ****** Holidays *********
+export const CREATE_HOLIDAY = '/create-holiday';
+export const FETCH_HOLIDAYS = '/holidays';
+export const DELETE_HOLIDAY = '/delete-holiday';

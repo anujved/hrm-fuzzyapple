@@ -24,6 +24,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateComplaintModal from "./CreateComplaintModal";
+import HrServices from "src/webservices/hrServices";
+
 
 const payslips = [
   {
@@ -47,6 +49,8 @@ const payslips = [
 const Complaints = (props) => {
   const navigate = useNavigate();
 
+  const [values, setValues] = React.useState([])
+  const [counter, setCounter] = React.useState([])
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -66,6 +70,44 @@ const Complaints = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await HrServices.createComplaint(data);
+      setCounter(pre => pre + 1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await HrServices.deleteComplaint(id);
+      console.log("this is delete res : ", response)
+      if (response.ok) {
+        setValues(pre => {
+          return pre.filter(obj => obj._id !== id)
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchData = async () => {
+    try {
+      const response = await HrServices.fetchComplaints();
+      setValues(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchData()
+  }, [counter])
 
   return (
     <React.Fragment>
@@ -100,11 +142,11 @@ const Complaints = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
                       <TableRow
                         hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={payslip._id}
+                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
                         <TableCell>{payslip.complaintFrom}</TableCell>
                         <TableCell>{payslip.compalintAgainst}</TableCell>
@@ -117,7 +159,7 @@ const Complaints = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <EditRoundedIcon />
@@ -128,7 +170,7 @@ const Complaints = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={handleDelete.bind(this, payslip._id)}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -155,7 +197,7 @@ const Complaints = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateComplaintModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateComplaintModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
     </React.Fragment>
   );
 };

@@ -20,6 +20,41 @@ const leaveTypes = [
 ];
 
 const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
+
+  const [noticeDate, setNoticeDate] = React.useState(new Date())
+  const [terminationDate, setTerminationDate] = React.useState(new Date())
+
+  const formik = useFormik({
+    initialValues: {
+      employee: "",
+      termination_type: "",
+      notice_date: "",
+      termination_date: "",
+      description: ""
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.employee.length === 0) {
+        errors.employeeError = "required";
+      }
+      if (values.description.length === 0) {
+        errors.descriptionError = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      // alert(JSON.stringify(data));
+      const data = {
+        ...values,
+        notice_date: noticeDate,
+        termination_date: terminationDate
+      }
+      onSubmitClickListener(data);
+      setTimeout(onCloseClickListener, 1000)
+    },
+    validateOnChange: true,
+  });
+
   return (
     <div>
       <Dialog
@@ -27,102 +62,102 @@ const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListe
         onClose={onCloseClickListener}
         aria-labelledby="form-dialog-title"
       >
-        <Box py={2} px={4}>
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Termination</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
+        <form onSubmit={formik.handleSubmit} autoComplete={"off"}>
+          <Box py={2} px={4}>
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Termination</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Employee"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.employeeError}
+                  error={formik.errors.employeeError && true}
+                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  id="employee"
+                  select
+                >
                   {leaveTypes &&
                     leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Termination Type"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                select
-              >
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Termination Type"
+                  variant="outlined"
+                  fullWidth
+                  onChange={e => formik.setFieldValue("termination_type", e.target.value)}
+                  id="termination_type"
+                  select
+                >
                   {leaveTypes &&
                     leaveTypes.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
                         {option.option}
                       </MenuItem>
                     ))}
-              </TextField>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="MM/dd/yyyy"
+                  id="date-picker"
+                  label="Notice Date"
+                  value={noticeDate}
+                  fullWidth
+                  onChange={(date) => setNoticeDate(date)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="MM/dd/yyyy"
+                  id="date-picker"
+                  label="Termination Date"
+                  value={terminationDate}
+                  fullWidth
+                  onChange={(date) => setTerminationDate(date)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError}
+                  onChange={formik.handleChange}
+                  id="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant="contained" type="submit" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Notice Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Termination Date"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button>Cancel</Button>
-            </Grid>
-          </Grid>
-        </Box>
+          </Box>
+        </form>
       </Dialog>
     </div>
   );
