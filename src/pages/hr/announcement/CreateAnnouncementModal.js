@@ -14,12 +14,15 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
-const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
+const CreateAnnouncementModal = ({
+  open,
+  branches,
+  departments,
+  employees,
+  onCloseClickListener,
+  onSubmitClickListener,
+}) => {
+  const [announcement, setAnnouncement] = React.useState(0);
 
   const formik = useFormik({
     initialValues: {
@@ -52,10 +55,9 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
     },
     validateOnChange: false,
     onSubmit: (values) => {
-      formik.validateForm(values)
-        .then(() => {
-          onSubmitClickListener(values)
-        })
+      formik.validateForm(values).then(() => {
+        onSubmitClickListener(values);
+      });
     },
   });
 
@@ -82,16 +84,12 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                   fullWidth
                   helperText={formik.errors.titleError}
                   error={formik.errors.titleError}
-                  onChange={e => formik.setFieldValue("announcement_title", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("announcement_title", e.target.value)
+                  }
                   id="announcement_title"
-                  select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
-                      </MenuItem>
-                    ))}
+                  {announcement}
                 </TextField>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -101,14 +99,16 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                   fullWidth
                   helperText={formik.errors.branchError}
                   error={formik.errors.branchError && true}
-                  onChange={e => formik.setFieldValue("branch", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("branch", e.target.value)
+                  }
                   id="branch"
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {branches &&
+                    branches.map((option) => (
+                      <MenuItem key={option._id} value={option}>
+                        {option.branchName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -120,14 +120,16 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                   fullWidth
                   helperText={formik.errors.departmentError}
                   error={formik.errors.departmentError}
-                  onChange={e => formik.setFieldValue("department", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("department", e.target.value)
+                  }
                   id="department"
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {departments &&
+                    departments.map((option) => (
+                      <MenuItem key={option._id} value={option}>
+                        {option.name}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -139,14 +141,16 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                   fullWidth
                   helperText={formik.errors.employeeError}
                   error={formik.errors.employeeError}
-                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("employee", e.target.value)
+                  }
                   id="employee"
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -160,7 +164,9 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                   label="Announcement Start Date"
                   value={formik.values.announcement_start_date}
                   fullWidth
-                  onChange={(date) => formik.setFieldValue("announcement_start_date", date)}
+                  onChange={(date) =>
+                    formik.setFieldValue("announcement_start_date", date)
+                  }
                   KeyboardButtonProps={{
                     "aria-label": "change date",
                   }}
@@ -175,7 +181,9 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                   label="Announcement End Date"
                   value={formik.values.announcement_end_date}
                   fullWidth
-                  onChange={(date) => formik.setFieldValue("announcement_end_date", date)}
+                  onChange={(date) =>
+                    formik.setFieldValue("announcement_end_date", date)
+                  }
                   KeyboardButtonProps={{
                     "aria-label": "change date",
                   }}
@@ -194,7 +202,11 @@ const CreateAnnouncementModal = ({ open, onCloseClickListener, onSubmitClickList
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button variant="contained" type={"submit"} style={{ marginRight: 10 }}>
+                <Button
+                  variant="contained"
+                  type={"submit"}
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
               </Grid>

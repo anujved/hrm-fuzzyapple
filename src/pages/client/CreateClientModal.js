@@ -15,12 +15,14 @@ import ConstantService from "src/webservices/constantsService";
 import EmployeeService from "src/webservices/employeeService";
 import { useFormik } from "formik";
 
-const CreateMeetingModal = ({
+const CreateClientModal = ({
   open,
   onCloseClickListener,
-  branches,
-  employees,
-  departments,
+  name,
+  status,
+  company,
+  address,
+  phone,
   onSubmitClickListener,
 }) => {
   const [meetingDate, setMeetingDate] = useState(Date.now);
@@ -28,28 +30,33 @@ const CreateMeetingModal = ({
 
   const formik = useFormik({
     initialValues: {
-      branch: "",
-      employee: "",
-      department: "",
-      meetingTitle: "",
-      meetintNote: "",
+      name: "",
+      status: "",
+      company: "",
+      address: "",
+      phone: "",
     },
     validate: (values) => {
       const errors = {};
-      if (values.meetingTitle.length === 0) {
-        errors.meetingTitleError = "required";
+      if (values.name.length === 0) {
+        errors.nameError = "required";
       }
-      if (values.meetingNote.length === 0) {
-        errors.meetingNoteError = "required";
+      if (values.status.length === 0) {
+        errors.statusError = "required";
+      }
+      if (values.phone.length === 0) {
+        errors.phoneError = "required";
       }
       return errors;
     },
     onSubmit: (values) => {
       const data = {
-        meeting_title: values.meetingTitle,
-        meeting_note: values.meetingNote,
-        meeting_date: meetingDate._d,
-        meeting_time: meetingTime._d,
+        name: values.name,
+        status: values.status,
+        company: values.company,
+        phone: values.phone,
+        address: values.address,
+        phone: values.phone,
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
@@ -63,7 +70,7 @@ const CreateMeetingModal = ({
         <Box py={2} px={4}>
           <form onSubmit={formik.handleSubmit} autoComplete="off">
             <Grid container justifyContent="space-between" alignItems="center">
-              <Typography>Create New Meeting</Typography>
+              <Typography>Create New Client</Typography>
               <IconButton onClick={onCloseClickListener}>
                 <CancelIcon />
               </IconButton>
@@ -71,97 +78,67 @@ const CreateMeetingModal = ({
             <Grid container spacing={3}>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Branch"
+                  label="Name"
                   variant="outlined"
                   fullWidth
                   onChange={formik.handleChange}
-                  name="branch"
-                  select
+                  helperText={formik.errors.nameError}
+                  error={formik.errors.nameError && true}
+                  name="name"
                 >
-                  {branches &&
-                    branches.map((option) => (
-                      <MenuItem key={option._id} value={option}>
-                        {option.branchName}
-                      </MenuItem>
-                    ))}
+                  {name}
                 </TextField>
               </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Department"
+                  label="Status"
                   variant="outlined"
                   fullWidth
                   onChange={formik.handleChange}
-                  name="department"
-                  select
+                  helperText={formik.errors.statusError}
+                  error={formik.errors.statusError && true}
+                  name="status"
                 >
-                  {departments &&
-                    departments.map((option) => (
-                      <MenuItem key={option._id} value={option}>
-                        {option.name}
-                      </MenuItem>
-                    ))}
+                  {status}
                 </TextField>
               </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Employee"
+                  label="Company"
                   variant="outlined"
                   fullWidth
                   onChange={formik.handleChange}
-                  name="employee"
-                  select
+                  name="company"
                 >
-                  {employees &&
-                    employees.map((option, index) => (
-                      <MenuItem key={index} value={option}>
-                        {option.personalDetail.employeeName}
-                      </MenuItem>
-                    ))}
+                  {company}
                 </TextField>
               </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Meeting Title"
+                  label="address"
                   variant="outlined"
                   fullWidth
                   helperText={formik.errors.meetingTitleError}
                   error={formik.errors.meetingTitleError && true}
                   onChange={formik.handleChange}
-                  name="meetingTitle"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <KeyboardDatePicker
-                  disableToolbar
-                  autoOk
-                  variant="inline"
-                  format="DD/MM/yyyy"
-                  label="Meeting Date"
-                  fullWidth
-                  onChange={(value) => setMeetingDate(value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <KeyboardTimePicker
-                  label="Meeting Time"
-                  variant="inline"
-                  mask="__:__ _M"
-                  value={meetingTime}
-                  onChange={(date) => setMeetingTime(date)}
-                />
+                  name="address"
+                >
+                  {address}
+                </TextField>
               </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Meeting Note"
+                  label="phone"
                   variant="outlined"
                   fullWidth
-                  helperText={formik.errors.meetingNoteError}
-                  error={formik.errors.meetingNoteError && true}
+                  helperText={formik.errors.phoneError}
+                  error={formik.errors.phoneError && true}
                   onChange={formik.handleChange}
-                  name="meetingNote"
+                  name="phone"
                   multiline
-                />
+                >
+                  {phone}
+                </TextField>
               </Grid>
               <Grid item xs={12} md={12}>
                 <Button
@@ -181,4 +158,4 @@ const CreateMeetingModal = ({
   );
 };
 
-export default CreateMeetingModal;
+export default CreateClientModal;

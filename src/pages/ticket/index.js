@@ -25,6 +25,7 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateTicketModal from "./CreateTicketModal";
 import ReplyIcon from "@material-ui/icons/Reply";
+import ConstantService from "src/webservices/constantsService";
 import EmployeeService from "src/webservices/employeeService";
 import Progress from "src/common/loader";
 import TicketService from "src/webservices/ticketService";
@@ -38,12 +39,28 @@ const Ticket = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [employees, setEmployees] = React.useState([]);
+  const [branches, setBranches] = React.useState([]);
+  const [departments, setdepartments] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [tickets, setTickets] = React.useState([]);
   const [ticket, setTicket] = React.useState(null);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+
+  const getBranches = async () => {
+    try {
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    } catch (error) {}
+  };
+
+  const getDepartments = async () => {
+    try {
+      const response = await ConstantService.fetchAllDepartment();
+      setdepartments(response);
+    } catch (error) {}
+  };
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -131,6 +148,8 @@ const Ticket = (props) => {
   React.useEffect(() => {
     fetchEmployees();
     getTickets();
+    getDepartments();
+    getBranches();
   }, []);
 
   return (
@@ -163,6 +182,8 @@ const Ticket = (props) => {
                         <TableCell>Title</TableCell>
                         <TableCell>Ticket Code</TableCell>
                         <TableCell>Employee</TableCell>
+                        <TableCell>Branch</TableCell>
+                        <TableCell>Department</TableCell>
                         <TableCell>Priority</TableCell>
                         <TableCell>End Date</TableCell>
                         <TableCell>Desciption</TableCell>
@@ -177,7 +198,11 @@ const Ticket = (props) => {
                           </TableCell>
                           <TableCell>{ticket.subject}</TableCell>
                           <TableCell>{ticket.ticketCode}</TableCell>
-                          <TableCell>{ticket.employee}</TableCell>
+                          <TableCell>
+                            {ticket.employee.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>{ticket.branch?.branchName}</TableCell>
+                          <TableCell>{ticket.department.name}</TableCell>
                           <TableCell>{ticket.priority}</TableCell>
                           <TableCell>
                             {moment(ticket.endDate).format("DD/MM/YYYY")}
@@ -232,6 +257,8 @@ const Ticket = (props) => {
       </Box>
       <CreateTicketModal
         open={openDialog}
+        branches={branches}
+        departments={departments}
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
         employees={employees}

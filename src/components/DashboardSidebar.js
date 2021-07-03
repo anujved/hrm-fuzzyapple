@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { useEffect } from "react";
+import { Link as RouterLink, useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 import {
   Avatar,
   Box,
@@ -9,8 +9,8 @@ import {
   Drawer,
   Hidden,
   List,
-  Typography
-} from '@material-ui/core';
+  Typography,
+} from "@material-ui/core";
 import {
   AlertCircle as AlertCircleIcon,
   BarChart as BarChartIcon,
@@ -19,453 +19,459 @@ import {
   ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
   UserPlus as UserPlusIcon,
-  Users as UsersIcon
-} from 'react-feather';
-import NavItem from './NavItem';
-import NavItem2 from './NavItem2';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+  Users as UsersIcon,
+} from "react-feather";
+import NavItem from "./NavItem";
+import NavItem2 from "./NavItem2";
+import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith'
+  avatar: "/static/images/avatars/avatar_6.png",
+  jobTitle: "Senior Developer",
+  name: "lucy Smith",
 };
 
 const items = [
   {
-    href: '/',
+    href: "/",
     icon: BarChartIcon,
-    title: 'Dashboard'
+    title: "Dashboard",
   },
   {
-    href: '/dashboard/staff',
+    href: "/dashboard/staff",
     icon: UsersIcon,
-    title: 'Staff',
+    title: "Staff",
     items: [
       {
-        href: '/staff/user',
+        href: "/staff/user",
         icon: ShoppingBagIcon,
-        title: 'User'
+        title: "User",
       },
       {
-        href: '/staff/role',
+        href: "/staff/role",
         icon: ShoppingBagIcon,
-        title: 'Role'
+        title: "Role",
       },
       {
-        href: '/staff/employee-profile',
+        href: "/staff/employee-profile",
         icon: ShoppingBagIcon,
-        title: 'Employee Profile'
+        title: "Employee Profile",
       },
       {
-        href: '/staff/last-login',
+        href: "/staff/last-login",
         icon: ShoppingBagIcon,
-        title: 'Last Login'
-      }
-    ]
+        title: "Last Login",
+      },
+    ],
   },
   {
-    href: '/dashboard/employee',
+    href: "/dashboard/employee",
     icon: BarChartIcon,
-    title: 'Employee'
+    title: "Employee",
   },
   {
-    href: '/dashboard/payroll',
+    href: "/dashboard/payroll",
     icon: UsersIcon,
-    title: 'Payroll',
+    title: "Payroll",
     items: [
       {
-        href: '/payroll/set-salary',
+        href: "/payroll/set-salary",
         icon: ShoppingBagIcon,
-        title: 'Set Salary'
+        title: "Set Salary",
       },
       {
-        href: '/payroll/pay-slip',
+        href: "/payroll/pay-slip",
         icon: ShoppingBagIcon,
-        title: 'Pay Slip'
-      }
-    ]
+        title: "Pay Slip",
+      },
+    ],
   },
   {
-    href: '/dashboard/timesheet',
+    href: "/dashboard/timesheet",
     icon: ShoppingBagIcon,
-    title: 'TimeSheet',
+    title: "TimeSheet",
     items: [
       {
-        href: '/timesheet/manage-timesheet',
+        href: "/timesheet/manage-timesheet",
         icon: ShoppingBagIcon,
-        title: 'TimeSheet'
+        title: "TimeSheet",
       },
       {
-        href: '/timesheet/manage-leave',
+        href: "/timesheet/manage-leave",
         icon: ShoppingBagIcon,
-        title: 'Manage Leave'
+        title: "Manage Leave",
       },
       {
-        href: '/dashboard/attendance',
+        href: "/dashboard/attendance",
         icon: ShoppingBagIcon,
-        title: 'Attendance',
+        title: "Attendance",
         items: [
           {
-            href: '/timesheet/attendance/manage-marked-attendance',
+            href: "/timesheet/attendance/manage-marked-attendance",
             icon: ShoppingBagIcon,
-            title: 'Manrked Attendance'
-          },{
-            href: '/timesheet/attendance/manage-bulk-attendance',
-            icon: ShoppingBagIcon,
-            title: 'Bulk Attendance'
+            title: "Manrked Attendance",
           },
-        ]
-      }
-    ]
+          {
+            href: "/timesheet/attendance/manage-bulk-attendance",
+            icon: ShoppingBagIcon,
+            title: "Bulk Attendance",
+          },
+        ],
+      },
+    ],
   },
   {
-    href: '/dashboard/performance',
+    href: "/dashboard/performance",
     icon: UsersIcon,
-    title: 'Performance',
+    title: "Performance",
     items: [
       {
-        href: '/performance/indicator',
+        href: "/performance/indicator",
         icon: ShoppingBagIcon,
-        title: 'Indicator'
+        title: "Indicator",
       },
       {
-        href: '/performance/appraisal',
+        href: "/performance/appraisal",
         icon: ShoppingBagIcon,
-        title: 'Appraisal'
+        title: "Appraisal",
       },
       {
-        href: '/performance/goal-tracking',
+        href: "/performance/goal-tracking",
         icon: ShoppingBagIcon,
-        title: 'Goal Tracking'
-      }
-    ]
+        title: "Goal Tracking",
+      },
+    ],
   },
   {
-    href: '/dashboard/finance',
+    href: "/dashboard/finance",
     icon: UsersIcon,
-    title: 'Finance',
+    title: "Finance",
     items: [
       {
-        href: '/finance/account-list',
+        href: "/finance/account-list",
         icon: ShoppingBagIcon,
-        title: 'Account List'
+        title: "Account List",
       },
       {
-        href: '/finance/payees',
+        href: "/finance/payees",
         icon: ShoppingBagIcon,
-        title: 'Payees'
+        title: "Payees",
       },
       {
-        href: '/finance/payers',
+        href: "/finance/payers",
         icon: ShoppingBagIcon,
-        title: 'Payers'
+        title: "Payers",
       },
       {
-        href: '/finance/deposit',
+        href: "/finance/deposit",
         icon: ShoppingBagIcon,
-        title: 'Deposit'
+        title: "Deposit",
       },
       {
-        href: '/finance/expense',
+        href: "/finance/expense",
         icon: ShoppingBagIcon,
-        title: 'Expense'
+        title: "Expense",
       },
       {
-        href: '/finance/transfer-balance',
+        href: "/finance/transfer-balance",
         icon: ShoppingBagIcon,
-        title: 'Transfer Balance'
-      }
-    ]
+        title: "Transfer Balance",
+      },
+    ],
   },
   {
-    href: '/dashboard/training',
+    href: "/dashboard/training",
     icon: UsersIcon,
-    title: 'Training',
+    title: "Training",
     items: [
       {
-        href: '/training/training-list',
+        href: "/training/training-list",
         icon: ShoppingBagIcon,
-        title: 'Training List'
+        title: "Training List",
       },
       {
-        href: '/training/trainer',
+        href: "/training/trainer",
         icon: ShoppingBagIcon,
-        title: 'Trainer'
+        title: "Trainer",
       },
-    ]
+    ],
   },
   {
-    href: '/dashboard/hr',
+    href: "/dashboard/hr",
     icon: UsersIcon,
-    title: 'HR',
+    title: "HR",
     items: [
       {
-        href: '/hr/award',
+        href: "/hr/award",
         icon: ShoppingBagIcon,
-        title: 'Award'
+        title: "Award",
       },
       {
-        href: '/hr/transfer',
+        href: "/hr/transfer",
         icon: ShoppingBagIcon,
-        title: 'Transfer'
+        title: "Transfer",
       },
       {
-        href: '/hr/resignation',
+        href: "/hr/resignation",
         icon: ShoppingBagIcon,
-        title: 'Resignation'
+        title: "Resignation",
       },
       {
-        href: '/hr/trip',
+        href: "/hr/trip",
         icon: ShoppingBagIcon,
-        title: 'Trip'
+        title: "Trip",
       },
       {
-        href: '/hr/promotion',
+        href: "/hr/promotion",
         icon: ShoppingBagIcon,
-        title: 'Promotion'
+        title: "Promotion",
       },
       {
-        href: '/hr/complaints',
+        href: "/hr/complaints",
         icon: ShoppingBagIcon,
-        title: 'Compliants'
+        title: "Compliants",
       },
       {
-        href: '/hr/warning',
+        href: "/hr/warning",
         icon: ShoppingBagIcon,
-        title: 'Warning'
+        title: "Warning",
       },
       {
-        href: '/hr/termination',
+        href: "/hr/termination",
         icon: ShoppingBagIcon,
-        title: 'Termination'
+        title: "Termination",
       },
       {
-        href: '/hr/announcement',
+        href: "/hr/announcement",
         icon: ShoppingBagIcon,
-        title: 'Announcement'
+        title: "Announcement",
       },
       {
-        href: '/dashboard/holidays',
+        href: "/dashboard/holidays",
         icon: ShoppingBagIcon,
-        title: 'Holidays'
+        title: "Holidays",
       },
-    ]
+    ],
   },
   {
-    href: '/dashboard/recruitment',
+    href: "/dashboard/recruitment",
     icon: UsersIcon,
-    title: 'Recruitment',
+    title: "Recruitment",
     items: [
       {
-        href: '/recruitment/jobs ',
+        href: "/recruitment/jobs ",
         icon: ShoppingBagIcon,
-        title: 'Jobs'
+        title: "Jobs",
       },
       {
-        href: '/dashboard/job-application',
+        href: "/dashboard/job-application",
         icon: ShoppingBagIcon,
-        title: 'Job Application'
+        title: "Job Application",
       },
       {
-        href: '/dashboard/job-candidate',
+        href: "/dashboard/job-candidate",
         icon: ShoppingBagIcon,
-        title: 'Job Candidate'
+        title: "Job Candidate",
       },
       {
-        href: '/dashboard/job-onboard',
+        href: "/dashboard/job-onboard",
         icon: UserIcon,
-        title: 'Job OnBoard'
+        title: "Job OnBoard",
       },
       {
-        href: '/dashboard/custom-question',
+        href: "/dashboard/custom-question",
         icon: UserIcon,
-        title: 'Custom Question'
+        title: "Custom Question",
       },
       {
-        href: '/dashboard/interview-schedule',
+        href: "/dashboard/interview-schedule",
         icon: UserIcon,
-        title: 'Interview Schedule'
+        title: "Interview Schedule",
       },
       {
-        href: '/dashboard/career',
+        href: "/dashboard/career",
         icon: UserIcon,
-        title: 'Career'
+        title: "Career",
       },
-    ]
+    ],
   },
   {
-    href: '/dashboard/messenger',
+    href: "/dashboard/messenger",
     icon: UserIcon,
-    title: 'Messenger'
+    title: "Messenger",
   },
   {
-    href: '/dashboard/ticket',
+    href: "/dashboard/ticket",
     icon: UserIcon,
-    title: 'Ticket'
+    title: "Ticket",
   },
   {
-    href: '/event',
+    href: "/event",
     icon: UserIcon,
-    title: 'Event'
+    title: "Event",
   },
   {
-    href: '/dashboard/meeting',
+    href: "/dashboard/meeting",
     icon: UserIcon,
-    title: 'Meeting'
+    title: "Meeting",
   },
   {
-    href: '/dashboard/assets',
+    href: "/dashboard/client",
     icon: UserIcon,
-    title: 'Assets'
+    title: "client",
   },
   {
-    href: '/dashboard/document',
+    href: "/dashboard/assets",
     icon: UserIcon,
-    title: 'Document'
+    title: "Assets",
   },
   {
-    href: '/dashboard/company-policy',
+    href: "/dashboard/document",
     icon: UserIcon,
-    title: 'Company Policy'
+    title: "Document",
   },
   {
-    href: '/dashboard/report',
+    href: "/dashboard/company-policy",
     icon: UserIcon,
-    title: 'Report',
+    title: "Company Policy",
+  },
+  {
+    href: "/dashboard/report",
+    icon: UserIcon,
+    title: "Report",
     items: [
       {
-        href: '/report/income-vs-expense',
+        href: "/report/income-vs-expense",
         icon: UserIcon,
-        title: 'Income Vs Expense'
+        title: "Income Vs Expense",
       },
       {
-        href: '/report/monthly-attendance',
+        href: "/report/monthly-attendance",
         icon: UserIcon,
-        title: 'Monthly Attendance'
+        title: "Monthly Attendance",
       },
       {
-        href: '/report/leave',
+        href: "/report/leave",
         icon: UserIcon,
-        title: 'Leave'
+        title: "Leave",
       },
       {
-        href: '/report/account-statement',
+        href: "/report/account-statement",
         icon: UserIcon,
-        title: 'Account Statement'
+        title: "Account Statement",
       },
       {
-        href: '/report/payroll',
+        href: "/report/payroll",
         icon: UserIcon,
-        title: 'Payroll'
+        title: "Payroll",
       },
       {
-        href: '/report/timesheet',
+        href: "/report/timesheet",
         icon: UserIcon,
-        title: 'Timesheet'
+        title: "Timesheet",
       },
-    ]
+    ],
   },
   {
-    href: '/constant/constant',
+    href: "/constant/constant",
     icon: UserIcon,
-    title: 'Constant',
+    title: "Constant",
     items: [
       {
-        href: '/constant/branch',
+        href: "/constant/branch",
         icon: UserIcon,
-        title: 'Branch'
+        title: "Branch",
       },
       {
-        href: '/constant/department',
+        href: "/constant/department",
         icon: UserIcon,
-        title: 'Department'
+        title: "Department",
       },
       {
-        href: '/constant/designation',
+        href: "/constant/designation",
         icon: UserIcon,
-        title: 'Designation'
+        title: "Designation",
       },
       {
-        href: '/constant/document-type',
+        href: "/constant/document-type",
         icon: UserIcon,
-        title: 'Document Type'
+        title: "Document Type",
       },
       {
-        href: '/constant/award-type',
+        href: "/constant/award-type",
         icon: UserIcon,
-        title: 'Award Type'
+        title: "Award Type",
       },
       {
-        href: '/constant/payslip-type',
+        href: "/constant/payslip-type",
         icon: UserIcon,
-        title: 'Payslip Type'
+        title: "Payslip Type",
       },
       {
-        href: '/constant/allowance-option',
+        href: "/constant/allowance-option",
         icon: UserIcon,
-        title: 'Allowance Option'
+        title: "Allowance Option",
       },
       {
-        href: '/constant/loan-option',
+        href: "/constant/loan-option",
         icon: UserIcon,
-        title: 'Loan Option'
+        title: "Loan Option",
       },
       {
-        href: '/constant/deduction-option',
+        href: "/constant/deduction-option",
         icon: UserIcon,
-        title: 'Deduction Option'
+        title: "Deduction Option",
       },
       {
-        href: '/constant/expense-type',
+        href: "/constant/expense-type",
         icon: UserIcon,
-        title: 'Expense Type'
+        title: "Expense Type",
       },
       {
-        href: '/constant/income-type',
+        href: "/constant/income-type",
         icon: UserIcon,
-        title: 'Income Type'
+        title: "Income Type",
       },
       {
-        href: '/constant/payment-type',
+        href: "/constant/payment-type",
         icon: UserIcon,
-        title: 'Payment Type'
+        title: "Payment Type",
       },
       {
-        href: '/constant/leave-type',
+        href: "/constant/leave-type",
         icon: UserIcon,
-        title: 'Leave Type'
+        title: "Leave Type",
       },
       {
-        href: '/constant/termination-type',
+        href: "/constant/termination-type",
         icon: UserIcon,
-        title: 'Termination Type'
+        title: "Termination Type",
       },
       {
-        href: '/constant/goal-type',
+        href: "/constant/goal-type",
         icon: UserIcon,
-        title: 'Goal Type'
+        title: "Goal Type",
       },
       {
-        href: '/constant/training-type',
+        href: "/constant/training-type",
         icon: UserIcon,
-        title: 'Training Type'
+        title: "Training Type",
       },
       {
-        href: '/constant/job-category',
+        href: "/constant/job-category",
         icon: UserIcon,
-        title: 'Job Category'
+        title: "Job Category",
       },
       {
-        href: '/constant/job-stage',
+        href: "/constant/job-stage",
         icon: UserIcon,
-        title: 'Job Stage'
+        title: "Job Stage",
       },
-    ]
+    ],
   },
   {
-    href: '/dashboard/settings',
+    href: "/dashboard/settings",
     icon: SettingsIcon,
-    title: 'System Setting'
+    title: "System Setting",
   },
   // {
   //   href: '/login',
@@ -496,39 +502,33 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const content = (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%'
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
         sx={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          p: 2
+          alignItems: "center",
+          display: "flex",
+          flexDirection: "column",
+          p: 2,
         }}
       >
         <Avatar
           component={RouterLink}
           src={user.avatar}
           sx={{
-            cursor: 'pointer',
+            cursor: "pointer",
             width: 64,
-            height: 64
+            height: 64,
           }}
           to="/app/account"
         />
-        <Typography
-          color="textPrimary"
-          variant="h5"
-        >
+        <Typography color="textPrimary" variant="h5">
           {user.name}
         </Typography>
-        <Typography
-          color="textSecondary"
-          variant="body2"
-        >
+        <Typography color="textSecondary" variant="body2">
           {user.jobTitle}
         </Typography>
       </Box>
@@ -559,8 +559,8 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           variant="temporary"
           PaperProps={{
             sx: {
-              width: 256
-            }
+              width: 256,
+            },
           }}
         >
           {content}
@@ -575,8 +575,8 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
             sx: {
               width: 256,
               top: 64,
-              height: 'calc(100% - 64px)'
-            }
+              height: "calc(100% - 64px)",
+            },
           }}
         >
           {content}
@@ -588,12 +588,12 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
 
 DashboardSidebar.propTypes = {
   onMobileClose: PropTypes.func,
-  openMobile: PropTypes.bool
+  openMobile: PropTypes.bool,
 };
 
 DashboardSidebar.defaultProps = {
-  onMobileClose: () => { },
-  openMobile: false
+  onMobileClose: () => {},
+  openMobile: false,
 };
 
 export default DashboardSidebar;

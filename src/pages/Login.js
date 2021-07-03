@@ -1,7 +1,8 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import * as Yup from 'yup';
-import { Formik } from 'formik';
+import React from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import * as Yup from "yup";
+import { Formik } from "formik";
 import {
   Box,
   Button,
@@ -9,12 +10,17 @@ import {
   Grid,
   Link,
   TextField,
-  Typography
-} from '@material-ui/core';
-import FacebookIcon from 'src/icons/Facebook';
-import GoogleIcon from 'src/icons/Google';
+  Typography,
+} from "@material-ui/core";
+import loginService from "../webservices/loginService";
+import { StateContext } from "../state/StateProvider";
+import { StateProvider } from "../state/StateProvider";
+// import FacebookIcon from "src/icons/Facebook";
+// import GoogleIcon from "src/icons/Google";
 
-const Login = () => {
+const Login = (props) => {
+  const state = React.useContext(StateContext);
+  const { setLoginState } = state;
   const navigate = useNavigate();
 
   return (
@@ -24,25 +30,37 @@ const Login = () => {
       </Helmet>
       <Box
         sx={{
-          backgroundColor: 'background.default',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'center'
+          backgroundColor: "background.default",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          justifyContent: "center",
         }}
       >
         <Container maxWidth="sm">
           <Formik
             initialValues={{
-              email: 'demo@devias.io',
-              password: 'Password123'
+              email: "luv@gmail.com",
+              password: "123123",
             }}
             validationSchema={Yup.object().shape({
-              email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-              password: Yup.string().max(255).required('Password is required')
+              email: Yup.string()
+                .email("Must be a valid email")
+                .max(255)
+                .required("Email is required"),
+              password: Yup.string().max(255).required("Password is required"),
             })}
-            onSubmit={() => {
-              navigate('/app/dashboard', { replace: true });
+            onSubmit={async (values) => {
+              try {
+                const result = await loginService.login(values);
+                if (result?.success) {
+                  setLoginState("LOGGED_IN");
+                } else {
+                  alert("Invalid Credentials.");
+                }
+              } catch (err) {
+                //TODO: if any error occurs show toast message or alert
+              }
             }}
           >
             {({
@@ -52,34 +70,24 @@ const Login = () => {
               handleSubmit,
               isSubmitting,
               touched,
-              values
+              values,
             }) => (
               <form onSubmit={handleSubmit}>
                 <Box sx={{ mb: 3 }}>
-                  <Typography
-                    color="textPrimary"
-                    variant="h2"
-                  >
+                  <Typography color="textPrimary" variant="h2">
                     Sign in
                   </Typography>
-                  <Typography
+                  {/* <Typography
                     color="textSecondary"
                     gutterBottom
                     variant="body2"
                   >
                     Sign in on the internal platform
-                  </Typography>
+                  </Typography> */}
                 </Box>
-                <Grid
-                  container
-                  spacing={3}
-                >
-                  <Grid
-                    item
-                    xs={12}
-                    md={6}
-                  >
-                    <Button
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    {/* <Button
                       color="primary"
                       fullWidth
                       startIcon={<FacebookIcon />}
@@ -88,14 +96,10 @@ const Login = () => {
                       variant="contained"
                     >
                       Login with Facebook
-                    </Button>
+                    </Button> */}
                   </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    md={6}
-                  >
-                    <Button
+                  <Grid item xs={12} md={6}>
+                    {/* <Button
                       fullWidth
                       startIcon={<GoogleIcon />}
                       onClick={handleSubmit}
@@ -103,13 +107,13 @@ const Login = () => {
                       variant="contained"
                     >
                       Login with Google
-                    </Button>
+                    </Button> */}
                   </Grid>
                 </Grid>
                 <Box
                   sx={{
                     pb: 1,
-                    pt: 3
+                    pt: 3,
                   }}
                 >
                   <Typography
@@ -117,7 +121,7 @@ const Login = () => {
                     color="textSecondary"
                     variant="body1"
                   >
-                    or login with email address
+                    login with email address
                   </Typography>
                 </Box>
                 <TextField
@@ -158,17 +162,9 @@ const Login = () => {
                     Sign in now
                   </Button>
                 </Box>
-                <Typography
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  Don&apos;t have an account?
-                  {' '}
-                  <Link
-                    component={RouterLink}
-                    to="/register"
-                    variant="h6"
-                  >
+                <Typography color="textSecondary" variant="body1">
+                  Don&apos;t have an account?{" "}
+                  <Link component={RouterLink} to="/register" variant="h6">
                     Sign up
                   </Link>
                 </Typography>

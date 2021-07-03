@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Dialog from "@material-ui/core/Dialog";
 import {
   Grid,
-  Typography,
-  Dialog,
-  IconButton,
-  Button,
   TextField,
+  Button,
   Box,
+  Typography,
+  IconButton,
   MenuItem,
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers";
+import EventService from "src/webservices/eventService";
+import ConstantService from "src/webservices/constantsService";
+import EmployeeService from "src/webservices/employeeService";
 import { useFormik } from "formik";
 
 const CreateEventModal = ({
@@ -21,53 +24,56 @@ const CreateEventModal = ({
   departments,
   onSubmitClickListener,
 }) => {
-    const [eventStartDate, setEventStartDate] = React.useState(Date.now);
-    const [eventEndDate, setEventEndDate] = React.useState(Date.now);
+  const [eventStartDate, setEventStartDate] = useState(Date.now());
+  const [eventEndDate, setEventEndDate] = useState(Date.now());
 
-    const formik = useFormik({
-        initialValues: {
-          branch: "",
-          department: "",
-          employee: "",
-          eventTitle: "",
-          description: "",
-        },
-        validate: (values) => {
-          const errors = {};
-          if (values.subject.length === 0) {
-            errors.subjectError = "required";
-          }
-          if (values.description.length === 0) {
-            errors.descriptionError = "required";
-          }
-          return errors;
-        },
-        onSubmit: (values) => {
-          const data = {
-            branch: values.branch,
-            department: values.department,
-            employee: values.employee,
-            event_title: values.eventTitle,
-            description: values.description,
-            event_start_date: eventStartDate._d,
-            event_end_date: eventEndDate._d,
-          };
-          // alert(JSON.stringify(data));
-          onSubmitClickListener(data);
-        },
-        validateOnChange: false,
-      });
+  const formik = useFormik({
+    initialValues: {
+      branch: "",
+      employee: "",
+      department: "",
+      event_title: "",
+      event_color: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.event_title.length === 0) {
+        errors.event_title_error = "required";
+      }
+      if (values.description.length === 0) {
+        errors.description_error = "required";
+      }
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        event_title: values.event_title,
+        event_description: values.description,
+        event_end_date: eventEndDate._d,
+        start_event_date: eventStartDate._d,
+        event_select_color: values.event_color,
+        event_description: values.description,
+      };
+      console.log("--data--", data);
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
-    <>
+    <div>
       <Dialog open={open} onClose={onCloseClickListener}>
         <Box py={2} px={4}>
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Event</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Event</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
+            </Grid>
+            <Grid container spacing={3}>
               <Grid item xs={12} md={12}>
                 <TextField
                   label="Branch"
@@ -124,10 +130,10 @@ const CreateEventModal = ({
                   label="Event Title"
                   variant="outlined"
                   fullWidth
-                  helperText={formik.errors.meetingTitleError}
-                  error={formik.errors.meetingTitleError && true}
+                  helperText={formik.errors.event_title_error}
+                  error={formik.errors.event_title_error && true}
                   onChange={formik.handleChange}
-                  name="eventTitle"
+                  name="event_title"
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -136,46 +142,65 @@ const CreateEventModal = ({
                   autoOk
                   variant="inline"
                   format="DD/MM/yyyy"
-                  label="Start Date"
+                  label="Event Start Date"
                   value={eventStartDate}
                   fullWidth
                   onChange={(value) => setEventStartDate(value)}
                 />
               </Grid>
+
               <Grid item xs={12} md={6}>
                 <KeyboardDatePicker
                   disableToolbar
-                  label="End Date"
-                  variant="inline"
                   autoOk
+                  variant="inline"
                   format="DD/MM/yyyy"
+                  label="Event End Date"
                   value={eventEndDate}
+                  fullWidth
                   onChange={(date) => setEventEndDate(date)}
                 />
               </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
-                  label="Event Note"
+                  label="Enter Event Description"
                   variant="outlined"
                   fullWidth
-                  helperText={formik.errors.meetingNoteError}
-                  error={formik.errors.meetingNoteError && true}
+                  helperText={formik.errors.description_error}
+                  error={formik.errors.description_error && true}
                   onChange={formik.handleChange}
                   name="description"
                   multiline
                 />
               </Grid>
+              {/* <Grid item xs={12} md={6}>
+                <TextField
+                  label="event color"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.description_error}
+                  error={formik.errors.description_error && true}
+                  onChange={formik.handleChange}
+                  name="description"
+                  multiline
+                />
+              </Grid> */}
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button>Cancel</Button>
               </Grid>
             </Grid>
+          </form>
         </Box>
       </Dialog>
-    </>
+    </div>
   );
 };
 
-export default CreateEventModal
+export default CreateEventModal;

@@ -19,9 +19,13 @@ const leaveTypes = [
   { id: 2, option: "Medical Leave" },
 ];
 
-
-const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, employees, awardTypes }) => {
-
+const CreateAwardModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  awardTypes,
+  employees,
+}) => {
   const [awardDate, setAwardDate] = React.useState(Date.now);
 
   const formik = useFormik({
@@ -33,12 +37,7 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
     },
     validate: (values) => {
       const errors = {};
-      if (values.employee.length === 0) {
-        errors.employeeError = "required";
-      }
-      if (values.awardType.length === 0) {
-        errors.awardTypeError = "required";
-      }
+
       if (values.gift.length === 0) {
         errors.giftError = "required";
       }
@@ -53,12 +52,12 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
         award_type: values.awardType,
         description: values.description,
         date: new Date(awardDate),
-        gift: values.gift
+        gift: values.gift,
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
       setTimeout(() => {
-        onCloseClickListener()
+        onCloseClickListener();
       }, 1000);
     },
     validateOnChange: true,
@@ -85,16 +84,14 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
                   label="Employee"
                   variant="outlined"
                   fullWidth
-                  id="employee"
-                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  name="employee"
+                  onChange={formik.handleChange}
                   select
-                  error={formik.errors.employeeError}
-                  helperText={formik.errors.employeeError ? formik.errors.employeeError : null}
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -104,16 +101,14 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
                   label="Award Type"
                   variant="outlined"
                   fullWidth
-                  id="awardType"
-                  onChange={e => formik.setFieldValue("awardType", e.target.value)}
-                  error={formik.errors.awardTypeError}
-                  helperText={formik.errors.awardTypeError ? formik.errors.employeeError : null}
+                  name="awardType"
+                  onChange={formik.handleChange}
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
+                  {employees &&
+                    employees.map((option) => (
                       <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -134,7 +129,9 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
                   label="Gift"
                   variant="outlined"
                   fullWidth
-                  helperText={formik.errors.giftError ? formik.errors.giftError : null}
+                  helperText={
+                    formik.errors.giftError ? formik.errors.giftError : null
+                  }
                   error={formik.errors.giftError && true}
                   onChange={formik.handleChange}
                   id="gift"
@@ -145,7 +142,11 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
                   label="Description"
                   variant="outlined"
                   fullWidth
-                  helperText={formik.errors.descriptionError ? formik.errors.descriptionError : null}
+                  helperText={
+                    formik.errors.descriptionError
+                      ? formik.errors.descriptionError
+                      : null
+                  }
                   error={formik.errors.descriptionError && true}
                   onChange={formik.handleChange}
                   id="description"
@@ -153,7 +154,11 @@ const CreateAwardModal = ({ open, onCloseClickListener, onSubmitClickListener, e
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button onClick={onCloseClickListener}>Cancel</Button>

@@ -19,7 +19,13 @@ const leaveTypes = [
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListener, employees, designations }) => {
+const CreatePromotionModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  employees,
+  designations,
+}) => {
   const [promotionDate, setPromotionDate] = React.useState(Date.now);
 
   const formik = useFormik({
@@ -55,7 +61,7 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
-      setTimeout(onCloseClickListener, 1000)
+      setTimeout(onCloseClickListener, 1000);
     },
     validateOnChange: true,
   });
@@ -84,13 +90,16 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
                   id="employee"
                   helperText={formik.errors.promotionTitleError}
                   error={formik.errors.promotionTitleError && true}
-                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("employee", e.target.value)
+                  }
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {console.log(option.personalDetail.employeeName)}
+                        {option.personDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -103,7 +112,9 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
                   id="designation"
                   helperText={formik.errors.promotionTitleError}
                   error={formik.errors.promotionTitleError && true}
-                  onChange={e => formik.setFieldValue("designation", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("designation", e.target.value)
+                  }
                   select
                 >
                   {leaveTypes &&
@@ -149,7 +160,11 @@ const CreatePromotionModal = ({ open, onCloseClickListener, onSubmitClickListene
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button onClick={onCloseClickListener}>Cancel</Button>

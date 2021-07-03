@@ -17,7 +17,6 @@ import {
   Tooltip,
 } from "@material-ui/core";
 import Header from "src/common/header";
-import axios from "axios";
 import SearchToolBar from "src/common/search-toolbar";
 import { useNavigate } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -25,7 +24,7 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateAwardModal from "./CreateAwardModal";
 import HrServices from "src/webservices/hrServices";
-
+import EmployeeService from "src/webservices/employeeService";
 
 const payslips = [
   {
@@ -34,7 +33,7 @@ const payslips = [
     awardType: "Trophy",
     date: "MAR 4, 2020",
     gift: "certificate",
-    description: 'Loreum Ipsum',
+    description: "Loreum Ipsum",
   },
   {
     id: 2,
@@ -42,26 +41,38 @@ const payslips = [
     awardType: "Trophy",
     date: "MAR 4, 2020",
     gift: "certificate",
-    description: 'Loreum Ipsum',
+    description: "Loreum Ipsum",
   },
 ];
 
 const Award = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([])
-  const [counter, setCounter] = React.useState([])
+  const [values, setValues] = React.useState([]);
+  const [counter, setCounter] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [employees, setEmployees] = React.useState([]);
 
   const onClickListener = () => {
     setOpenDialog(true);
   };
 
+  const fetchEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setLoading(false);
+      setEmployees(response);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -74,39 +85,42 @@ const Award = (props) => {
   const onSubmitClickListener = async (data) => {
     try {
       const response = await HrServices.createAward(data);
-      setCounter(pre => pre + 1)
+      setCounter((pre) => pre + 1);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
     try {
       const response = await HrServices.deleteAward(id);
       // console.log("this is delete res : ", response)
       if (response.ok) {
-        setValues(pre => {
-          return pre.filter(obj => obj._id !== id)
-        })
+        setValues((pre) => {
+          return pre.filter((obj) => obj._id !== id);
+        });
       }
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const fetchData = async () => {
     try {
       const response = await HrServices.fetchAwards();
-      setValues(response)
+      setValues(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   React.useEffect(() => {
-    fetchData()
-  }, [counter])
+    fetchEmployees();
+  }, []);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [counter]);
 
   return (
     <React.Fragment>
@@ -140,44 +154,48 @@ const Award = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip._id}
-                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.award_type}</TableCell>
-                        <TableCell>{payslip.date}</TableCell>
-                        <TableCell>{payslip.gift}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => { }}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {Array.isArray(values) &&
+                      values.slice(0, limit).map((payslip) => (
+                        <TableRow
+                          hover
+                          key={payslip._id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>{payslip.employee}</TableCell>
+                          <TableCell>{payslip.award_type}</TableCell>
+                          <TableCell>{payslip.date}</TableCell>
+                          <TableCell>{payslip.gift}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={handleDelete.bind(
+                                      this,
+                                      payslip._id
+                                    )}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={handleDelete.bind(this, payslip._id)}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
@@ -195,7 +213,12 @@ const Award = (props) => {
         </Container>
       </Box>
 
-      <CreateAwardModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
+      <CreateAwardModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+        employees={employees}
+      />
     </React.Fragment>
   );
 };

@@ -23,39 +23,28 @@ import { useNavigate } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import CreateComplaintModal from "./CreateComplaintModal";
-import HrServices from "src/webservices/hrServices";
-import EmployeeService from "src/webservices/employeeService";
+import CreateClientModal from "./CreateClientModal";
+import ClientService from "src/webservices/clientService";
+import ConfirmDialog from "../../common/confirm-dialog";
+import SimpleBackdrop from "../../common/backdrop";
 
-const payslips = [
-  {
-    id: 1,
-    complaintFrom: "Ida F. Mullen",
-    compalintAgainst: "Protiong",
-    title: "Senior Tester",
-    complaintDate: "MAR 4, 2020",
-    description: "Loreum Ipsum",
-  },
-  {
-    id: 2,
-    complaintFrom: "Ida F. Mullen",
-    compalintAgainst: "Test",
-    title: "Senior Tester",
-    complaintDate: "MAR 4, 2020",
-    description: "Loreum Ipsum",
-  },
-];
-
-const Complaints = (props) => {
+const Client = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([]);
-  const [counter, setCounter] = React.useState([]);
-  const [employees, setEmployees] = React.useState([]);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const [loading, setLoading] = React.useState(true);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [clients, setClients] = React.useState();
+  const [client, setClient] = React.useState();
+
+  const getClients = async () => {
+    try {
+      const response = await ClientService.fetchAllClients();
+      setClients(response);
+    } catch (error) {}
+  };
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -63,16 +52,6 @@ const Complaints = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  };
-
-  const fetchEmployees = async () => {
-    try {
-      const response = await EmployeeService.fetchAllEmployee();
-      setLoading(false);
-      setEmployees(response);
-    } catch (error) {
-      setLoading(false);
-    }
   };
 
   const handlePageChange = (event, newPage) => {
@@ -84,48 +63,52 @@ const Complaints = (props) => {
   };
 
   const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
     try {
-      const response = await HrServices.createComplaint(data);
-      setCounter((pre) => pre + 1);
+      const response = await ClientService.createClient(data);
+      //TODO: send email to respetive employee, branch and department here
+      getClients();
+    } catch (error) {}
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (client) => {
+    setClients(client);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await ClientService.deleteClient(client._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getClients();
     } catch (error) {
-      console.log(error);
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await HrServices.deleteComplaint(id);
-      console.log("this is delete res : ", response);
-      if (response.ok) {
-        setValues((pre) => {
-          return pre.filter((obj) => obj._id !== id);
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchData = async () => {
-    try {
-      const response = await HrServices.fetchComplaints();
-      setValues(response);
-    } catch (error) {
-      console.log(error);
-    }
+  const onCancelClickListener = () => {
+    setOpenConfirmDialog(false);
   };
 
   React.useEffect(() => {
-    fetchEmployees();
+    getClients();
+    // getBranches();
+    // getEmployees();
+    // getDepartments();
+    // getMeetings();
   }, []);
-
-  React.useEffect(() => {
-    fetchData();
-  }, [counter]);
 
   return (
     <React.Fragment>
-      <Helmet>Training List</Helmet>
+      <Helmet>Client List</Helmet>
       <Box
         sx={{
           backgroundColor: "background.default",
@@ -135,7 +118,7 @@ const Complaints = (props) => {
       >
         <Container maxWidth={false}>
           <Header
-            title="Manage Complain"
+            title="Manage Client"
             buttonText="Create"
             onClickListener={onClickListener}
             showActionButton
@@ -147,27 +130,26 @@ const Complaints = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Complaint From</TableCell>
-                      <TableCell>Complaint Against</TableCell>
-                      <TableCell>Title</TableCell>
-                      <TableCell>Complaint Date</TableCell>
-                      <TableCell>Description</TableCell>
-                      <TableCell>Action</TableCell>
+                      <TableCell>Client Name</TableCell>
+                      <TableCell>Client Company</TableCell>
+                      <TableCell>Client Status</TableCell>
+                      <TableCell>Client Phone</TableCell>
+                      <TableCell>Client Email</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) &&
-                      values.slice(0, limit).map((payslip) => (
+                    {clients &&
+                      clients.slice(0, limit).map((client) => (
                         <TableRow
                           hover
-                          key={payslip._id}
+                          key={client._id}
                           //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
-                          <TableCell>{payslip.complaintFrom}</TableCell>
-                          <TableCell>{payslip.compalintAgainst}</TableCell>
-                          <TableCell>{payslip.title}</TableCell>
-                          <TableCell>{payslip.complaintDate}</TableCell>
-                          <TableCell>{payslip.description}</TableCell>
+                          <TableCell>{client.name}</TableCell>
+                          <TableCell>{client.company}</TableCell>
+                          <TableCell>{client.status}</TableCell>
+                          <TableCell>{client.phone}</TableCell>
+                          <TableCell>{client.email}</TableCell>
                           <TableCell>
                             <Grid container>
                               <Grid>
@@ -185,10 +167,9 @@ const Complaints = (props) => {
                                 <Tooltip title="Delete" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={handleDelete.bind(
-                                      this,
-                                      payslip._id
-                                    )}
+                                    onClick={() =>
+                                      onDeleteClickListener(client)
+                                    }
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -205,7 +186,7 @@ const Complaints = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={clients?.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -215,14 +196,19 @@ const Complaints = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateComplaintModal
+      <CreateClientModal
         open={openDialog}
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
-        employees={employees}
       />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };
 
-export default Complaints;
+export default Client;

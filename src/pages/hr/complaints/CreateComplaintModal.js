@@ -19,7 +19,12 @@ const leaveTypes = [
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateComplaintModal = ({ open, onCloseClickListener, onSubmitClickListener, employees }) => {
+const CreateComplaintModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  employees,
+}) => {
   const [complaintDate, setComplaintDate] = React.useState(Date.now);
 
   const formik = useFormik({
@@ -41,8 +46,8 @@ const CreateComplaintModal = ({ open, onCloseClickListener, onSubmitClickListene
     },
     onSubmit: (values) => {
       const data = {
-        complaint_from: values.complaintFrom,
-        complaint_against: values.complaintAgainst,
+        from: values.complaintFrom,
+        against: values.complaintAgainst,
         title: values.title,
         description: values.description,
         complaint_date: new Date(complaintDate),
@@ -76,13 +81,15 @@ const CreateComplaintModal = ({ open, onCloseClickListener, onSubmitClickListene
                   variant="outlined"
                   fullWidth
                   id="complaintFrom"
-                  onChange={e => formik.setFieldValue("complaintFrom", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("complaintFrom", e.target.value)
+                  }
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -93,13 +100,15 @@ const CreateComplaintModal = ({ open, onCloseClickListener, onSubmitClickListene
                   variant="outlined"
                   fullWidth
                   id="complaintAgainst"
-                  onChange={e => formik.setFieldValue("complaintAgainst", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("complaintAgainst", e.target.value)
+                  }
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -139,7 +148,11 @@ const CreateComplaintModal = ({ open, onCloseClickListener, onSubmitClickListene
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button onClick={onCloseClickListener}>Cancel</Button>

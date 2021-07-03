@@ -24,15 +24,20 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateAnnouncementModal from "./CreateAnnouncementModal";
+import ConstantService from "src/webservices/constantsService";
+import EmployeeService from "src/webservices/employeeService";
 import HrServices from "src/webservices/hrServices";
-
 
 const Announcement = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([])
+  const [values, setValues] = React.useState([]);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [branches, setBranches] = React.useState([]);
+  const [employees, setEmployees] = React.useState([]);
+  const [departments, setDepartments] = React.useState([]);
+  const [announcements, setAnnouncements] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
 
   const onClickListener = () => {
@@ -41,7 +46,34 @@ const Announcement = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
+
+  const getAnnouncements = async () => {
+    try {
+      const response = await HrServices.fetchAnnouncements();
+    } catch (error) {}
+  };
+
+  const getBranches = async () => {
+    try {
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    } catch (error) {}
+  };
+
+  const getEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch (error) {}
+  };
+
+  const getDepartments = async () => {
+    try {
+      const response = await ConstantService.fetchAllDepartment();
+      setDepartments(response);
+    } catch (error) {}
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -54,40 +86,44 @@ const Announcement = (props) => {
   const onSubmitClickListener = async (data) => {
     try {
       const response = await HrServices.createAnnouncement(data);
-      setValues(response)
+      setAnnouncements(response);
+      getAnnouncements();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
     try {
       const response = await HrServices.deleteAnnouncement(id);
       // console.log("this is delete res : ", response)
       if (response.ok) {
-        setValues(pre => {
-          return pre.filter(obj => obj._id !== id)
-        })
+        setValues((pre) => {
+          return pre.filter((obj) => obj._id !== id);
+        });
       }
-
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const fetchData = async () => {
     try {
       const response = await HrServices.fetchAnnouncements();
-      console.log('-response-', response);
-      setValues(response)
+      console.log("-response-", response);
+      setAnnouncements(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   React.useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+    getAnnouncements();
+    getEmployees();
+    getBranches();
+    getDepartments();
+  }, []);
 
   return (
     <React.Fragment>
@@ -121,44 +157,50 @@ const Announcement = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip._id}
-                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.announcement_title}</TableCell>
-                        <TableCell>{payslip.announcement_start_date}</TableCell>
-                        <TableCell>{payslip.announcement_end_date}</TableCell>
-                        <TableCell>{payslip.description}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => { }}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {Array.isArray(values) &&
+                      values.slice(0, limit).map((payslip) => (
+                        <TableRow
+                          hover
+                          key={payslip._id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>{payslip.announcement_title}</TableCell>
+                          <TableCell>
+                            {payslip.announcement_start_date}
+                          </TableCell>
+                          <TableCell>{payslip.announcement_end_date}</TableCell>
+                          <TableCell>{payslip.description}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={handleDelete.bind(
+                                      this,
+                                      payslip._id
+                                    )}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={handleDelete.bind(this, payslip._id)}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
@@ -175,7 +217,14 @@ const Announcement = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateAnnouncementModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
+      <CreateAnnouncementModal
+        open={openDialog}
+        branches={branches}
+        departments={departments}
+        employees={employees}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+      />
     </React.Fragment>
   );
 };

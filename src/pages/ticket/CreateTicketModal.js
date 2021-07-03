@@ -15,11 +15,12 @@ import { useFormik } from "formik";
 import { APP_STRINGS } from "src/utils/strings";
 import TicketService from "src/webservices/ticketService";
 
-
 const CreateTicketModal = ({
   open,
   onCloseClickListener,
   employees,
+  branches,
+  departments,
   onSubmitClickListener,
 }) => {
   const [endDate, setEndDate] = useState(Date.now);
@@ -30,6 +31,8 @@ const CreateTicketModal = ({
       subject: "",
       employee: "",
       priority: "",
+      branch: "",
+      departments: "",
       description: "Male",
     },
     validate: (values) => {
@@ -46,7 +49,9 @@ const CreateTicketModal = ({
       if (values.description.length === 0) {
         errors.descriptionError = "required";
       }
-
+      if (values.branch.length === 0) {
+        errors.branchError = "required";
+      }
       return errors;
     },
     onSubmit: (values) => {
@@ -115,8 +120,42 @@ const CreateTicketModal = ({
                 >
                   {employees &&
                     employees.map((option, index) => (
-                      <MenuItem key={index} value={option._id}>
+                      <MenuItem key={index} value={option}>
                         {option.personalDetail.employeeName}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Branch"
+                  variant="outlined"
+                  fullWidth
+                  onChange={formik.handleChange}
+                  name="branch"
+                  select
+                >
+                  {branches &&
+                    branches.map((option) => (
+                      <MenuItem key={option._id} value={option}>
+                        {option.branchName}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Department"
+                  variant="outlined"
+                  fullWidth
+                  onChange={formik.handleChange}
+                  name="department"
+                  select
+                >
+                  {departments &&
+                    departments.map((option) => (
+                      <MenuItem key={option._id} value={option}>
+                        {option.name}
                       </MenuItem>
                     ))}
                 </TextField>
