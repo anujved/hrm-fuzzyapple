@@ -14,10 +14,10 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
+// const leaveTypes = [
+//   { id: 1, option: "Casual Leave" },
+//   { id: 2, option: "Medical Leave" },
+// ];
 
 const CreateAwardModal = ({
   open,
@@ -60,7 +60,7 @@ const CreateAwardModal = ({
         onCloseClickListener();
       }, 1000);
     },
-    validateOnChange: true,
+    validateOnChange: false,
   });
 
   return (
@@ -89,8 +89,8 @@ const CreateAwardModal = ({
                   select
                 >
                   {employees &&
-                    employees.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
                         {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
@@ -103,14 +103,8 @@ const CreateAwardModal = ({
                   fullWidth
                   name="awardType"
                   onChange={formik.handleChange}
-                  select
                 >
-                  {employees &&
-                    employees.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.personalDetail.employeeName}
-                      </MenuItem>
-                    ))}
+                  {awardTypes}
                 </TextField>
               </Grid>
               <Grid item xs={12} md={6}>

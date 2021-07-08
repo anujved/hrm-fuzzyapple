@@ -8,16 +8,10 @@ import {
   Typography,
   IconButton,
   MenuItem,
-  Menu,
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
-
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
 
 const CreatePromotionModal = ({
   open,
@@ -37,12 +31,6 @@ const CreatePromotionModal = ({
     },
     validate: (values) => {
       const errors = {};
-      if (values.employee.length === 0) {
-        errors.employeeError = "required";
-      }
-      if (values.designation.length === 0) {
-        errors.designationError = "required";
-      }
       if (values.promotionTitle.length === 0) {
         errors.promotionTitleError = "required";
       }
@@ -63,7 +51,7 @@ const CreatePromotionModal = ({
       onSubmitClickListener(data);
       setTimeout(onCloseClickListener, 1000);
     },
-    validateOnChange: true,
+    validateOnChange: false,
   });
 
   return (
@@ -87,19 +75,14 @@ const CreatePromotionModal = ({
                   label="Employee"
                   variant="outlined"
                   fullWidth
-                  id="employee"
-                  helperText={formik.errors.promotionTitleError}
-                  error={formik.errors.promotionTitleError && true}
-                  onChange={(e) =>
-                    formik.setFieldValue("employee", e.target.value)
-                  }
+                  name="employee"
+                  onChange={formik.handleChange}
                   select
                 >
                   {employees &&
                     employees.map((option, index) => (
                       <MenuItem key={index} value={option}>
-                        {console.log(option.personalDetail.employeeName)}
-                        {option.personDetail.employeeName}
+                        {option?.personalDetail?.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -109,18 +92,14 @@ const CreatePromotionModal = ({
                   label="Designation"
                   variant="outlined"
                   fullWidth
-                  id="designation"
-                  helperText={formik.errors.promotionTitleError}
-                  error={formik.errors.promotionTitleError && true}
-                  onChange={(e) =>
-                    formik.setFieldValue("designation", e.target.value)
-                  }
+                  name="designation"
+                  onChange={formik.handleChange}
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {designations &&
+                    designations.map((option) => (
+                      <MenuItem key={option._id} value={option}>
+                        {option.name}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -133,7 +112,7 @@ const CreatePromotionModal = ({
                   helperText={formik.errors.promotionTitleError}
                   error={formik.errors.promotionTitleError && true}
                   onChange={formik.handleChange}
-                  id="promotionTitle"
+                  name="promotionTitle"
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -155,7 +134,7 @@ const CreatePromotionModal = ({
                   helperText={formik.errors.descriptionError}
                   error={formik.errors.descriptionError && true}
                   onChange={formik.handleChange}
-                  id="description"
+                  name="description"
                   multiline
                 />
               </Grid>

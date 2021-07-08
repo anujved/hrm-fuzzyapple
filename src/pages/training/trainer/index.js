@@ -23,31 +23,23 @@ import { useNavigate } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import TrainerService from "src/webservices/trainerService";
 import CreateTrainerModal from "./CreateTrainerModal";
+import ConstantService from "src/webservices/constantsService";
+import ConfirmDialog from "src/common/confirm-dialog";
 
-const payslips = [
-  {
-    id: 1,
-    branch: "Science",
-    fullname: "Tersa McRae",
-    contact: "9876543210",
-    email: "tersa@yahoo.com",
-  },
-  {
-    id: 1,
-    branch: "Science",
-    fullname: "Tersa McRae",
-    contact: "9876543210",
-    email: "tersa@yahoo.com",
-  },
-];
 
 const Trainer = (props) => {
   const navigate = useNavigate();
 
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [trainers, setTrainers] = React.useState([]);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [branches, setBranches] = React.useState([]);
+  const [trainer, setTrainer] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -57,6 +49,31 @@ const Trainer = (props) => {
     setOpenDialog(false);
   }
 
+  const getBranches = async() => {
+    try{
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    }catch(error){}
+  }
+
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await TrainerService.createTrainer(data);
+      onDialogCloseClickListener();
+      getTrainers();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getTrainers = async () => {
+    try {
+      const response = await TrainerService.getTrainer();
+      setTrainers(response);
+    } catch (error) {
+    }
+  }
+
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
@@ -64,6 +81,42 @@ const Trainer = (props) => {
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+   const onDeleteClickListener = (trainer) => {
+    console.log("delete listener");
+    setTrainer(trainer);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      console.log(trainer._id);
+      const result = await TrainerService.deleteTrainer(trainer._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getTrainers();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
+
+  React.useEffect(() => {
+    getBranches();
+    getTrainers();
+  },[])
 
   return (
     <React.Fragment>
@@ -97,16 +150,16 @@ const Trainer = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {trainers && trainers.slice(0, limit).map((trainer) => (
                       <TableRow
                         hover
-                        key={payslip.id}
+                        key={trainer.id}
                         //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
-                        <TableCell>{payslip.branch}</TableCell>
-                        <TableCell>{payslip.fullname}</TableCell>
-                        <TableCell>{payslip.contact}</TableCell>
-                        <TableCell>{payslip.email}</TableCell>
+                        <TableCell>{trainer?.branch.branchName}</TableCell>
+                        <TableCell>{trainer.first_name} {trainer.last_name}</TableCell>
+                        <TableCell>{trainer.contact}</TableCell>
+                        <TableCell>{trainer.email}</TableCell>
                         <TableCell>
                           <Grid container>
                             <Grid>
@@ -124,7 +177,7 @@ const Trainer = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => {onDeleteClickListener(trainer)}}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -141,7 +194,7 @@ const Trainer = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={trainers.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -151,7 +204,16 @@ const Trainer = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTrainerModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateTrainerModal 
+          open={openDialog} 
+          onCloseClickListener={onDialogCloseClickListener} 
+          onSubmitClickListener={onSubmitClickListener}
+          branches={branches} />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };

@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import ConfirmDialog from "../../../common/confirm-dialog";
 import CreateAwardModal from "./CreateAwardModal";
 import HrServices from "src/webservices/hrServices";
 import EmployeeService from "src/webservices/employeeService";
@@ -48,13 +49,16 @@ const payslips = [
 const Award = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([]);
   const [counter, setCounter] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [awards, setAwards] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [award, setAward] = React.useState(null);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [employees, setEmployees] = React.useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -68,6 +72,14 @@ const Award = (props) => {
     } catch (error) {
       setLoading(false);
     }
+  };
+
+  const getAwards = async () => {
+    try {
+      const response = await HrServices.fetchAwards();
+      setAwards(response);
+      console.log(awards);
+    } catch (error) {}
   };
 
   const onDialogCloseClickListener = () => {
@@ -86,41 +98,50 @@ const Award = (props) => {
     try {
       const response = await HrServices.createAward(data);
       setCounter((pre) => pre + 1);
+      getAwards();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await HrServices.deleteAward(id);
-      // console.log("this is delete res : ", response)
-      if (response.ok) {
-        setValues((pre) => {
-          return pre.filter((obj) => obj._id !== id);
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (award) => {
+    console.log("delete listener");
+    setAward(award);
+    setOpenConfirmDialog(true);
   };
 
-  const fetchData = async () => {
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
     try {
-      const response = await HrServices.fetchAwards();
-      setValues(response);
+      console.log(award);
+      const result = await HrServices.deleteAward(award._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getAwards();
     } catch (error) {
-      console.log(error);
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
     }
+  };
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
   };
 
   React.useEffect(() => {
     fetchEmployees();
+    getAwards();
   }, []);
 
-  React.useEffect(() => {
-    fetchData();
-  }, [counter]);
+  // React.useEffect(() => {
+  //   fetchData();
+  // }, [counter]);
 
   return (
     <React.Fragment>
@@ -154,17 +175,19 @@ const Award = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) &&
-                      values.slice(0, limit).map((payslip) => (
+                    {awards &&
+                      awards.map((award) => (
                         <TableRow
                           hover
-                          key={payslip._id}
+                          key={award._id}
                           //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
-                          <TableCell>{payslip.employee}</TableCell>
-                          <TableCell>{payslip.award_type}</TableCell>
-                          <TableCell>{payslip.date}</TableCell>
-                          <TableCell>{payslip.gift}</TableCell>
+                          <TableCell>
+                            {award.employee.personalDetail.employeeName}
+                          </TableCell>
+                          <TableCell>{award.award_type}</TableCell>
+                          <TableCell>{award.date}</TableCell>
+                          <TableCell>{award.gift}</TableCell>
                           <TableCell>
                             <Grid container>
                               <Grid>
@@ -182,10 +205,7 @@ const Award = (props) => {
                                 <Tooltip title="Delete" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={handleDelete.bind(
-                                      this,
-                                      payslip._id
-                                    )}
+                                    onClick={() => onDeleteClickListener(award)}
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -202,7 +222,7 @@ const Award = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={awards.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -218,6 +238,11 @@ const Award = (props) => {
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
         employees={employees}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
       />
     </React.Fragment>
   );

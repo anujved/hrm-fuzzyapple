@@ -75,6 +75,12 @@ export const CREATE_TRANSFER = "/create-transfer";
 export const FETCH_TRANSFERS = "/transfers";
 export const DELETE_TRANSFER = "/delete-transfer";
 
+//**** transfer HR */
+export const CREATE_TRANSFER_HR = "/create-transfer-emp";
+export const FETCH_TRANSFER_HR = "/transfers-emp";
+export const DELETE_TRANSFER_HR = "/delete-transfer-emp";
+export const UPDATE_TRANSFER_HR = "/update-transfer-emp";
+
 // ****** Resignation *********
 export const CREATE_RESIGNATION = "/create-resignation";
 export const FETCH_RESIGNATIONS = "/resignations";
@@ -150,5 +156,32 @@ export const GETME = "/getme";
 
 export const CREATE_ClIENT = "/create-client";
 export const FETCH_CLIENTS = "/clients";
-export const DELETE_CLIENT = "/delete-client/:id";
-export const UPDATE_CLIENT = "/update-client/:id";
+export const DELETE_CLIENT = "/delete-client";
+export const UPDATE_CLIENT = "/update-client";
+
+// Staff - Role
+export const CREATE_ROLE = "/create-role";
+export const GET_MODULES = "/modules";
+export const FETCH_ROLES = "/roles";
+export const DELETE_ROLE = "/delete-role";
+export const UPDATE_ROLE = "/update-role";
+
+// Training-list
+export const CREATE_TRAINING_LIST = "/create-training-list";
+export const FETCH_TRAINING = "/trainings";
+export const DELETE_TRAINING = "/delete-training";
+export const UPDATE_TRAINING = "/update-training";
+
+// Trainer
+export const CREATE_TRAINER = "/create-trainer";
+export const FETCH_TRAINER = "/trainers";
+export const DELETE_TRAINER = "/delete-trainer";
+export const UPDATE_TRAINER = "/update-trainer";
+
+// Training type
+export const CREATE_TRAINING_TYPE = "/create-traing-type";
+export const FETCH_TRAINING_TYPE = "/training-type";
+
+// constant - termination type
+export const CREATE_TERMINATION_TYPE = "/create-termination-type";
+export const FETCH_TERMINATIONS_TYPE = "/termination-types";

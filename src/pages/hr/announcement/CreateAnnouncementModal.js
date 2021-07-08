@@ -55,10 +55,23 @@ const CreateAnnouncementModal = ({
     },
     validateOnChange: false,
     onSubmit: (values) => {
-      formik.validateForm(values).then(() => {
-        onSubmitClickListener(values);
-      });
+      // formik.validateForm(values).then(() => {
+      //   onSubmitClickListener(values);
+
+      const data = {
+        announcement_title: values.annoincement_title,
+        branch: values.branch,
+        department: values.department,
+        employee: values.employee,
+        announcement_end_date: values.announcement_end_date,
+        description: values.description,
+        announcement_start_date: values.announcement_start_date,
+      };
+      onSubmitClickListener(values);
+
+      // });
     },
+    validateOnChange: false,
   });
 
   return (
@@ -159,7 +172,7 @@ const CreateAnnouncementModal = ({
                 <KeyboardDatePicker
                   disableToolbar
                   variant="inline"
-                  format="MM/dd/yyyy"
+                  format="DD/MM/yyyy"
                   id="date-picker"
                   label="Announcement Start Date"
                   value={formik.values.announcement_start_date}
@@ -176,7 +189,7 @@ const CreateAnnouncementModal = ({
                 <KeyboardDatePicker
                   disableToolbar
                   variant="inline"
-                  format="MM/dd/yyyy"
+                  format="DD/MM/yyyy"
                   id="date-picker"
                   label="Announcement End Date"
                   value={formik.values.announcement_end_date}
@@ -204,7 +217,7 @@ const CreateAnnouncementModal = ({
               <Grid item xs={12} md={12}>
                 <Button
                   variant="contained"
-                  type={"submit"}
+                  type="submit"
                   style={{ marginRight: 10 }}
                 >
                   Create

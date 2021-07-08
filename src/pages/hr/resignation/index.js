@@ -25,33 +25,22 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateResignationModal from "./CreateResignationModal";
 import HrServices from "src/webservices/hrServices";
-
-
-const payslips = [
-  {
-    id: 1,
-    employee: "Ida F. Mullen",
-    resignationDate: "MAR 4, 2020",
-    noticeDate: "MAR 4, 2020",
-    description: 'Loreum Ipsum',
-  },
-  {
-    id: 2,
-    employee: "Ida F. Mullen",
-    resignationDate: "MAR 4, 2020",
-    noticeDate: "MAR 4, 2020",
-    description: 'Loreum Ipsum',
-  },
-];
+import EmployeeService from "src/webservices/employeeService";
+import ConfirmDialog from "../../../common/confirm-dialog";
 
 const Resignation = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([])
-  const [counter, setCounter] = React.useState([])
+  const [values, setValues] = React.useState([]);
+  const [counter, setCounter] = React.useState([]);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [employees, setEmployees] = React.useState([]);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [resignations, setResignations] = React.useState([]);
+  const [resignation, setResignation] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -59,7 +48,7 @@ const Resignation = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -72,38 +61,78 @@ const Resignation = (props) => {
   const onSubmitClickListener = async (data) => {
     try {
       const response = await HrServices.createResignation(data);
-      setCounter(pre => pre + 1)
+      setCounter((pre) => pre + 1);
+      getResignation();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await HrServices.deleteResignation(id);
-      if (response.ok) {
-        setValues(pre => {
-          return pre.filter(obj => obj._id !== id)
-        })
-      }
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const fetchData = async () => {
+  const getResignation = async () => {
     try {
       const response = await HrServices.fetchResignations();
-      setValues(response)
+      setResignations(response);
+      console.log(resignations);
+    } catch (error) {}
+  };
+
+  const getEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch (error) {}
+  };
+
+  // const handleDelete = async (id) => {
+  //   try {
+  //     const response = await HrServices.deleteResignation(id);
+  //     if (response.ok) {
+  //       setValues((pre) => {
+  //         return pre.filter((obj) => obj._id !== id);
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (resignation) => {
+    console.log("delete listener");
+    setResignation(resignation);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await HrServices.deleteResignation(resignation._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getResignation();
     } catch (error) {
-      console.log(error)
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
     }
-  }
+  };
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
 
   React.useEffect(() => {
-    fetchData()
-  }, [counter])
+    getEmployees();
+    getResignation();
+  }, []);
+
+  // React.useEffect(() => {
+  //   fetchData();
+  // }, [counter]);
 
   return (
     <React.Fragment>
@@ -137,51 +166,56 @@ const Resignation = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip._id}
-                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.notice_date}</TableCell>
-                        <TableCell>{payslip.resignation_date}</TableCell>
-                        <TableCell>{payslip.description}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => { }}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {resignations &&
+                      resignations.slice(0, limit).map((resignation) => (
+                        <TableRow
+                          hover
+                          key={resignation._id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>
+                            {resignation.employee?.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>{resignation.notice_date}</TableCell>
+                          <TableCell>{resignation.resignation_date}</TableCell>
+                          <TableCell>{resignation.description}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() =>
+                                      onDeleteClickListener(resignation)
+                                    }
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={handleDelete.bind(this, payslip._id)}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={resignations.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -191,7 +225,17 @@ const Resignation = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateResignationModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
+      <CreateResignationModal
+        open={openDialog}
+        employees={employees}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };

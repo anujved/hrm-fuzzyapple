@@ -25,35 +25,25 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateTransferModal from "./CreateTransferModal";
 import HrServices from "src/webservices/hrServices";
-
-
-const payslips = [
-  {
-    id: 1,
-    employee: "Ida F. Mullen",
-    branch: "Santanu",
-    department: "IOS",
-    transferDate: "MAR 4, 2020",
-    description: 'Loreum Ipsum',
-  },
-  {
-    id: 2,
-    employee: "Ida F. Mullen",
-    branch: "Santanu",
-    department: "IOS",
-    transferDate: "MAR 4, 2020",
-    description: 'Loreum Ipsum',
-  },
-];
+import EmployeeService from "src/webservices/employeeService";
+import ConstantService from "src/webservices/constantsService";
+import ConfirmDialog from "../../../common/confirm-dialog";
 
 const Transfer = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([])
-  const [counter, setCounter] = React.useState([])
+  const [values, setValues] = React.useState([]);
+  const [counter, setCounter] = React.useState([]);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [branches, setBranches] = React.useState([]);
+  const [departments, setDepartments] = React.useState([]);
+  const [employees, setEmployees] = React.useState([]);
+  const [transfers, setTransfers] = React.useState([]);
+  const [transfer, setTransfer] = React.useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -61,7 +51,7 @@ const Transfer = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -71,41 +61,82 @@ const Transfer = (props) => {
     setLimit(event.target.value);
   };
 
+  const getBranches = async () => {
+    try {
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    } catch (error) {}
+  };
+
+  const getDepartments = async () => {
+    try {
+      const response = await ConstantService.fetchAllDepartment();
+      setDepartments(response);
+    } catch (error) {}
+  };
+
+  const getEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch (error) {}
+  };
+
   const onSubmitClickListener = async (data) => {
     try {
-      const response = await HrServices.createTransfer(data);
-      setCounter(pre => pre + 1)
+      const response = await HrServices.createTranferHr(data);
+      setOpenDialog(false);
+      getTransfers();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  const handleDelete = async (id) => {
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (transfer) => {
+    console.log("delete listener");
+    setTransfer(transfer);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
     try {
-      const response = await HrServices.deleteTransfer(id);
-      if (response.ok) {
-        setValues(pre => {
-          return pre.filter(obj => obj._id !== id)
-        })
-      }
-
+      const result = await HrServices.deleteTransferHr(transfer._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getTransfers();
     } catch (error) {
-      console.log(error)
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
     }
-  }
+  };
 
-  const fetchData = async () => {
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
+
+  const getTransfers = async () => {
     try {
-      const response = await HrServices.fetchTransfers();
-      setValues(response)
+      const response = await HrServices.fetchTransferHr();
+      setTransfers(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   React.useEffect(() => {
-    fetchData()
-  }, [counter])
+    getTransfers();
+    getDepartments();
+    getBranches();
+    getEmployees();
+  }, []);
 
   return (
     <React.Fragment>
@@ -139,51 +170,56 @@ const Transfer = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip._id}
-                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.branch}</TableCell>
-                        <TableCell>{payslip.department}</TableCell>
-                        <TableCell>{payslip.transferDate}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => { }}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {transfers &&
+                      transfers.slice(0, limit).map((transfer) => (
+                        <TableRow
+                          hover
+                          key={transfer._id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>
+                            {transfer?.employee.personalDetail.employeeName}
+                          </TableCell>
+                          <TableCell>{transfer?.branch.branchName}</TableCell>
+                          <TableCell>{transfer?.department.name}</TableCell>
+                          <TableCell>{transfer.transfer_date}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {
+                                      onDeleteClickListener(transfer);
+                                    }}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={handleDelete.bind(this, payslip._id)}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={transfers.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -193,7 +229,19 @@ const Transfer = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTransferModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
+      <CreateTransferModal
+        open={openDialog}
+        employees={employees}
+        branches={branches}
+        departments={departments}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };

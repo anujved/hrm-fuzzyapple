@@ -14,12 +14,12 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
-const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, employees }) => {
+const CreateTripModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  employees,
+}) => {
   const [startDate, setStartDate] = React.useState(Date.now);
   const [endDate, setEndDate] = React.useState(Date.now);
 
@@ -32,9 +32,6 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
     },
     validate: (values) => {
       const errors = {};
-      if (values.employee.length === 0) {
-        errors.employeeError = "required";
-      }
       if (values.purposeOfVisit.length === 0) {
         errors.purposeOfVisitError = "required";
       }
@@ -49,17 +46,18 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
     onSubmit: (values) => {
       const data = {
         employee: values.employee,
-        purpose_of_visit: values.purposeOfVisit,
-        place_of_visit: values.placeOfVisit,
+        purpose: values.purposeOfVisit,
+        place: values.placeOfVisit,
         description: values.description,
         start_date: new Date(startDate),
         end_date: new Date(endDate),
       };
       // alert(JSON.stringify(data));
+      console.log("--datadata-----", data);
       onSubmitClickListener(data);
-      setTimeout(onCloseClickListener, 1000)
+      // setTimeout(onCloseClickListener, 1000);
     },
-    validateOnChange: true,
+    validateOnChange: false,
   });
 
   return (
@@ -83,14 +81,14 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
                   label="Employee"
                   variant="outlined"
                   fullWidth
-                  id="employee"
-                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  name="employee"
+                  onChange={formik.handleChange}
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -103,6 +101,7 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
                   format="DD/MM/yyyy"
                   label="Start Date"
                   fullWidth
+                  value={startDate}
                   onChange={(value) => setStartDate(value)}
                 />
               </Grid>
@@ -114,6 +113,7 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
                   format="DD/MM/yyyy"
                   label="End Date"
                   fullWidth
+                  value={endDate}
                   onChange={(value) => setEndDate(value)}
                 />
               </Grid>
@@ -152,7 +152,11 @@ const CreateTripModal = ({ open, onCloseClickListener, onSubmitClickListener, em
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button onClick={onCloseClickListener}>Cancel</Button>

@@ -30,6 +30,10 @@ import {
   CREATE_HOLIDAY,
   FETCH_HOLIDAYS,
   DELETE_HOLIDAY,
+  CREATE_TRANSFER_HR,
+  FETCH_TRANSFER_HR,
+  DELETE_TRANSFER_HR,
+  UPDATE_TRANSFER_HR,
 } from "src/api-client/endpoints";
 
 export default class HrServices {
@@ -341,6 +345,53 @@ export default class HrServices {
     const updatedURL = `${DELETE_TERMINATION}/${params}`;
     return await ApiClient.call(
       ApiClient.requestMethod.DELETE,
+      updatedURL,
+      null,
+      null,
+      null,
+      false
+    );
+  };
+
+  // Transfer
+  static createTranferHr = async (data) => {
+    return await ApiClient.call(
+      ApiClient.requestMethod.PUT,
+      CREATE_TRANSFER_HR,
+      data,
+      null,
+      null,
+      false
+    );
+  };
+
+  static fetchTransferHr = async () => {
+    return await ApiClient.call(
+      ApiClient.requestMethod.GET,
+      FETCH_TRANSFER_HR,
+      null,
+      null,
+      null,
+      false
+    );
+  };
+
+  static deleteTransferHr = async (params) => {
+    const updatedURL = `${DELETE_TRANSFER_HR}/${params}`;
+    return await ApiClient.call(
+      ApiClient.requestMethod.DELETE,
+      updatedURL,
+      null,
+      null,
+      null,
+      false
+    );
+  };
+
+  static updateTransferHr = async (params) => {
+    const updatedURL = `${UPDATE_TRANSFER_HR}/${params}`;
+    return await ApiClient.call(
+      ApiClient.requestMethod.PUT,
       updatedURL,
       null,
       null,

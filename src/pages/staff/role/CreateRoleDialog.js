@@ -16,6 +16,7 @@ import { useFormik } from "formik";
 import axios from "axios";
 import modules from "./modules";
 import ModuleFormControl from "./ModuleFormControl";
+import RoleService from "src/webservices/roleService";
 
 const arr = [];
 
@@ -28,6 +29,7 @@ const CreateRoleDialog = ({
   onCloseClickListener,
   role = null,
   onCreateRoleSuccessListener,
+  onSubmitClickListener,
 }) => {
   console.log(open);
   /**
@@ -36,19 +38,14 @@ const CreateRoleDialog = ({
   const [roleModules, setRoleModules] = React.useState([]);
   const [allModules, setAllModules] = React.useState([]);
 
-  React.useEffect(()=>{
-    // Get All Modules
-     const endpoint = "/modules";
-      axios
-        .get(endpoint)
-        .then((res) => {
-          console.log("----getModules Response", res);
-          setAllModules(res?.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-  },[]);
+  React.useEffect(async () => {
+    try {
+      const modules = await RoleService.fetchModules();
+      setAllModules(modules);
+    } catch (err) {
+      console.log("--fetch--error--", err);
+    }
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -64,31 +61,39 @@ const CreateRoleDialog = ({
       return errors;
     },
     onSubmit: (values) => {
-      console.log("--values, moduleUser--", values);
-      const endpoint = "/create-role";
-      axios
-        .put(endpoint, values)
-        .then((res) => {
-          console.log("res", res);
-          onCreateRoleSuccessListener(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      // console.log("--values, moduleUser--", values);
+      // const endpoint = "/create-role";
+      // axios
+      //   .put(endpoint, values)
+      //   .then((res) => {
+      //     console.log("res", res);
+      //     onCreateRoleSuccessListener(res);
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
+      const _temp = roleModules;
+      setRoleModules([]);
+      onSubmitClickListener(values.roleType, _temp);
     },
     validateOnChange: true,
   });
 
   // React.useEffect();
-  const updateRoleModules = (module) => {
-
-  }
+  const updateRoleModules = (module) => {};
 
   const _onCloseClickListener = () => {
     if (formik.errors.roleError) {
       formik.errors.roleError = null;
     }
     onCloseClickListener();
+  };
+
+  const onSelectModulePermissionsListener = (modules, moduleName) => {
+    const _tempArr = [...roleModules];
+    const data = { module: moduleName, permissions: modules };
+    _tempArr.push(data);
+    setRoleModules(_tempArr);
   };
 
   return (
@@ -143,19 +148,34 @@ const CreateRoleDialog = ({
                     <Divider />
                   </Grid>
                   <Grid item xs={12} md={12}>
-                    {allModules && allModules.map((m) => (
-                      <Grid container spacing={3} alignItems="center" justifyContent="center">
-                        <Grid item xs={12} md={4}>
-                          <Typography>{m.moduleName}</Typography>
+                    {allModules &&
+                      allModules.map((m) => (
+                        <Grid
+                          container
+                          spacing={2}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Grid item xs={12} md={4}>
+                            <Typography>{m.moduleName}</Typography>
+                          </Grid>
+                          <Grid item xs={12} md={8}>
+                            <ModuleFormControl
+                              controls={m.operations}
+                              controlState={""}
+                              onSelectModulePermissionsListener={(controls) =>
+                                onSelectModulePermissionsListener(
+                                  controls,
+                                  m.moduleName
+                                )
+                              }
+                            />
+                          </Grid>
+                          <Grid item xs={12} md={12}>
+                            <Divider />
+                          </Grid>
                         </Grid>
-                        <Grid item xs={12} md={8}>
-                          <ModuleFormControl controls={m.operations} controlState={""} />
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                          <Divider />
-                        </Grid>
-                      </Grid>
-                    ))}
+                      ))}
                   </Grid>
                 </Grid>
               </Grid>

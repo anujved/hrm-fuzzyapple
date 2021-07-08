@@ -14,11 +14,6 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
 const CreateComplaintModal = ({
   open,
   onCloseClickListener,
@@ -56,7 +51,7 @@ const CreateComplaintModal = ({
       onSubmitClickListener(data);
       setTimeout(onCloseClickListener, 1000);
     },
-    validateOnChange: true,
+    validateOnChange: false,
   });
 
   return (
@@ -80,10 +75,8 @@ const CreateComplaintModal = ({
                   label="Complaint From"
                   variant="outlined"
                   fullWidth
-                  id="complaintFrom"
-                  onChange={(e) =>
-                    formik.setFieldValue("complaintFrom", e.target.value)
-                  }
+                  name="complaintFrom"
+                  onChange={formik.handleChange}
                   select
                 >
                   {employees &&
@@ -99,10 +92,8 @@ const CreateComplaintModal = ({
                   label="Complaint Against"
                   variant="outlined"
                   fullWidth
-                  id="complaintAgainst"
-                  onChange={(e) =>
-                    formik.setFieldValue("complaintAgainst", e.target.value)
-                  }
+                  name="complaintAgainst"
+                  onChange={formik.handleChange}
                   select
                 >
                   {employees &&

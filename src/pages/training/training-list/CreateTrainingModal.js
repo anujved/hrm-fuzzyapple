@@ -12,21 +12,70 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
+const trainer_options = [
+  { id: 1, option: "internal" },
+  { id: 2, option: "external" },
 ];
 
-const CreateTrainingModal = ({ open, onCloseClickListener }) => {
+const CreateTrainingModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  branches,
+  trainers,
+  training_type,
+  employees,
+}) => {
+
+  const [startDate, setStartDate] = React.useState(Date.now());
+  const [endDate, setEndDate] = React.useState(Date.now());
+
+  const formik = useFormik({
+    initialValues: {
+      branch: "",
+      trainer_option: "",
+      training_type: "",
+      trainer: "",
+      training_cost: "",
+      employee: "",
+      description: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      // if (values.branch.length === 0) {
+      //   errors.branchError = "required";
+      // }
+      return errors;
+    },
+    validateOnChange: false,
+    onSubmit: (values) => {
+      console.log('---values---', values);
+      const data = {
+        training_type: values.training_type,
+        branch: values.branch,
+        trainer_option: values.trainer_option,
+        employee: values.employee,
+        end_date: endDate._d,
+        description: values.description,
+        start_date: startDate._d,
+      };
+      onSubmitClickListener(data);
+
+      // });
+    },
+    validateOnChange: false,
+  });
+
   return (
-    <div>
       <Dialog
         open={open}
         onClose={onCloseClickListener}
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Training</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -34,23 +83,21 @@ const CreateTrainingModal = ({ open, onCloseClickListener }) => {
             </IconButton>
           </Grid>
           <Grid container spacing={3}>
-          <Grid item xs={12} md={12}>
+            <Grid item xs={12} md={12}>
               <TextField
                 label="Branch"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="branch"
+                onChange={formik.handleChange}
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
-                      </MenuItem>
-                    ))}
+                {branches &&
+                  branches.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.branchName}
+                    </MenuItem>
+                  ))}
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -58,18 +105,16 @@ const CreateTrainingModal = ({ open, onCloseClickListener }) => {
                 label="Trainer Option"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="trainer_option"
+                onChange={formik.handleChange}
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
-                      </MenuItem>
-                    ))}
+                {trainer_options &&
+                  trainer_options.map((option) => (
+                    <MenuItem key={option.id} value={option.option}>
+                      {option.option}
+                    </MenuItem>
+                  ))}
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -77,48 +122,33 @@ const CreateTrainingModal = ({ open, onCloseClickListener }) => {
                 label="Training Type"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="training_type"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
-                      </MenuItem>
-                    ))}
+                {training_type &&
+                  training_type.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
               </TextField>
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Employee"
-                variant="outlined"
-                fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-              />
             </Grid>
             <Grid item xs={12} md={12}>
               <TextField
                 label="Trainer"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="trainer"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
-                      </MenuItem>
-                    ))}
+                { trainers &&
+                  trainers.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.first_name} {option.last_name}
+                    </MenuItem>
+                  ))}
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -126,10 +156,8 @@ const CreateTrainingModal = ({ open, onCloseClickListener }) => {
                 label="Training Cost"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="training_cost"
+                onChange={formik.handleChange}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -137,48 +165,40 @@ const CreateTrainingModal = ({ open, onCloseClickListener }) => {
                 label="Employee"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="employee"
+                onChange={formik.handleChange}
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
-                      </MenuItem>
-                    ))}
+                {employees &&
+                  employees.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.personalDetail.employeeName}
+                    </MenuItem>
+                  ))}
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
               <KeyboardDatePicker
+              autoOk
                 disableToolbar
                 variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Start Date"
-                value={new Date()}
+                format="MM/DD/yyyy"
+                label="startDate"
+                value={startDate}
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setStartDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <KeyboardDatePicker
+              autoOk
                 disableToolbar
                 variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="End Date"
-                value={new Date()}
+                format="MM/DD/yyyy"
+                label="endDate"
+                value={endDate}
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setEndDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -186,23 +206,21 @@ const CreateTrainingModal = ({ open, onCloseClickListener }) => {
                 label="Description"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                name="description"
+                onChange={formik.handleChange}
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained"  style={{ marginRight: 10 }}>
                 Create
               </Button>
               <Button>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
-    </div>
   );
 };
 

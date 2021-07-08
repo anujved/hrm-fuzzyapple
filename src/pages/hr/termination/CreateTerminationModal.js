@@ -14,23 +14,21 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
-const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
-
-  const [noticeDate, setNoticeDate] = React.useState(new Date())
-  const [terminationDate, setTerminationDate] = React.useState(new Date())
+const CreateTerminationModal = ({
+  open,
+  employees,
+  terminationTypes,
+  onCloseClickListener,
+  onSubmitClickListener,
+}) => {
+  const [noticeDate, setNoticeDate] = React.useState(new Date());
+  const [terminationDate, setTerminationDate] = React.useState(new Date());
 
   const formik = useFormik({
     initialValues: {
       employee: "",
       termination_type: "",
-      notice_date: "",
-      termination_date: "",
-      description: ""
+      description: "",
     },
     validate: (values) => {
       const errors = {};
@@ -47,10 +45,10 @@ const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListe
       const data = {
         ...values,
         notice_date: noticeDate,
-        termination_date: terminationDate
-      }
+        termination_date: terminationDate,
+      };
       onSubmitClickListener(data);
-      setTimeout(onCloseClickListener, 1000)
+      setTimeout(onCloseClickListener, 1000);
     },
     validateOnChange: true,
   });
@@ -78,14 +76,14 @@ const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListe
                   fullWidth
                   helperText={formik.errors.employeeError}
                   error={formik.errors.employeeError && true}
-                  onChange={e => formik.setFieldValue("employee", e.target.value)}
-                  id="employee"
+                  onChange={formik.handleChange}
+                  name="employee"
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option?.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -95,14 +93,14 @@ const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListe
                   label="Termination Type"
                   variant="outlined"
                   fullWidth
-                  onChange={e => formik.setFieldValue("termination_type", e.target.value)}
-                  id="termination_type"
+                  onChange={formik.handleChange}
+                  name="termination_type"
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {terminationTypes &&
+                    terminationTypes.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option?.name}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -150,7 +148,11 @@ const CreateTerminationModal = ({ open, onCloseClickListener, onSubmitClickListe
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button variant="contained" type="submit" style={{ marginRight: 10 }}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button>Cancel</Button>

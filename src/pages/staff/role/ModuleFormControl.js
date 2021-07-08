@@ -3,23 +3,27 @@ import { FormControlLabel, Checkbox } from "@material-ui/core";
 import PropTypes from "prop-types";
 
 class ModuleFormControl extends React.PureComponent {
-  // const [state, setState] = React.useState({ ...controls });
-
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
-      ...props.controls,
-    }
+      controls: props.controls,
+    };
   }
 
-  handleChange = (event) => {
-    console.log('--CheckboxEvent--', event);
-    // setState({ ...state, [event.target.name]: event.target.checked });
-    // this.setState({
-    //   ...this.state,
-    //   [event.target.name]: event.target.checked
-    // })
+  handleChange = (event, control) => {
+    const { controls } = this.state;
+    const _tempArr = [...controls];
+    const itemIndex = _tempArr.findIndex((e) => e._id === control._id);
+    if (itemIndex !== -1) {
+      const _item = controls[itemIndex];
+      _item.isActive = event.target.checked;
+      _tempArr.splice(itemIndex, 1, _item);
+      console.log("-ModuleFormControl--_tempArr---", _tempArr);
+      this.setState(_tempArr, () => {
+        this.props.onSelectModulePermissionsListener(controls);
+      });
+    }
   };
 
   // isAnyActivePermission = () => {
@@ -34,7 +38,12 @@ class ModuleFormControl extends React.PureComponent {
         {this.props.controls.map((ct, idx) => {
           return (
             <FormControlLabel
-              control={<Checkbox onChange={this.handleChange} name={ct.operation} />}
+              control={
+                <Checkbox
+                  onChange={(event) => this.handleChange(event, ct)}
+                  name={ct.operation}
+                />
+              }
               label={ct.operation}
               key={idx}
             />
@@ -43,8 +52,7 @@ class ModuleFormControl extends React.PureComponent {
       </React.Fragment>
     );
   }
-  
-};
+}
 
 ModuleFormControl.propTypes = {
   controls: PropTypes.array.isRequired,

@@ -19,7 +19,12 @@ const leaveTypes = [
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateResignationModal = ({ open, onCloseClickListener, onSubmitClickListener, employees }) => {
+const CreateResignationModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  employees,
+}) => {
   const [noticeDate, setNoticeDate] = React.useState(Date.now);
   const [resignationDate, setResignationDate] = React.useState(Date.now);
 
@@ -47,7 +52,7 @@ const CreateResignationModal = ({ open, onCloseClickListener, onSubmitClickListe
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
-      setTimeout(onCloseClickListener, 1000)
+      setTimeout(onCloseClickListener, 1000);
     },
     validateOnChange: false,
   });
@@ -74,13 +79,15 @@ const CreateResignationModal = ({ open, onCloseClickListener, onSubmitClickListe
                   variant="outlined"
                   fullWidth
                   name="employee"
-                  onChange={e => formik.setFieldValue("employee", e.target.value)}
+                  onChange={(e) =>
+                    formik.setFieldValue("employee", e.target.value)
+                  }
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {employees &&
+                    employees.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -120,7 +127,11 @@ const CreateResignationModal = ({ open, onCloseClickListener, onSubmitClickListe
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button onClick={onCloseClickListener}>Cancel</Button>

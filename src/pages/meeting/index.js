@@ -71,10 +71,12 @@ const Meeting = (props) => {
   };
 
   const onClickListener = () => {
+    console.log("click listener");
     setOpenDialog(true);
   };
 
   const onDialogCloseClickListener = () => {
+    console.log("console listener");
     setOpenDialog(false);
   };
 
@@ -100,11 +102,13 @@ const Meeting = (props) => {
    * @param {*} ticket - to delete
    */
   const onDeleteClickListener = (meeting) => {
+    console.log("delete listener");
     setMeeting(meeting);
     setOpenConfirmDialog(true);
   };
 
   const onConfirmClickListener = async () => {
+    console.log("confirm listener");
     setOpenConfirmDialog(false);
     setOpenBackdrop(true);
     try {
@@ -119,6 +123,7 @@ const Meeting = (props) => {
   };
 
   const onCancelClickListener = () => {
+    console.log("cancel listener");
     setOpenConfirmDialog(false);
   };
 

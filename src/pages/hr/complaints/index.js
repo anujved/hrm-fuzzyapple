@@ -26,25 +26,7 @@ import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateComplaintModal from "./CreateComplaintModal";
 import HrServices from "src/webservices/hrServices";
 import EmployeeService from "src/webservices/employeeService";
-
-const payslips = [
-  {
-    id: 1,
-    complaintFrom: "Ida F. Mullen",
-    compalintAgainst: "Protiong",
-    title: "Senior Tester",
-    complaintDate: "MAR 4, 2020",
-    description: "Loreum Ipsum",
-  },
-  {
-    id: 2,
-    complaintFrom: "Ida F. Mullen",
-    compalintAgainst: "Test",
-    title: "Senior Tester",
-    complaintDate: "MAR 4, 2020",
-    description: "Loreum Ipsum",
-  },
-];
+import ConfirmDialog from "../../../common/confirm-dialog";
 
 const Complaints = (props) => {
   const navigate = useNavigate();
@@ -56,6 +38,10 @@ const Complaints = (props) => {
   const [page, setPage] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [complaints, setComplaints] = React.useState([]);
+  const [complaint, setComplaint] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -87,41 +73,54 @@ const Complaints = (props) => {
     try {
       const response = await HrServices.createComplaint(data);
       setCounter((pre) => pre + 1);
+      getComplaints();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await HrServices.deleteComplaint(id);
-      console.log("this is delete res : ", response);
-      if (response.ok) {
-        setValues((pre) => {
-          return pre.filter((obj) => obj._id !== id);
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchData = async () => {
+  const getComplaints = async () => {
     try {
       const response = await HrServices.fetchComplaints();
-      setValues(response);
+      setComplaints(response);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (complaint) => {
+    console.log("delete listener");
+    setComplaint(complaint);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await HrServices.deleteComplaint(complaint._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getComplaints();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
   };
 
   React.useEffect(() => {
     fetchEmployees();
+    getComplaints();
   }, []);
-
-  React.useEffect(() => {
-    fetchData();
-  }, [counter]);
 
   return (
     <React.Fragment>
@@ -156,18 +155,22 @@ const Complaints = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) &&
-                      values.slice(0, limit).map((payslip) => (
+                    {complaints &&
+                      complaints.slice(0, limit).map((complaint) => (
                         <TableRow
                           hover
-                          key={payslip._id}
+                          key={complaint._id}
                           //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
-                          <TableCell>{payslip.complaintFrom}</TableCell>
-                          <TableCell>{payslip.compalintAgainst}</TableCell>
-                          <TableCell>{payslip.title}</TableCell>
-                          <TableCell>{payslip.complaintDate}</TableCell>
-                          <TableCell>{payslip.description}</TableCell>
+                          <TableCell>
+                            {complaint?.from?.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>
+                            {complaint?.against?.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>{complaint.title}</TableCell>
+                          <TableCell>{complaint.complaint_date}</TableCell>
+                          <TableCell>{complaint.description}</TableCell>
                           <TableCell>
                             <Grid container>
                               <Grid>
@@ -185,10 +188,9 @@ const Complaints = (props) => {
                                 <Tooltip title="Delete" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={handleDelete.bind(
-                                      this,
-                                      payslip._id
-                                    )}
+                                    onClick={() => {
+                                      onDeleteClickListener(complaint);
+                                    }}
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -205,7 +207,7 @@ const Complaints = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={complaints.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -220,6 +222,12 @@ const Complaints = (props) => {
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
         employees={employees}
+      />
+
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
       />
     </React.Fragment>
   );

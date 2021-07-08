@@ -26,19 +26,23 @@ import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateAnnouncementModal from "./CreateAnnouncementModal";
 import ConstantService from "src/webservices/constantsService";
 import EmployeeService from "src/webservices/employeeService";
+import ConfirmDialog from "../../../common/confirm-dialog";
 import HrServices from "src/webservices/hrServices";
+import SimpleBackdrop from "../../../common/backdrop";
 
 const Announcement = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([]);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [branches, setBranches] = React.useState([]);
   const [employees, setEmployees] = React.useState([]);
   const [departments, setDepartments] = React.useState([]);
-  const [announcements, setAnnouncements] = React.useState(0);
+  const [announcements, setAnnouncements] = React.useState([]);
+  const [announcement, setAnnouncement] = React.useState(null);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -51,6 +55,8 @@ const Announcement = (props) => {
   const getAnnouncements = async () => {
     try {
       const response = await HrServices.fetchAnnouncements();
+      setAnnouncements(response);
+      console.log("response");
     } catch (error) {}
   };
 
@@ -84,41 +90,59 @@ const Announcement = (props) => {
   };
 
   const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
     try {
       const response = await HrServices.createAnnouncement(data);
-      setAnnouncements(response);
+      // setAnnouncements(response);
       getAnnouncements();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = async (id) => {
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (announcement) => {
+    console.log("delete listener");
+    setAnnouncement(announcement);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
     try {
-      const response = await HrServices.deleteAnnouncement(id);
-      // console.log("this is delete res : ", response)
-      if (response.ok) {
-        setValues((pre) => {
-          return pre.filter((obj) => obj._id !== id);
-        });
-      }
+      console.log(announcement);
+      const result = await HrServices.deleteAnnouncement(announcement._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getAnnouncements();
     } catch (error) {
-      console.log(error);
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
     }
   };
 
-  const fetchData = async () => {
-    try {
-      const response = await HrServices.fetchAnnouncements();
-      console.log("-response-", response);
-      setAnnouncements(response);
-    } catch (error) {
-      console.log(error);
-    }
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
   };
+
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await HrServices.fetchAnnouncements();
+  //     console.log("-response-", response);
+  //     setAnnouncements(response);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   React.useEffect(() => {
-    fetchData();
+    // fetchData();
     getAnnouncements();
     getEmployees();
     getBranches();
@@ -157,19 +181,23 @@ const Announcement = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) &&
-                      values.slice(0, limit).map((payslip) => (
+                    {Array.isArray(announcements) &&
+                      announcements.slice(0, limit).map((announcement) => (
                         <TableRow
                           hover
-                          key={payslip._id}
+                          key={announcement._id}
                           //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
-                          <TableCell>{payslip.announcement_title}</TableCell>
                           <TableCell>
-                            {payslip.announcement_start_date}
+                            {announcement.announcement_title}
                           </TableCell>
-                          <TableCell>{payslip.announcement_end_date}</TableCell>
-                          <TableCell>{payslip.description}</TableCell>
+                          <TableCell>
+                            {announcement.announcement_start_date}
+                          </TableCell>
+                          <TableCell>
+                            {announcement.announcement_end_date}
+                          </TableCell>
+                          <TableCell>{announcement.description}</TableCell>
                           <TableCell>
                             <Grid container>
                               <Grid>
@@ -187,10 +215,9 @@ const Announcement = (props) => {
                                 <Tooltip title="Delete" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={handleDelete.bind(
-                                      this,
-                                      payslip._id
-                                    )}
+                                    onClick={() =>
+                                      onDeleteClickListener(announcement)
+                                    }
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -207,7 +234,7 @@ const Announcement = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={values ? values.length : 10}
+              count={announcements ? announcements.length : 10}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -225,6 +252,12 @@ const Announcement = (props) => {
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
       />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
+      <SimpleBackdrop open={openBackdrop} />
     </React.Fragment>
   );
 };

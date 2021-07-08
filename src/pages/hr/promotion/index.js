@@ -26,36 +26,23 @@ import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreatePromotionModal from "./CreatePromotionModal";
 import HrServices from "src/webservices/hrServices";
 import EmployeeService from "src/webservices/employeeService";
-
-const payslips = [
-  {
-    id: 1,
-    employee: "Ida F. Mullen",
-    designation: "Designer",
-    promotionTitle: "Senior Tester",
-    promotionDate: "MAR 4, 2020",
-    description: "Loreum Ipsum",
-  },
-  {
-    id: 2,
-    employee: "Ida F. Mullen",
-    designation: "Designer",
-    promotionTitle: "Senior Tester",
-    promotionDate: "MAR 4, 2020",
-    description: "Loreum Ipsum",
-  },
-];
+import ConstantService from "src/webservices/constantsService";
+import ConfirmDialog from "../../../common/confirm-dialog";
 
 const Promotion = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([]);
   const [counter, setCounter] = React.useState([]);
   const [employees, setEmployees] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [limit, setLimit] = React.useState(10);
+  const [promotions, setPromotions] = React.useState([]);
+  const [promotion, setPromotion] = React.useState(null);
+  const [designations, setDesignations] = React.useState(null);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -73,55 +60,87 @@ const Promotion = (props) => {
     setLimit(event.target.value);
   };
 
-  const fetchEmployees = async () => {
+  const getEmployees = async () => {
     try {
       const response = await EmployeeService.fetchAllEmployee();
-      setLoading(false);
       setEmployees(response);
-    } catch (error) {
-      setLoading(false);
-    }
+    } catch (error) {}
+  };
+
+  const getDesignations = async () => {
+    try {
+      const response = await ConstantService.fetchAllDesignation();
+      setDesignations(response);
+    } catch (error) {}
   };
 
   const onSubmitClickListener = async (data) => {
     try {
       const response = await HrServices.createPromotion(data);
-      setCounter((pre) => pre + 1);
+      getPromotions();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await HrServices.deletePromotion(id);
-      console.log("this is delete res : ", response);
-      if (response.ok) {
-        setValues((pre) => {
-          return pre.filter((obj) => obj._id !== id);
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleDelete = async (id) => {
+  //   try {
+  //     const response = await HrServices.deletePromotion(id);
+  //     console.log("this is delete res : ", response);
+  //     if (response.ok) {
+  //       setValues((pre) => {
+  //         return pre.filter((obj) => obj._id !== id);
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  const fetchData = async () => {
+  const getPromotions = async () => {
     try {
       const response = await HrServices.fetchPromotions();
-      setValues(response);
+      setPromotions(response);
     } catch (error) {
       console.log(error);
     }
   };
 
-  React.useEffect(() => {
-    fetchEmployees();
-  }, []);
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (promotion) => {
+    console.log("delete listener");
+    setPromotion(promotion);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await HrServices.deletePromotion(promotion._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getPromotions();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
 
   React.useEffect(() => {
-    fetchData();
-  }, [counter]);
+    getEmployees();
+    getPromotions();
+    getDesignations();
+  }, []);
 
   return (
     <React.Fragment>
@@ -156,18 +175,20 @@ const Promotion = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) &&
-                      values.slice(0, limit).map((payslip) => (
+                    {promotions &&
+                      promotions.slice(0, limit).map((promotion) => (
                         <TableRow
                           hover
-                          key={payslip._id}
+                          key={promotion._id}
                           //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
-                          <TableCell>{payslip.employee}</TableCell>
-                          <TableCell>{payslip.designation}</TableCell>
-                          <TableCell>{payslip.promotion_title}</TableCell>
-                          <TableCell>{payslip.promotion_date}</TableCell>
-                          <TableCell>{payslip.description}</TableCell>
+                          <TableCell>
+                            {promotion.employee.personalDetail.employeeName}
+                          </TableCell>
+                          <TableCell>{promotion.designation.name}</TableCell>
+                          <TableCell>{promotion.promotion_title}</TableCell>
+                          <TableCell>{promotion.promotion_date}</TableCell>
+                          <TableCell>{promotion.description}</TableCell>
                           <TableCell>
                             <Grid container>
                               <Grid>
@@ -185,10 +206,9 @@ const Promotion = (props) => {
                                 <Tooltip title="Delete" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={handleDelete.bind(
-                                      this,
-                                      payslip._id
-                                    )}
+                                    onClick={() => {
+                                      onDeleteClickListener(promotion);
+                                    }}
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -205,7 +225,7 @@ const Promotion = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={promotions.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -220,6 +240,12 @@ const Promotion = (props) => {
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
         employees={employees}
+        designations={designations}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
       />
     </React.Fragment>
   );

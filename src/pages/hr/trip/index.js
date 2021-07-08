@@ -25,37 +25,20 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateTripModal from "./CreateTripModal";
 import HrServices from "src/webservices/hrServices";
-
-
-const payslips = [
-  {
-    id: 1,
-    employee: "Ida F. Mullen",
-    startDate: "MAR 4, 2020",
-    endDate: "MAR 4, 2020",
-    purposeOfVisit: 'Meeting',
-    placeOfVisit: 'Surat',
-    description: 'Loreum Ipsum'
-  },
-  {
-    id: 2,
-    employee: "Ida F. Mullen",
-    startDate: "MAR 4, 2020",
-    endDate: "MAR 4, 2020",
-    purposeOfVisit: 'Meeting',
-    placeOfVisit: 'Surat',
-    description: 'Loreum Ipsum'
-  },
-];
+import EmployeeService from "src/webservices/employeeService";
+import ConfirmDialog from "../../../common/confirm-dialog";
 
 const Trip = (props) => {
   const navigate = useNavigate();
 
-  const [values, setValues] = React.useState([])
-  const [counter, setCounter] = React.useState([])
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [trips, setTrips] = React.useState([]);
+  const [trip, setTrip] = React.useState(null);
+  const [employees, setEmployees] = React.useState([]);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -63,7 +46,7 @@ const Trip = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -73,43 +56,81 @@ const Trip = (props) => {
     setLimit(event.target.value);
   };
 
+  const getEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch (error) {}
+  };
 
   const onSubmitClickListener = async (data) => {
     try {
+      console.log("submit click");
       const response = await HrServices.createTrip(data);
-      setCounter(pre => pre + 1)
+      setOpenDialog(false);
+      // setCounter((pre) => pre + 1);
+      getTrips();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  const handleDelete = async (id) => {
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+  const onDeleteClickListener = (trip) => {
+    console.log("delete listener");
+    setTrip(trip);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
     try {
-      const response = await HrServices.deleteTrip(id);
-      console.log("this is delete res : ", response)
-      if (response.ok) {
-        setValues(pre => {
-          return pre.filter(obj => obj._id !== id)
-        })
-      }
-
+      const result = await HrServices.deleteTrip(trip._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getTrips();
     } catch (error) {
-      console.log(error)
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
     }
-  }
+  };
 
-  const fetchData = async () => {
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
+
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await HrServices.fetchTrips();
+  //     setValues(response);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const getTrips = async () => {
     try {
       const response = await HrServices.fetchTrips();
-      setValues(response)
+      setTrips(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   React.useEffect(() => {
-    fetchData()
-  }, [counter])
+    getEmployees();
+    getTrips();
+  }, []);
+
+  // React.useEffect(() => {
+  //   fetchData();
+  // }, [counter]);
 
   return (
     <React.Fragment>
@@ -145,53 +166,56 @@ const Trip = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Array.isArray(values) && values.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip._id}
-                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.start_date}</TableCell>
-                        <TableCell>{payslip.end_date}</TableCell>
-                        <TableCell>{payslip.purposeOfVisit}</TableCell>
-                        <TableCell>{payslip.placeOfVisit}</TableCell>
-                        <TableCell>{payslip.description}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => { }}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    {trips &&
+                      trips.slice(0, limit).map((trip) => (
+                        <TableRow
+                          hover
+                          key={trip._id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>
+                            {trip.employee?.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>{trip.start_date}</TableCell>
+                          <TableCell>{trip.end_date}</TableCell>
+                          <TableCell>{trip.purpose}</TableCell>
+                          <TableCell>{trip.place}</TableCell>
+                          <TableCell>{trip.description}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => onDeleteClickListener(trip)}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={handleDelete.bind(this, payslip._id)}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={trips.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -201,7 +225,17 @@ const Trip = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTripModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} />
+      <CreateTripModal
+        open={openDialog}
+        employees={employees}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };

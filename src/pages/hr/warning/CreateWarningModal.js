@@ -8,18 +8,18 @@ import {
   Typography,
   IconButton,
   MenuItem,
-  Menu,
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
-const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener, employees }) => {
+const CreateWarningModal = ({
+  open,
+  onCloseClickListener,
+  onSubmitClickListener,
+  warningTo,
+  warningBy,
+}) => {
   const [warningDate, setWarningDate] = React.useState(Date.now);
 
   const formik = useFormik({
@@ -41,15 +41,15 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
     },
     onSubmit: (values) => {
       const data = {
-        warning_by: values.warningBy,
-        warning_to: values.warningTo,
+        by: values.warningBy,
+        to: values.warningTo,
         subject: values.subject,
         description: values.description,
         warning_date: new Date(warningDate),
       };
       // alert(JSON.stringify(data));
       onSubmitClickListener(data);
-      setTimeout(onCloseClickListener, 1000)
+      setTimeout(onCloseClickListener, 1000);
     },
     validateOnChange: true,
   });
@@ -75,14 +75,14 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
                   label="Warning By"
                   variant="outlined"
                   fullWidth
-                  id="warningBy"
-                  onChange={e => formik.setFieldValue("warningBy", e.target.value)}
+                  name="warningBy"
+                  onChange={formik.handleChange}
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {warningBy &&
+                    warningBy.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -92,14 +92,14 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
                   label="Warning To"
                   variant="outlined"
                   fullWidth
-                  id="warningTo"
-                  onChange={e => formik.setFieldValue("warningTo", e.target.value)}
+                  name="warningTo"
+                  onChange={formik.handleChange}
                   select
                 >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {warningTo &&
+                    warningTo.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.personalDetail.employeeName}
                       </MenuItem>
                     ))}
                 </TextField>
@@ -139,7 +139,11 @@ const CreateWarningModal = ({ open, onCloseClickListener, onSubmitClickListener,
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: 10 }}
+                >
                   Create
                 </Button>
                 <Button onClick={onCloseClickListener}>Cancel</Button>

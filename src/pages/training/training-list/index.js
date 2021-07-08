@@ -24,27 +24,11 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import CreateTrainingModal from "./CreateTrainingModal";
-
-const payslips = [
-  {
-    id: 1,
-    branch: "Science",
-    training: {type: "Job Training", status: 'Pending'},
-    employee: "Katrina Kaif",
-    trainer: "Teresa",
-    trainingDuration: "MAR 2, 2020 to APR 5, 2020",
-    cost: "$1000,00",
-  },
-  {
-    id: 1,
-    branch: "Science",
-    training: {type: "Job Training", status: 'Pending'},
-    employee: "Katrina Kaif",
-    trainer: "Teresa",
-    trainingDuration: "MAR 2, 2020 to APR 5, 2020",
-    cost: "$1000,00",
-  },
-];
+import ConstantService from "src/webservices/constantsService";
+import EmployeeService from "src/webservices/employeeService";
+import TrainerService from "src/webservices/trainerService";
+import TrainingListService from "src/webservices/trainingService";
+import ConfirmDialog from "src/common/confirm-dialog";
 
 const TrainingList = (props) => {
   const navigate = useNavigate();
@@ -52,6 +36,14 @@ const TrainingList = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [trainingLists, setTrainingLists] = React.useState([]);
+  const [trainingList, setTrainingList] = React.useState(null);
+  const [employees, setEmployees] = React.useState([]);
+  const [branches, setBranches] = React.useState([]);
+  const [trainers, setTrainers] = React.useState([]);
+  const [trainingType, setTrainingType] = React.useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -59,7 +51,7 @@ const TrainingList = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -69,6 +61,88 @@ const TrainingList = (props) => {
     setLimit(event.target.value);
   };
 
+  const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
+    try {
+      const response = await TrainingListService.createTraining(data);
+      getTrainingLists();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getEmployees = async () => {
+    try {
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch (error) {}
+  };
+  
+  const getBranches = async () => {
+    try {
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    } catch (error) {}
+  };
+
+  const getTrainingLists = async () => {
+    try {
+      const response = await TrainingListService.getTraining();
+      setTrainingLists(response);
+    } catch (error) {}
+  };
+
+  const getTrainers = async () => {
+    try{
+      const response = await TrainerService.getTrainer();
+      setTrainers(response);
+    } catch(error){}
+  }
+
+  const getTrainingType = async() => {
+    try{
+      const response = await TrainingListService.getTrainingType();
+      setTrainingType(response);
+    }catch(error){}
+  }
+
+    /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+     const onDeleteClickListener = (trainingList) => {
+      console.log("delete listener");
+      setTrainingList(trainingList);
+      setOpenConfirmDialog(true);
+    };
+  
+    const onConfirmClickListener = async () => {
+      console.log("confirm listener");
+      setOpenConfirmDialog(false);
+      setOpenBackdrop(true);
+      try {
+        const result = await TrainingListService.deleteTraining(trainingList._id);
+        console.log("--Delete-Result--", result);
+        setOpenBackdrop(false);
+        getTrainingLists();
+      } catch (error) {
+        console.log("--Delete-Error--", error);
+        setOpenBackdrop(false);
+      }
+    };
+  
+    const onCancelClickListener = () => {
+      console.log("cancel listener");
+      setOpenConfirmDialog(false);
+    };
+
+  React.useEffect(() => {
+    getTrainingLists();
+    getBranches();
+    getEmployees();
+    getTrainers();
+    getTrainingType();
+  }, []);
   return (
     <React.Fragment>
       <Helmet>Training List</Helmet>
@@ -103,53 +177,52 @@ const TrainingList = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
-                      <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{payslip.branch}</TableCell>
-                        <TableCell>{payslip.training.type}</TableCell>
-                        <TableCell>{payslip.employee}</TableCell>
-                        <TableCell>{payslip.trainer}</TableCell>
-                        <TableCell>{payslip.trainingDuration}</TableCell>
-                        <TableCell>{payslip.cost}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
+                    { trainingLists &&
+                      trainingLists?.slice(0, limit).map((trainingList, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{trainingList.branch.branchName}</TableCell>
+                          <TableCell>{trainingList.training_type.name}</TableCell>
+                          <TableCell>
+                            {trainingList?.employee?.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>{trainingList.trainer_option}</TableCell>
+                          <TableCell>{trainingList.start_date} to {trainingList.end_date}</TableCell>
+                          <TableCell>{trainingList.cost}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {}}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {onDeleteClickListener(trainingList)}}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={trainingLists.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -159,7 +232,20 @@ const TrainingList = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTrainingModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateTrainingModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
+        onSubmitClickListener={onSubmitClickListener}
+        branches={branches}
+        employees={employees}
+        trainers={trainers}
+        training_type={trainingType}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };
