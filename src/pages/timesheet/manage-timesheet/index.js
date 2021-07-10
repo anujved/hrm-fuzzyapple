@@ -28,6 +28,8 @@ import Progress from "src/common/loader";
 import TimesheetService from "src/webservices/timesheetService";
 import moment from 'moment';
 import { SignalCellularNullSharp } from "@material-ui/icons";
+import ConfirmDialog from "src/common/confirm-dialog";
+
 
 const ManageTimesheet = (props) => {
   const navigate = useNavigate();
@@ -38,7 +40,10 @@ const ManageTimesheet = (props) => {
   const [employees, setEmployees] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [timesheets, setTimesheets] = React.useState([]);
+  const [timesheet, setTimesheet] = React.useState(null);
   const [updateTimeSheet, setUpdateTimeSheet] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -125,6 +130,44 @@ const ManageTimesheet = (props) => {
     }
   }
 
+  const getTimeSheets = async () => {
+    try{
+      const response = await TimesheetService.fetchAllTimesheet();
+      setTimesheets(response);
+    }
+    catch(error){}
+  }
+
+    /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+  */
+     const onDeleteClickListener = (timesheet) => {
+      console.log("delete listener");
+      setTimesheet(timesheet);
+      setOpenConfirmDialog(true);
+    };
+  
+    const onConfirmClickListener = async () => {
+      console.log("confirm listener");
+      setOpenConfirmDialog(false);
+      setOpenBackdrop(true);
+      try {
+        const result = await TimesheetService.deleteTimesheet(timesheet._id);
+        console.log("--Delete-Result--", result);
+        setOpenBackdrop(false);
+        getTimeSheets();
+      } catch (error) {
+        console.log("--Delete-Error--", error);
+        setOpenBackdrop(false);
+      }
+    };
+  
+    const onCancelClickListener = () => {
+      console.log("cancel listener");
+      setOpenConfirmDialog(false);
+    };
+
   React.useEffect(() => {
     fetchEmployees();
     fetchTimesheets();
@@ -187,8 +230,7 @@ const ManageTimesheet = (props) => {
                                 <Grid>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={handleDelete.bind(this, timesheet.
-                                      _id)}
+                                    onClick={() => onDeleteClickListener(timesheet)}
                                     color="secondary"
                                   >
                                     <DeleteForeverRoundedIcon />
@@ -221,6 +263,11 @@ const ManageTimesheet = (props) => {
         employees={employees}
         onSubmitClickListener={onSubmitClickListener}
         updateTimeSheet={updateTimeSheet}
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
       />
     </React.Fragment>
   );

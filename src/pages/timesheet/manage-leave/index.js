@@ -26,33 +26,10 @@ import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import PlayCircleFilledOutlinedIcon from "@material-ui/icons/PlayCircleFilledOutlined";
 import CreateLeaveModal from "./CreateLeaveModal";
 import LeaveActionModal from "./LeaveActionModal";
-
-const payslips = [
-  {
-    id: 1,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Approal",
-  },
-  {
-    id: 2,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Pending",
-  },
-];
+import EmployeeService from "src/webservices/employeeService";
+import { CatchingPokemonSharp } from "@material-ui/icons";
+import TimesheetService from "src/webservices/timesheetService";
+import ConfirmDialog from "src/common/confirm-dialog";
 
 const ManageTimesheet = (props) => {
   const navigate = useNavigate();
@@ -62,6 +39,11 @@ const ManageTimesheet = (props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [openLeaveActionDialog, setOpenLeaveActionDialog] = React.useState(false);
   const [leaveData, setLeaveData] = React.useState(null);
+  const [employees, setEmployees] = React.useState([]);
+  const [leaves, setLeaves] = React.useState([]);
+  const [leave, setLeave] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -79,6 +61,16 @@ const ManageTimesheet = (props) => {
     setOpenDialog(false);
   }
 
+  const onSubmitClickListener = async (data) => {
+    try{
+      const response = await TimesheetService.createLeave(data);
+      setOpenDialog(false);
+      getLeaves();
+    } catch(error){
+      console.log(error);
+    }
+  }
+
   const onLeaveActionClickListener = (data) => {
     setLeaveData(data);
     setOpenLeaveActionDialog(true);
@@ -88,6 +80,58 @@ const ManageTimesheet = (props) => {
     setLeaveData(null);
     setOpenLeaveActionDialog(false);
   }
+
+  const getEmployees = async () => {
+    try{
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    }
+    catch(error){
+    }
+  }
+
+  const getLeaves = async () => {
+    try{
+      const response = await TimesheetService.fetchAllLeave();
+      setLeaves(response);
+    } catch(error){
+    }
+  }
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+  */
+   const onDeleteClickListener = (leave) => {
+    console.log("delete listener");
+    setLeave(leave);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await TimesheetService.deleteLeave(leave._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getLeaves();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
+  
+  React.useEffect(() => {
+    getEmployees();
+    getLeaves();
+  },[]);
 
   return (
     <React.Fragment>
@@ -115,30 +159,25 @@ const ManageTimesheet = (props) => {
                     <TableRow>
                       <TableCell>Employee</TableCell>
                       <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
                       <TableCell>Start Date</TableCell>
                       <TableCell>End Date</TableCell>
-                      <TableCell>Total Days</TableCell>
                       <TableCell>Leave Reason</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Action</TableCell>
+                      <TableCell>remarks</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {leaves && leaves.slice(0, limit).map((leave) => (
                       <TableRow
                         hover
-                        key={payslip.id}
+                        key={leave.id}
                         //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
+                        <TableCell>{leave?.employee?.personalDetail?.employeeName}</TableCell>
+                        <TableCell>{leave.leaveType}</TableCell>
+                        <TableCell>{leave.startDate}</TableCell>
+                        <TableCell>{leave.endDate}</TableCell>
+                        <TableCell>{leave.leaveReason}</TableCell>
+                        <TableCell>{leave.remark}</TableCell>
                         <TableCell>
                           <Grid container>
                             <Grid>
@@ -149,7 +188,7 @@ const ManageTimesheet = (props) => {
                               >
                                 <IconButton
                                   style={{ float: "right", color: "green" }}
-                                  onClick={() => onLeaveActionClickListener(payslip)}
+                                  onClick={() => onLeaveActionClickListener(leave)}
                                   color="primary"
                                 >
                                   <PlayCircleFilledOutlinedIcon />
@@ -171,7 +210,7 @@ const ManageTimesheet = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => {onDeleteClickListener(leave)}}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -188,7 +227,7 @@ const ManageTimesheet = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={leaves.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -198,7 +237,17 @@ const ManageTimesheet = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateLeaveModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateLeaveModal 
+        open={openDialog} 
+        employees={employees} 
+        onSubmitClickListener={onSubmitClickListener} 
+        onCloseClickListener={onDialogCloseClickListener} 
+      />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
       <LeaveActionModal open={openLeaveActionDialog} onCloseClickListener={onLeaveActionDialogCloseClickListener} data={leaveData} />
     </React.Fragment>
   );

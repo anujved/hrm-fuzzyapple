@@ -58,8 +58,10 @@ const CreateTrainingModal = ({
         trainer_option: values.trainer_option,
         employee: values.employee,
         end_date: endDate._d,
+        trainer: values.trainer,
         description: values.description,
         start_date: startDate._d,
+        training_cost: values.training_cost,
       };
       onSubmitClickListener(data);
 

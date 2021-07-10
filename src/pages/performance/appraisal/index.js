@@ -24,34 +24,12 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import VisibilityRoundedIcon from '@material-ui/icons/VisibilityRounded';
-import CreateAppraisalModal from "./CreateAppraisalModal";
+import CreateAppraisalModal from './CreateAppraisalModal';
+import ConstantService from "src/webservices/constantsService";
+import PerformanceService from "src/webservices/performanceService";
+import EmployeeService from "src/webservices/employeeService";
+import ConfirmDialog from "src/common/confirm-dialog";
 
-const payslips = [
-  {
-    id: 1,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Approal",
-  },
-  {
-    id: 2,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Pending",
-  },
-];
 
 const Appraisal = (props) => {
   const navigate = useNavigate();
@@ -59,6 +37,14 @@ const Appraisal = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [branches, setBranches] = React.useState([]);
+  const [departments, setDepartments] = React.useState([]);
+  const [designations, setDesignations] = React.useState([]);
+  const [employees, setEmployees] = React.useState([]);
+  const [appraisals, setAppraisals] = React.useState([]);
+  const [appraisal, setAppraisal] = React.useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -72,9 +58,77 @@ const Appraisal = (props) => {
     setPage(newPage);
   };
 
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await PerformanceService.createAppraisal(data);
+      setOpenDialog(false);
+      getAppraisals();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAppraisals  = async() => {
+    try{
+      const response = await PerformanceService.getAppraisal();
+      setAppraisals(response);
+    } catch(error){}
+  }
+
+  const getBranches = async () => {
+    try{
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    }catch(error){}
+  }
+
+  const getEmployees = async () => {
+    try{
+      const response = await EmployeeService.fetchAllEmployee();
+      setEmployees(response);
+    } catch(error){}
+  }
+
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+  */
+     const onDeleteClickListener = (appraisal) => {
+      console.log("delete listener");
+      setAppraisal(appraisal);
+      setOpenConfirmDialog(true);
+    };
+  
+    const onConfirmClickListener = async () => {
+      console.log("confirm listener");
+      setOpenConfirmDialog(false);
+      setOpenBackdrop(true);
+      try {
+        const result = await PerformanceService.deleteAppraisal(appraisal._id);
+        console.log("--Delete-Result--", result);
+        setOpenBackdrop(false);
+        getAppraisals();
+      } catch (error) {
+        console.log("--Delete-Error--", error);
+        setOpenBackdrop(false);
+      }
+    };
+  
+    const onCancelClickListener = () => {
+      console.log("cancel listener");
+      setOpenConfirmDialog(false);
+    };
+
+  React.useEffect(()=> {
+    getBranches();
+    getAppraisals();
+    getEmployees();
+  },[]);
 
   return (
     <React.Fragment>
@@ -100,32 +154,30 @@ const Appraisal = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Employee</TableCell>
-                      <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
-                      <TableCell>Start Date</TableCell>
+                      <TableCell>branch</TableCell>
+                      <TableCell>employee</TableCell>
+                      <TableCell>select month</TableCell>
+                      {/* <TableCell></TableCell>
                       <TableCell>End Date</TableCell>
                       <TableCell>Total Days</TableCell>
                       <TableCell>Leave Reason</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>Action</TableCell>
+                      <TableCell>Action</TableCell> */}
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    { appraisals && appraisals.slice(0, limit).map((appraisal) => (
                       <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={appraisal.id}
                       >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
+                        <TableCell>{appraisal.branch.branchName}</TableCell>
+                        <TableCell>{appraisal.employee.personalDetail.employeeName}</TableCell>
+                        <TableCell>{appraisal.select_month}</TableCell>
+                        {/* <TableCell>{appraisal.startDate}</TableCell>
+                        <TableCell>{appraisal.endDate}</TableCell>
+                        <TableCell>{appraisal.totalDays}</TableCell>
+                        <TableCell>{appraisal.leaveReason}</TableCell>
+                        <TableCell>{appraisal.status}</TableCell> */}
                         <TableCell>
                           <Grid container>
                             <Grid>
@@ -158,7 +210,7 @@ const Appraisal = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => {onDeleteClickListener(appraisal)}}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -175,7 +227,7 @@ const Appraisal = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={appraisals.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -185,7 +237,20 @@ const Appraisal = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateAppraisalModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateAppraisalModal 
+        open={openDialog} 
+        onCloseClickListener={onDialogCloseClickListener} 
+        onSubmitClickListener={onSubmitClickListener}
+        branches={branches}
+        employees={employees}
+        designations={designations}
+        departments={departments}
+        />
+        <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };

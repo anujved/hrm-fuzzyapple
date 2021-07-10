@@ -11,26 +11,7 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
-
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
-const branches = [
-  { id: 1, option: "Shantanu" },
-  { id: 2, option: "Wage Curve" },
-];
-
-const departments = [
-  { id: 1, option: "PHP" },
-  { id: 2, option: "JAva" },
-];
-
-const designations = [
-  { id: 1, option: "Manager" },
-  { id: 2, option: "Director" },
-];
+import { useFormik } from "formik";
 
 const technicalCompentencies = [
   { id: 1, option: "None" },
@@ -47,7 +28,58 @@ const organizationalCompentencies = [
   { id: 4, option: "Advanced" },
 ];
 
-const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
+const CreateAppraisalModal = ({ 
+      open, 
+      onCloseClickListener, 
+      onSubmitClickListener,
+      branches, 
+      employees,
+       }) => {
+
+  const [month, setMonth] = React.useState(Date.now());
+
+  const formik = useFormik({
+    initialValues: {
+      branch: "",
+      employee: "",
+      customer_experience: "",
+      marketing: "",
+      administration: "",
+      professional: "",
+      integrity: "",
+      attendance: "",
+      remark: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.branch.length === 0) {
+        errors.branchError = "required";
+      }
+      if (values.employee.length === 0) {
+        errors.employee = "required";
+      }
+      return errors;
+    },
+    validateOnChange: false,
+    onSubmit: (values) => {
+      const data = {
+        select_month: month._d,
+        branch: values.branch,
+        employee: values.employee,
+        Administration: values.administration,
+        customer_experience: values.customer_experience,
+        marketing: values.marketing,
+        professionalism: values.professional,
+        integrity: values.integrity,
+        attendance: values.attendance,
+        remark: values.remark,
+      };
+      console.log('---values-data---', data);
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
     <div>
       <Dialog
@@ -55,6 +87,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
         onClose={onCloseClickListener}
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
+
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Appraisal</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -69,14 +103,14 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="branch"
                 select
               >
                 {branches &&
-                  branches.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                  branches.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.branchName}
                     </MenuItem>
                   ))}
               </TextField>
@@ -88,32 +122,29 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="employee"
                 select
               >
-                {departments &&
-                  departments.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                {employees &&
+                  employees.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.personalDetail.employeeName}
                     </MenuItem>
                   ))}
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
-            <KeyboardDatePicker
-                disableToolbar
-                variant="inline"
-                format="MM/dd/yyyy"
-                id="date-picker"
-                label="Select Month"
-                value={new Date()}
-                fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
+              <KeyboardDatePicker
+                autoOk
+                  disableToolbar
+                  variant="inline"
+                  views={["year", "month"]}
+                  label="Select Month"
+                  value={month}
+                  fullWidth
+                  onChange={(value) => setMonth(value)}
+                />
             </Grid>
             <Grid
               item
@@ -131,8 +162,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="customer_experience"
                 select
               >
                 {technicalCompentencies &&
@@ -150,8 +181,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="marketing"
                 select
               >
                 {technicalCompentencies &&
@@ -169,8 +200,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="administration"
                 select
               >
                 {technicalCompentencies &&
@@ -197,8 +228,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="professional"
                 select
               >
                 {organizationalCompentencies &&
@@ -216,8 +247,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="integrity"
                 select
               >
                 {organizationalCompentencies &&
@@ -235,8 +266,8 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="attendance"
                 select
               >
                 {organizationalCompentencies &&
@@ -254,18 +285,19 @@ const CreateAppraisalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="remark"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
               <Button>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

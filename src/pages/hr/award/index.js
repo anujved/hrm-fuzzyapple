@@ -27,25 +27,6 @@ import CreateAwardModal from "./CreateAwardModal";
 import HrServices from "src/webservices/hrServices";
 import EmployeeService from "src/webservices/employeeService";
 
-const payslips = [
-  {
-    id: 1,
-    employee: "Ida F. Mullen",
-    awardType: "Trophy",
-    date: "MAR 4, 2020",
-    gift: "certificate",
-    description: "Loreum Ipsum",
-  },
-  {
-    id: 2,
-    employee: "Protiong",
-    awardType: "Trophy",
-    date: "MAR 4, 2020",
-    gift: "certificate",
-    description: "Loreum Ipsum",
-  },
-];
-
 const Award = (props) => {
   const navigate = useNavigate();
 
@@ -97,7 +78,6 @@ const Award = (props) => {
   const onSubmitClickListener = async (data) => {
     try {
       const response = await HrServices.createAward(data);
-      setCounter((pre) => pre + 1);
       getAwards();
     } catch (error) {
       console.log(error);

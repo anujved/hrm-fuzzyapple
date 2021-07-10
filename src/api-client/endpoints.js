@@ -43,7 +43,7 @@ export const DELETE_DEDUCTION_OPTION = "/delete-deduction-option";
 // ****** Employee *********
 export const CREATE_EMPLOYEE = "/create-employee";
 export const FETCH_EMPLOYEE = "/employees";
-export const DELETE_EMPLOYEE = "/delete-employee/:id";
+export const DELETE_EMPLOYEE = "/delete-employee";
 
 // ****** Ticket *********
 export const CREATE_TICKET = "/create-ticket";
@@ -53,7 +53,7 @@ export const DELETE_TICKET = "/delete-ticket/";
 // ****** Timesheet *********
 export const CREATE_TIMESHEET = "/create-timesheet";
 export const FETCH_TIMESHEET = "/timesheets";
-export const DELETE_TIMESHEET = "/delete-timesheet/:id";
+export const DELETE_TIMESHEET = "/delete-timesheet";
 
 // ****** Meeting *********
 export const CREATE_MEETING = "/create-meeting";
@@ -185,3 +185,30 @@ export const FETCH_TRAINING_TYPE = "/training-type";
 // constant - termination type
 export const CREATE_TERMINATION_TYPE = "/create-termination-type";
 export const FETCH_TERMINATIONS_TYPE = "/termination-types";
+
+
+// PERFORMANCE
+
+// ****indicator****
+export const CREATE_INDICATOR = "/create-indicator";
+export const FETCH_INDICATOR = "/indicators";
+export const DELETE_INDICATOR = "/delete-indicator";
+export const UPDATE_INDICATOR = "/update-indicator";
+
+// ****appraisal****
+export const CREATE_APPRAISAL = "/create-appraisal";
+export const FETCH_APPRAISAL = "/appraisals";
+export const DELETE_APPRAISAL = "/delete-appraisal";
+export const UPDATE_APPRAISAL = "/update-appraisal";
+
+// ****Goal Tracking****
+export const CREATE_GOAL_TRACKING = "/create-goal_track";
+export const FETCH_GOALS = "/goal_tracks";
+export const DELETE_GOAL_TRACK = "/delete-goal_track";
+export const UPDATE_GOAL_TRACK = "/update-goal_track";
+
+// ****Manage Timesheet****
+export const CREATE_MANAGE_LEAVE = "/create-leave";
+export const FETCH_LEAVES = "/leaves";
+export const DELETE_LEAVES = "/delete-leave";
+export const UPDATE_LEAVES = "/updates-leave";

@@ -12,13 +12,50 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateLeaveModal = ({ open, onCloseClickListener }) => {
+const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClickListener }) => {
+
+  const [startDate, setStartDate] = React.useState(Date.now);
+  const [endDate, setEndDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      employee: "",
+      leaveType: "",
+      leaveReason: "",
+      remark: "",
+    },
+    validate: (values) => {
+      const errors = {};
+
+     
+      return errors;
+    },
+    onSubmit: (values) => {
+      const data = {
+        employee: values.employee,
+        leaveType: values.leaveType,
+        startDate: startDate._d,
+        endDate: endDate._d,
+        leaveReason: values.leaveReason,
+        remark: values.remark,
+      };
+      // alert(JSON.stringify(data));
+      onSubmitClickListener(data);
+      setTimeout(() => {
+        onCloseClickListener();
+      }, 1000);
+    },
+    validateOnChange: false,
+  });
+
+
   return (
     <div>
       <Dialog
@@ -27,8 +64,9 @@ const CreateLeaveModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New</Typography>
+            <Typography>Create New TimeSheet</Typography>
             <IconButton onClick={onCloseClickListener}>
               <CancelIcon />
             </IconButton>
@@ -41,9 +79,18 @@ const CreateLeaveModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
-              />
+                onChange={formik.handleChange}
+                name="employee"
+                select
+              >
+              {
+                employees && employees.map((option, index) => (
+                  <MenuItem key={index} value={option}>
+                  {option.personalDetail.employeeName}
+                </MenuItem>
+                ))
+              }
+              </TextField>
             </Grid>
             <Grid item xs={12} md={12}>
               <TextField
@@ -52,8 +99,8 @@ const CreateLeaveModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="leaveType"
                 select
               >
                   {leaveTypes &&
@@ -68,30 +115,24 @@ const CreateLeaveModal = ({ open, onCloseClickListener }) => {
               <KeyboardDatePicker
                 disableToolbar
                 variant="inline"
-                format="MM/dd/yyyy"
+                format="MM/DD/yyyy"
                 id="date-picker"
                 label="Start Date"
-                value={new Date()}
+                value={startDate}
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setStartDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <KeyboardDatePicker
                 disableToolbar
                 variant="inline"
-                format="MM/dd/yyyy"
+                format="MM/DD/yyyy"
                 id="date-picker"
                 label="End Date"
-                value={new Date()}
+                value={endDate}
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setEndDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -101,8 +142,8 @@ const CreateLeaveModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="leaveReason"
                 multiline
               />
             </Grid>
@@ -113,18 +154,19 @@ const CreateLeaveModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="remark"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
               <Button>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

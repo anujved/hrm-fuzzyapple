@@ -15,10 +15,7 @@ import { useFormik } from "formik";
 
 const CreateTimeSheetModal = ({ open, onCloseClickListener, employees, onSubmitClickListener, updateTimeSheet }) => {
 
-  const [date, setDate] = useState(() => {
-    return updateTimeSheet ? updateTimeSheet.initialValues.date :
-      Date.now
-  });
+  const [date, setDate] = useState(Date.now);
 
   const formikInitialValues = updateTimeSheet ? updateTimeSheet.initialValues : {
     employee: "",

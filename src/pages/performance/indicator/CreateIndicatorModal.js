@@ -10,26 +10,7 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
-
-const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
-];
-
-const branches = [
-  { id: 1, option: "Shantanu" },
-  { id: 2, option: "Wage Curve" },
-];
-
-const departments = [
-  { id: 1, option: "PHP" },
-  { id: 2, option: "JAva" },
-];
-
-const designations = [
-  { id: 1, option: "Manager" },
-  { id: 2, option: "Director" },
-];
+import { useFormik } from "formik";
 
 const technicalCompentencies = [
   { id: 1, option: "None" },
@@ -46,7 +27,52 @@ const organizationalCompentencies = [
   { id: 4, option: "Advanced" },
 ];
 
-const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
+const CreateIndicatorModal = ({ 
+      open, 
+      onCloseClickListener, 
+      onSubmitClickListener,
+      branches, 
+      departments, 
+      designations, }) => {
+
+  const formik = useFormik({
+    initialValues: {
+      branch: "",
+      department: "",
+      designation: "",
+      customer_experience: "",
+      marketing: "",
+      administration: "",
+      professional: "",
+      integrity: "",
+      attendance: "",
+    },
+    validate: (values) => {
+      const errors = {};
+      // if (values.branch.length === 0) {
+      //   errors.branchError = "required";
+      // }
+      return errors;
+    },
+    validateOnChange: false,
+    onSubmit: (values) => {
+      console.log('---values---', values);
+      const data = {
+        department: values.department,
+        branch: values.branch,
+        designation: values.designation,
+        Administration: values.administration,
+        customer_experience: values.customer_experience,
+        marketing: values.marketing,
+        professionalism: values.professional,
+        integrity: values.integrity,
+        attendance: values.attendance,
+      };
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
     <div>
       <Dialog
@@ -54,6 +80,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
         onClose={onCloseClickListener}
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
+
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Indicator</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -68,14 +96,14 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="branch"
                 select
               >
                 {branches &&
-                  branches.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                  branches.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.branchName}
                     </MenuItem>
                   ))}
               </TextField>
@@ -87,33 +115,33 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="department"
                 select
               >
                 {departments &&
-                  departments.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                  departments.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.name}
                     </MenuItem>
                   ))}
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
-                label="Department"
+                label="Designation"
                 variant="outlined"
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="designation"
                 select
               >
                 {designations &&
-                  designations.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
+                  designations.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option.name}
                     </MenuItem>
                   ))}
               </TextField>
@@ -134,8 +162,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="customer_experience"
                 select
               >
                 {technicalCompentencies &&
@@ -153,8 +181,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="marketing"
                 select
               >
                 {technicalCompentencies &&
@@ -172,8 +200,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="administration"
                 select
               >
                 {technicalCompentencies &&
@@ -200,8 +228,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="professional"
                 select
               >
                 {organizationalCompentencies &&
@@ -219,8 +247,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="integrity"
                 select
               >
                 {organizationalCompentencies &&
@@ -238,8 +266,8 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="attendance"
                 select
               >
                 {organizationalCompentencies &&
@@ -251,12 +279,13 @@ const CreateIndicatorModal = ({ open, onCloseClickListener }) => {
               </TextField>
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
               <Button>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

@@ -25,40 +25,22 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import VisibilityRoundedIcon from '@material-ui/icons/VisibilityRounded';
 import CreateGoalModal from "./CreateGoalModal";
+import ConstantService from "src/webservices/constantsService";
+import PerformanceService from "src/webservices/performanceService";
+import ConfirmDialog from "src/common/confirm-dialog";
 
-const payslips = [
-  {
-    id: 1,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Approal",
-  },
-  {
-    id: 2,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Pending",
-  },
-];
 
 const GoalTracking = (props) => {
   const navigate = useNavigate();
 
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [branches, setBranches] = React.useState([]);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [goalTracks, setGoalTracks] = React.useState([]);
+  const [goalTrack, setGoalTrack] = React.useState(null);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -71,9 +53,70 @@ const GoalTracking = (props) => {
     setPage(newPage);
   };
 
+  const onSubmitClickListener = async(data) => {
+    try {
+      const response = await PerformanceService.createGoalTracking(data);
+      setOpenDialog(false);
+      getGoalTracks();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getGoalTracks = async() => {
+    try{
+      const response = await PerformanceService.getGoalTracks();
+      setGoalTracks(response);
+    } catch(error){}
+  }
+ 
+  const getBranches = async() => {
+    try{
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    }
+    catch(error){}
+  } 
+
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+  /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+  */
+   const onDeleteClickListener = (goalTrack) => {
+    console.log("delete listener");
+    setGoalTrack(goalTrack);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await PerformanceService.deleteGoalTrack(goalTrack._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getGoalTracks();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
+
+
+  React.useEffect(() => {
+    getBranches();
+    getGoalTracks();
+  },[])
 
   return (
     <React.Fragment>
@@ -99,32 +142,29 @@ const GoalTracking = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Employee</TableCell>
-                      <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
+                      <TableCell>Branch</TableCell>
+                      <TableCell>Goal Type</TableCell>
                       <TableCell>Start Date</TableCell>
                       <TableCell>End Date</TableCell>
-                      <TableCell>Total Days</TableCell>
-                      <TableCell>Leave Reason</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Action</TableCell>
+                      <TableCell>Subject</TableCell>
+                      <TableCell>Target Achievement</TableCell>
+                      <TableCell>Description</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    {goalTracks && goalTracks.slice(0, limit).map((goalTrack) => (
                       <TableRow
                         hover
-                        key={payslip.id}
+                        key={goalTrack.id}
                         //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
+                        <TableCell>{goalTrack.branch.branchName}</TableCell>
+                        <TableCell>{goalTrack.goals_type}</TableCell>
+                        <TableCell>{goalTrack.start_date}</TableCell>
+                        <TableCell>{goalTrack.end_date}</TableCell>
+                        <TableCell>{goalTrack.subject}</TableCell>
+                        <TableCell>{goalTrack.target_achievement}</TableCell>
+                        <TableCell>{goalTrack.description}</TableCell>
                         <TableCell>
                           <Grid container>
                             <Grid>
@@ -142,7 +182,7 @@ const GoalTracking = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { onDeleteClickListener(goalTrack) }}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -159,7 +199,7 @@ const GoalTracking = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={goalTracks.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -169,7 +209,16 @@ const GoalTracking = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateGoalModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateGoalModal 
+        open={openDialog} 
+        branches={branches}
+        onSubmitClickListener={onSubmitClickListener}
+        onCloseClickListener={onDialogCloseClickListener} />
+      <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };

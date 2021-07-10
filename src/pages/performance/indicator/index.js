@@ -25,33 +25,10 @@ import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 import EditRoundedIcon from "@material-ui/icons/EditRounded";
 import VisibilityRoundedIcon from '@material-ui/icons/VisibilityRounded';
 import CreateIndicatorModal from './CreateIndicatorModal';
+import ConstantService from "src/webservices/constantsService";
+import PerformanceService from "src/webservices/performanceService";
+import ConfirmDialog from "src/common/confirm-dialog";
 
-const payslips = [
-  {
-    id: 1,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Approal",
-  },
-  {
-    id: 2,
-    employeeId: "#EMP0886787",
-    name: "Karie Smith",
-    leaveType: "Medical Leave",
-    appliedOn: "MAR 4, 2020",
-    startDate: "MAR 2, 2020",
-    endDate: "MAR 5, 2020",
-    totalDays: "3",
-    leaveReason: "Lorem Ipsum",
-    status: "Pending",
-  },
-];
 
 const Indicator = (props) => {
   const navigate = useNavigate();
@@ -59,6 +36,13 @@ const Indicator = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [branches, setBranches] = React.useState([]);
+  const [departments, setDepartments] = React.useState([]);
+  const [designations, setDesignations] = React.useState([]);
+  const [indicators, setIndicators] = React.useState([]);
+  const [indicator, setIndicator] = React.useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -72,9 +56,85 @@ const Indicator = (props) => {
     setPage(newPage);
   };
 
+  const onSubmitClickListener = async (data) => {
+    try {
+      const response = await PerformanceService.createIndicator(data);
+      setOpenDialog(false);
+      getIndicators();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getIndicators  = async() => {
+    try{
+      const response = await PerformanceService.getIndicator();
+      setIndicators(response);
+    } catch(error){}
+  }
+
+  const getBranches = async () => {
+    try{
+      const response = await ConstantService.fetchAllBranch();
+      setBranches(response);
+    }catch(error){}
+  }
+
+  const getDepartments = async() => {
+    try{
+      const response = await ConstantService.fetchAllDepartment();
+      setDepartments(response);
+    } catch(error){}
+  }
+
+  const getDesignations = async() => {
+    try{
+      const response = await ConstantService.fetchAllDesignation();
+      setDesignations(response);
+    } catch(error){}
+  }
+
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
+
+
+    /**
+   * Listener to delete a ticket
+   * @param {*} ticket - to delete
+   */
+     const onDeleteClickListener = (indicator) => {
+      console.log("delete listener");
+      setIndicator(indicator);
+      setOpenConfirmDialog(true);
+    };
+  
+    const onConfirmClickListener = async () => {
+      console.log("confirm listener");
+      setOpenConfirmDialog(false);
+      setOpenBackdrop(true);
+      try {
+        const result = await PerformanceService.deleteIndicator(indicator._id);
+        console.log("--Delete-Result--", result);
+        setOpenBackdrop(false);
+        getIndicators();
+      } catch (error) {
+        console.log("--Delete-Error--", error);
+        setOpenBackdrop(false);
+      }
+    };
+  
+    const onCancelClickListener = () => {
+      console.log("cancel listener");
+      setOpenConfirmDialog(false);
+    };
+
+  React.useEffect(()=> {
+    getBranches();
+    getDepartments();
+    getDesignations();
+    getIndicators();
+  },[]);
 
   return (
     <React.Fragment>
@@ -100,32 +160,30 @@ const Indicator = (props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Employee</TableCell>
-                      <TableCell>Leave Type</TableCell>
-                      <TableCell>Applied On</TableCell>
-                      <TableCell>Start Date</TableCell>
+                      <TableCell>branch</TableCell>
+                      <TableCell>department</TableCell>
+                      <TableCell>designation</TableCell>
+                      {/* <TableCell></TableCell>
                       <TableCell>End Date</TableCell>
                       <TableCell>Total Days</TableCell>
                       <TableCell>Leave Reason</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>Action</TableCell>
+                      <TableCell>Action</TableCell> */}
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {payslips.slice(0, limit).map((payslip) => (
+                    { indicators && indicators.slice(0, limit).map((indicator) => (
                       <TableRow
-                        hover
-                        key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        key={indicator.id}
                       >
-                        <TableCell>{payslip.name}</TableCell>
-                        <TableCell>{payslip.leaveType}</TableCell>
-                        <TableCell>{payslip.appliedOn}</TableCell>
-                        <TableCell>{payslip.startDate}</TableCell>
-                        <TableCell>{payslip.endDate}</TableCell>
-                        <TableCell>{payslip.totalDays}</TableCell>
-                        <TableCell>{payslip.leaveReason}</TableCell>
-                        <TableCell>{payslip.status}</TableCell>
+                        <TableCell>{indicator.branch.branchName}</TableCell>
+                        <TableCell>{indicator.department.name}</TableCell>
+                        <TableCell>{indicator.designation.name}</TableCell>
+                        {/* <TableCell>{indicator.startDate}</TableCell>
+                        <TableCell>{indicator.endDate}</TableCell>
+                        <TableCell>{indicator.totalDays}</TableCell>
+                        <TableCell>{indicator.leaveReason}</TableCell>
+                        <TableCell>{indicator.status}</TableCell> */}
                         <TableCell>
                           <Grid container>
                             <Grid>
@@ -158,7 +216,7 @@ const Indicator = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => {onDeleteClickListener(indicator)}}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -175,7 +233,7 @@ const Indicator = (props) => {
             </PerfectScrollbar>
             <TablePagination
               component="div"
-              count={payslips.length}
+              count={indicators.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -185,7 +243,19 @@ const Indicator = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateIndicatorModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateIndicatorModal 
+        open={openDialog} 
+        onCloseClickListener={onDialogCloseClickListener} 
+        onSubmitClickListener={onSubmitClickListener}
+        branches={branches}
+        designations={designations}
+        departments={departments}
+        />
+        <ConfirmDialog
+        open={openConfirmDialog}
+        onConfirmClickListener={onConfirmClickListener}
+        onCancelClickListener={onCancelClickListener}
+      />
     </React.Fragment>
   );
 };
