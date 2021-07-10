@@ -90,6 +90,7 @@ const CreateAssetsModal = ({ open, onCloseClickListener, onSubmitClickListener }
                   autoOk
                   variant="inline"
                   format="DD/MM/yyyy"
+                  id="date-picker"
                   label="Purchase Date"
                   fullWidth
                   onChange={(value) => setPurchaseDate(value)}

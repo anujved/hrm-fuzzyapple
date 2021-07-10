@@ -29,7 +29,7 @@ export default class FinanceService {
     }
 
     static deleteAccountList = async (params) => {
-        const updatedURL = `${DELETE_ACCOUNT}${params}`;
+        const updatedURL = `${DELETE_ACCOUNT}/${params}`;
         return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);
     }
 
@@ -43,7 +43,7 @@ export default class FinanceService {
     }
 
     static deletePayee = async (params) => {
-        const updatedURL = `${DELETE_PAYEE}${params}`;
+        const updatedURL = `${DELETE_PAYEE}/${params}`;
         return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);
     }
 

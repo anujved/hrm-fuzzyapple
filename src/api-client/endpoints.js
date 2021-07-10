@@ -123,11 +123,11 @@ export const DELETE_HOLIDAY = "/delete-holiday";
 // ****** Account List *********
 export const CREATE_ACCOUNTLIST = "/create-account-list";
 export const FETCH_ACCOUNTS = "/account-list";
-export const DELETE_ACCOUNT = "/delete-account/";
+export const DELETE_ACCOUNT = "/delete-account";
 
 export const CREATE_PAYEE = "/create-payee";
 export const FETCH_PAYEES = "/payee-list";
-export const DELETE_PAYEE = "/delete-payee/";
+export const DELETE_PAYEE = "/delete-payee";
 
 export const CREATE_PAYER = "/create-payer";
 export const FETCH_PAYERS = "/payer-list";
