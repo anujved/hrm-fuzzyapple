@@ -10,7 +10,8 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import {SetSallaryContext} from "../setSalarayContext";
+import { SetSallaryContext } from "../setSalarayContext";
+import AllowanceForm from './components/AllowanceForm'
 
 const employeeSalaries = [
   {
@@ -37,7 +38,7 @@ const EmployeeSalaryCard = (props) => {
       <CardHeader
         title="Employee Salary"
         buttonLabel="create"
-        onClickListener={OpenDialogWithForm.bind(this,[] )}
+        onClickListener={OpenDialogWithForm.bind(this,[AllowanceForm,'Nagaraj'] )}
       />
       <PerfectScrollbar>
         <Table>
