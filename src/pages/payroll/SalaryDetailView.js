@@ -16,7 +16,7 @@ import LoanCard from "./set-salary/LoanCard";
 import SaturationDeductionCard from "./set-salary/SaturationDeductionCard";
 import OtherPaymentCard from "./set-salary/OtherPaymentCard";
 import OvertimeCard from "./set-salary/OvertimeCard";
-import { SetSallaryProvider } from "./setSalarayContext"
+import { SetSallaryProvider } from "./set-salary/components/setSalarayContext"
 
 const SalaryDetailView = (props) => {
   const [showModal, setShowModal] = React.useState(false);

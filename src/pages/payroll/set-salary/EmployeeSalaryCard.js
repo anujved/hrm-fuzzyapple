@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import {SetSallaryContext} from "../setSalarayContext";
+import {SetSallaryContext} from "./components/setSalarayContext"
 import AllowanceForm from "./components/AllowanceForm"
 
 const employeeSalaries = [
