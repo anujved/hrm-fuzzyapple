@@ -212,3 +212,7 @@ export const CREATE_MANAGE_LEAVE = "/create-leave";
 export const FETCH_LEAVES = "/leaves";
 export const DELETE_LEAVES = "/delete-leave";
 export const UPDATE_LEAVES = "/updates-leave";
+
+
+// ****Employee****
+export const EMPLOYEE = "/employee";

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import {
@@ -20,16 +20,26 @@ import employeeSalries from "src/__mocks__/employee-salary";
 import SearchToolBar from "src/common/search-toolbar";
 import VisibilityRoundedIcon from '@material-ui/icons/VisibilityRounded';
 import { useNavigate } from 'react-router-dom';
+import {fetchEmployee} from "./store/actions"
+import {useDispatch} from "react-redux"
 
 const SetSalary = (props) => {
   const [showModal, setShowModal] = React.useState(false);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    
+    dispatch(fetchEmployee());
+
+  },[])
+
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
-
+ 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };

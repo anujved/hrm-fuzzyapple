@@ -65,6 +65,7 @@
     "yup": "^0.29.3"
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.19.0",
     "eslint-config-airbnb": "^18.2.1"
   }
 }
