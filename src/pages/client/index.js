@@ -76,7 +76,7 @@ const Client = (props) => {
    * @param {*} ticket - to delete
    */
   const onDeleteClickListener = (client) => {
-    setClients(client);
+    setClient(client);
     setOpenConfirmDialog(true);
   };
 
@@ -100,10 +100,6 @@ const Client = (props) => {
 
   React.useEffect(() => {
     getClients();
-    // getBranches();
-    // getEmployees();
-    // getDepartments();
-    // getMeetings();
   }, []);
 
   return (

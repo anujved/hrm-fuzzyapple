@@ -116,6 +116,10 @@ const Assets = (props) => {
       setOpenConfirmDialog(false);
     };
 
+    React.useEffect(() => {
+      getAssets();
+    }, []);
+
   return (
     <React.Fragment>
       <Helmet>Training List</Helmet>

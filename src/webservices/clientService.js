@@ -31,7 +31,7 @@ export default class EventService {
   };
 
   static deleteClient = async (params) => {
-    const updatedURL = `${DELETE_CLIENT}${params}`;
+    const updatedURL = `${DELETE_CLIENT}/${params}`;
     return await ApiClient.call(
       ApiClient.requestMethod.DELETE,
       updatedURL,
@@ -43,7 +43,7 @@ export default class EventService {
   };
 
   static updateClient = async (params) => {
-    const updatedURL = `${UPDATE_CLIENT}${params}`;
+    const updatedURL = `${UPDATE_CLIENT}/${params}`;
     return await ApiClient.call(
       ApiClient.requestMethod.PUT,
       updatedURL,

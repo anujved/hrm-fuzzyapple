@@ -12,13 +12,52 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import { useFormik } from "formik";
 
 const leaveTypes = [
-  { id: 1, option: "Casual Leave" },
-  { id: 2, option: "Medical Leave" },
+  { id: 1, option: "Invoice Goal" },
+  { id: 2, option: "Event Goal" },
 ];
 
-const CreateGoalModal = ({ open, onCloseClickListener }) => {
+const CreateGoalModal = ({ open, onCloseClickListener, branches, onSubmitClickListener }) => {
+
+  const [startDate, setStartDate] = React.useState(Date.now);
+  const [endDate, setEndDate] = React.useState(Date.now);
+
+  const formik = useFormik({
+    initialValues: {
+      branch: "",
+      goals_type: "",
+      subject: "",
+      targetAchievement: "",
+      description: "",
+      progress:"",
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.branch.length === 0) {
+        errors.branchError = "required";
+      }
+      return errors;
+    },
+    validateOnChange: false,
+    onSubmit: (values) => {
+      const data = {
+        branch: values.branch,
+        goals_type: values.goals_type,
+        subject: values.subject,
+        description: values.description,
+        target_achievement: values.targetAchievement,
+        status: values.progress,
+        start_date: startDate._d,
+        end_date: endDate._d,
+      };
+      console.log('---values-data---', data);
+      onSubmitClickListener(data);
+    },
+    validateOnChange: false,
+  });
+
   return (
     <div>
       <Dialog
@@ -27,6 +66,7 @@ const CreateGoalModal = ({ open, onCloseClickListener }) => {
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
+        <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography>Create New Goal Tracking</Typography>
             <IconButton onClick={onCloseClickListener}>
@@ -41,14 +81,14 @@ const CreateGoalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="branch"
                 select
               >
-                  {leaveTypes &&
-                    leaveTypes.map((option) => (
-                      <MenuItem key={option.id} value={option.option}>
-                        {option.option}
+                  {branches &&
+                    branches.map((option, index) => (
+                      <MenuItem key={index} value={option}>
+                        {option.branchName}
                       </MenuItem>
                     ))}
               </TextField>
@@ -60,8 +100,8 @@ const CreateGoalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="goals_type"
                 select
               >
                   {leaveTypes &&
@@ -76,30 +116,24 @@ const CreateGoalModal = ({ open, onCloseClickListener }) => {
               <KeyboardDatePicker
                 disableToolbar
                 variant="inline"
-                format="MM/dd/yyyy"
+                format="MM/DD/yyyy"
                 id="date-picker"
                 label="Start Date"
-                value={new Date()}
+                value={startDate}
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setStartDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <KeyboardDatePicker
                 disableToolbar
                 variant="inline"
-                format="MM/dd/yyyy"
+                format="MM/DD/yyyy"
                 id="date-picker"
                 label="End Date"
-                value={new Date()}
+                value={endDate}
                 fullWidth
-                onChange={(date) => console.log(date)}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
+                onChange={(value) => setEndDate(value)}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -109,8 +143,8 @@ const CreateGoalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="subject"
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -120,29 +154,30 @@ const CreateGoalModal = ({ open, onCloseClickListener }) => {
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="targetAchievement"
               />
             </Grid>
             <Grid item xs={12} md={12}>
               <TextField
-                label="Remark"
+                label="Description"
                 variant="outlined"
                 fullWidth
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
-                // onChange={formik.handleChange}
-                id="employee"
+                onChange={formik.handleChange}
+                name="description"
                 multiline
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button variant="contained" style={{ marginRight: 10 }}>
+              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
                 Create
               </Button>
               <Button>Cancel</Button>
             </Grid>
           </Grid>
+          </form>
         </Box>
       </Dialog>
     </div>

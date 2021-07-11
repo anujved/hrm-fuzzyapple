@@ -185,9 +185,9 @@ const TrainingList = (props) => {
                           <TableCell>
                             {trainingList?.employee?.personalDetail?.employeeName}
                           </TableCell>
-                          <TableCell>{trainingList.trainer_option}</TableCell>
+                          <TableCell>{trainingList.trainer.first_name} {trainingList.trainer.last_name}</TableCell>
                           <TableCell>{trainingList.start_date} to {trainingList.end_date}</TableCell>
-                          <TableCell>{trainingList.cost}</TableCell>
+                          <TableCell>{trainingList.training_cost}</TableCell>
                           <TableCell>
                             <Grid container>
                               <Grid>
