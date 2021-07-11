@@ -16,6 +16,7 @@ import LoanCard from "./set-salary/LoanCard";
 import SaturationDeductionCard from "./set-salary/SaturationDeductionCard";
 import OtherPaymentCard from "./set-salary/OtherPaymentCard";
 import OvertimeCard from "./set-salary/OvertimeCard";
+import { SetSallaryProvider } from "./setSalarayContext"
 
 const SalaryDetailView = (props) => {
   const [showModal, setShowModal] = React.useState(false);
@@ -36,7 +37,7 @@ const SalaryDetailView = (props) => {
           minHeight: "100%",
           py: 3,
         }}
-      >
+      ><SetSallaryProvider>
         <Container maxWidth={false}>
           <Header
             title="Employee Set Salary"
@@ -70,6 +71,7 @@ const SalaryDetailView = (props) => {
             </Grid>
           </PerfectScrollbar>
         </Container>
+        </SetSallaryProvider>
       </Box>
     </React.Fragment>
   );

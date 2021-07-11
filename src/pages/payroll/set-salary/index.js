@@ -21,12 +21,13 @@ import SearchToolBar from "src/common/search-toolbar";
 import VisibilityRoundedIcon from '@material-ui/icons/VisibilityRounded';
 import { useNavigate } from 'react-router-dom';
 import {fetchEmployee} from "./store/actions"
-import {useDispatch} from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
 
 const SetSalary = (props) => {
   const [showModal, setShowModal] = React.useState(false);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  // const {useSelector}  = useSelector()
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

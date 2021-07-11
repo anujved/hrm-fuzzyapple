@@ -42,7 +42,7 @@ const AllowanceCard = (props) => {
       <CardHeader
         title="Allowance"
         buttonLabel="create"
-        onClickListener={() => {}}
+        onClickListener={() => {console.log("working")}}
       />
       <PerfectScrollbar>
         <Table>
