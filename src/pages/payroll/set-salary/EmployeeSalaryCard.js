@@ -11,6 +11,7 @@ import {
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
 import {SetSallaryContext} from "../setSalarayContext";
+import AllowanceForm from "./components/AllowanceForm"
 
 const employeeSalaries = [
   {
@@ -23,7 +24,7 @@ const employeeSalaries = [
 const EmployeeSalaryCard = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const {OpenDialogWithForm} = useContext(SetSallaryContext);
+  const {OpenDialogWithForm, AllowanceSubmitHandler} = useContext(SetSallaryContext);
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
@@ -37,7 +38,7 @@ const EmployeeSalaryCard = (props) => {
       <CardHeader
         title="Employee Salary"
         buttonLabel="create"
-        onClickListener={OpenDialogWithForm.bind(this,[] )}
+        onClickListener={OpenDialogWithForm.bind(this,[<AllowanceForm onSubmit={AllowanceSubmitHandler}  /> ,'Allowance Edit'])}
       />
       <PerfectScrollbar>
         <Table>
