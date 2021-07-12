@@ -13,94 +13,90 @@ import {
   ADD_EMPLOYEE_OTHER_REQUEST,
 
   } from "./constants";
-  import {fetchEmployee} from "./ajax"
+import {
+  fetchEmployee,
+  addAllowance,
+  addCommission,
+  addEmployeeSalary,
+  addLoan,
+  addOvertime,
+  addOther,
+  addSaturationDeduction
+} from "./ajax"
 
 
 function* fetchEmployeeSaga() {
   try {
-
-   
-    
+    const data = yield (fetchEmployee)
+    console.log(data)
   } catch (e) {
-    
-   
+   console.log(e)
   }
 }
+
+
 function* createEmployeeSaga() {
   try {
-
-  
+   const data= yield(addEmployeeSalary)
+   console.log(data)
   } catch (e) {
-    
+    console.log(e)
     
   }
 }
 function* addAllowanceSaga() {
   try {
-
-  
-    
+    const data= yield(addAllowance)
+    console.log(data)
   } catch (e) {
-    
-   
-  
+    console.log(e)
   }
 }
 function* addCommissionSaga() {
   try {
-
-  
-    
+    const data= yield(addCommission)
+    console.log(data)
   } catch (e) {
-    
-   
-    
+    console.log(e)
   }
 }
 function* addLoanSaga() {
   try {
-
-   
-    
+    const data= yield(addLoan)
+    console.log(data)
   } catch (e) {
-    
-    
+    console.log(e)
   }
 }
 function* addSaturationSaga() {
   try {
-
+    const data= yield(addSaturationDeduction)
+    console.log(data)
   } catch (e) {
-    
-  
+    console.log(e)
   }
 }
 function* addOtherSaga() {
   try {
-
-  
-    
+    const data= yield(addOther)
+    console.log(data)
   } catch (e) {
-    
-  
+    console.log(e)
   }
 }
 function* addOvertimeSaga() {
   try {
-
-   
-    
+    const data= yield(addOvertime)
+    console.log(data)
   } catch (e) {
-    
-   
+    console.log(e)
   }
 }
 
 
 export default function* Employee() {
-  
-  yield takeLatest(FETCH_EMPLOYEE_REQUEST, fetchEmployeeSaga);
 
+  yield takeLatest(FETCH_EMPLOYEE_REQUEST, fetchEmployeeSaga);
   yield takeLatest(CREATE_EMPLOYEE_CREATE_SALARY_REQUEST, createEmployeeSaga);
   yield takeLatest(CREATE_EMPLOYEE_CREATE_ALLOWANCE_REQUEST, addAllowanceSaga);
   yield takeLatest(ADD_EMPLOYEE_COMMISSION_REQUEST, addCommissionSaga);
