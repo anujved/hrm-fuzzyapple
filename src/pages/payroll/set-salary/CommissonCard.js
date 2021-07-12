@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Card,
   Table,
@@ -12,8 +12,10 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
+import EditRoundedIcon from '@material-ui/icons/EditRounded';
+import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import CommisionForm from "./components/CommissionForm"
+import { SetSallaryContext } from "./components/setSalarayContext"
 
 const CommissionCard = ({ id, name, title, amount }) => {
   const [limit, setLimit] = React.useState(10);
@@ -26,13 +28,14 @@ const CommissionCard = ({ id, name, title, amount }) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
+  const {OpenDialogWithForm,CommissionHanlder } = useContext(SetSallaryContext);
 
   return (
     <Card>
       <CardHeader
         title="Commission"
         buttonLabel="create"
-        onClickListener={() => {}}
+        onClickListener={OpenDialogWithForm.bind(this,[<CommisionForm onsubmit={CommissionHanlder}  /> ,'Add Commission'])}
       />
       <PerfectScrollbar>
         <Table>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Card,
   Table,
@@ -14,6 +14,10 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import AllowanceForm from "./components/AllowanceForm"
+import {SetSallaryContext} from "./components/setSalarayContext"
+
+
 
 const AllowanceCard = ({name,allowanceOption,title, amount,id}) => {
   const [limit, setLimit] = React.useState(10);
@@ -26,13 +30,15 @@ const AllowanceCard = ({name,allowanceOption,title, amount,id}) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
+    const {OpenDialogWithForm, AllowanceSubmitHandler} = useContext(SetSallaryContext);
+
   
   return (
     <Card>
       <CardHeader
         title="Allowance"
         buttonLabel="create"
-        onClickListener={() => {console.log("working")}}
+        onClickListener={OpenDialogWithForm.bind(this,[<AllowanceForm onSubmit={AllowanceSubmitHandler}  /> ,'Add Allowance'])}
       />
       <PerfectScrollbar>
         <Table>

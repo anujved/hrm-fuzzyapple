@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Card,
   Table,
@@ -13,8 +13,10 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
+import EditRoundedIcon from '@material-ui/icons/EditRounded';
+import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import { SetSallaryContext } from "./components/setSalarayContext"
+import OvertimeForm from "./components/OvertimeForm";
 
 const OvertimeCard = ({
   id,
@@ -34,13 +36,15 @@ const OvertimeCard = ({
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
+  const {OpenDialogWithForm, OvertimeHandler} = useContext(SetSallaryContext);
 
+  
   return (
     <Card>
       <CardHeader
         title="Overtime"
         buttonLabel="create"
-        onClickListener={() => {}}
+        onClickListener={OpenDialogWithForm.bind(this,[<OvertimeForm onsubmit={OvertimeHandler}  /> ,'Add overtime Employee'])}
       />
       <PerfectScrollbar>
         <Table>

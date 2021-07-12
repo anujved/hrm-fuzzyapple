@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Card,
   Table,
@@ -12,8 +12,10 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import EditRoundedIcon from "@material-ui/icons/EditRounded";
-import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
+import EditRoundedIcon from '@material-ui/icons/EditRounded';
+import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import { SetSallaryContext } from "./components/setSalarayContext"
+import SaturationDeductionForm from "./components/SaturationDeductionForm";
 
 const SaturationDeductionCard = ({
   id,
@@ -33,12 +35,15 @@ const SaturationDeductionCard = ({
     setPage(newPage);
   };
 
+  const {OpenDialogWithForm, SaturationHandler} = useContext(SetSallaryContext);
+
+  
   return (
     <Card>
       <CardHeader
         title="Saturation Deduction"
         buttonLabel="create"
-        onClickListener={() => {}}
+        onClickListener={OpenDialogWithForm.bind(this,[<SaturationDeductionForm onsubmit={SaturationHandler}  /> ,'Add Saturation Deductions'])}
       />
       <PerfectScrollbar>
         <Table>
