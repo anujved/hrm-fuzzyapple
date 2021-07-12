@@ -1,3 +1,4 @@
+import { get } from "lodash";
 import {
   FETCH_EMPLOYEE_REQUEST,
   FETCH_EMPLOYEE_SUCCESS,
@@ -24,7 +25,7 @@ const Employee = (state = initialState, { type, payload }) => {
       state = { ...state, firstLoading: true, loading: true };
       break;
     case FETCH_EMPLOYEE_SUCCESS:
-      state = { ...state, loading: false, data: payload };
+      state = { ...state, loading: false, data: get(payload,'data') };
       break;
     case FETCH_EMPLOYEE_FAILED:
       state = {
