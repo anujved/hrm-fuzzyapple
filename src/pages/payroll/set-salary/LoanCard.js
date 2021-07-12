@@ -11,19 +11,7 @@ import {
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
 
-const loans = [
-  {
-    id: 1,
-    employeeName: "Karie Smith",
-    loanOptions: 'Health Insurance',
-    title: 'test',
-    laonAmount: '$10,000',
-    startDate: 'Mar 1, 2020',
-    endDate: 'Mar 9, 2020',
-  },
-];
-
-const LoanCard = (props) => {
+const LoanCard = ({id,name, loanOptions, title, laonAmount, startDate, endDate}) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
 
@@ -55,20 +43,19 @@ const LoanCard = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loans.slice(0, limit).map((loan) => (
+
               <TableRow
                 hover
-                key={loan.id}
+                key={id}
                 //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
               >
-                <TableCell>{loan.employeeName}</TableCell>
-                <TableCell>{loan.loanOptions}</TableCell>
-                <TableCell>{loan.title}</TableCell>
-                <TableCell>{loan.laonAmount}</TableCell>
-                <TableCell>{loan.startDate}</TableCell>
-                <TableCell>{loan.endDate}</TableCell>
+                <TableCell>{name}</TableCell>
+                <TableCell>{loanOptions}</TableCell>
+                <TableCell>{title}</TableCell>
+                <TableCell>{laonAmount}</TableCell>
+                <TableCell>{startDate}</TableCell>
+                <TableCell>{endDate}</TableCell>
               </TableRow>
-            ))}
           </TableBody>
         </Table>
       </PerfectScrollbar>

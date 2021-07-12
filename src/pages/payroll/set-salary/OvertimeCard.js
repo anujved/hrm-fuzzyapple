@@ -9,25 +9,21 @@ import {
   TableRow,
   Grid,
   IconButton,
-  Tooltip
+  Tooltip,
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import EditRoundedIcon from '@material-ui/icons/EditRounded';
-import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import EditRoundedIcon from "@material-ui/icons/EditRounded";
+import DeleteForeverRoundedIcon from "@material-ui/icons/DeleteForeverRounded";
 
-const overtimes = [
-  {
-    id: 1,
-    employeeName: 'Karie Nicole',
-    overtimeTitle: 'test',
-    numberOfDays: 10,
-    hours: 10,
-    rate: '$100',
-  },
-];
-
-const OvertimeCard = (props) => {
+const OvertimeCard = ({
+  id,
+  name,
+  overtimeTitle,
+  numberOfDays,
+  hours,
+  rate,
+}) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
 
@@ -38,7 +34,7 @@ const OvertimeCard = (props) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
-  
+
   return (
     <Card>
       <CardHeader
@@ -59,33 +55,27 @@ const OvertimeCard = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {overtimes.slice(0, limit).map((ot) => (
-              <TableRow
-                hover
-                key={ot.id}
-                //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-              >
-                <TableCell>{ot.employeeName}</TableCell>
-                <TableCell>{ot.overtimeTitle}</TableCell>
-                <TableCell>{ot.numberOfDays}</TableCell>
-                <TableCell>{ot.hours}</TableCell>
-                <TableCell>{ot.rate}</TableCell>
-                <TableCell>
-                  <Grid container>
-                    <Grid item>
-                      <IconButton>
-                        <EditRoundedIcon />
-                      </IconButton>
-                    </Grid>
-                    <Grid item>
-                      <IconButton>
-                        <DeleteForeverRoundedIcon style={{color: 'red'}} />
-                      </IconButton>
-                    </Grid>
+            <TableRow hover key={id}>
+              <TableCell>{name}</TableCell>
+              <TableCell>{overtimeTitle}</TableCell>
+              <TableCell>{numberOfDays}</TableCell>
+              <TableCell>{hours}</TableCell>
+              <TableCell>{rate}</TableCell>
+              <TableCell>
+                <Grid container>
+                  <Grid item>
+                    <IconButton>
+                      <EditRoundedIcon />
+                    </IconButton>
                   </Grid>
-                </TableCell>
-              </TableRow>
-            ))}
+                  <Grid item>
+                    <IconButton>
+                      <DeleteForeverRoundedIcon style={{ color: "red" }} />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </PerfectScrollbar>
