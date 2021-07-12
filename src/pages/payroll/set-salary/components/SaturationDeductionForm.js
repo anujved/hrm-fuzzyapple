@@ -1,38 +1,38 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useFormik } from "formik";
 import {Button, Grid, MenuItem, TextField} from "@material-ui/core";
 import { KeyboardDatePicker } from '@material-ui/pickers';
-const Loanform = ({ onSubmit }) => {
-    
-    const [startDate, setStartDate] = React.useState(Date.now);
-    const [endDate, setEndDate] = React.useState(Date.now);
-    let option = [{
+const SaturationDeduction = ({onSubmit}) => {
+    let option = [
+        {
         id: 1,
-        value: 'Healthinsurance',
-        name:'Healthinsurance'
-    }]
+        value: 'type1',
+        name:'type1'
+       },
+        {
+        id: 2,
+        value: 'type2',
+        name:'type2'
+       },
+        {
+        id: 3,
+        value: 'type3',
+        name:'type3'
+       },
+    ]
 
     const initialValues = {
         employeeName: '',
+        deductionOption: '',
         title:'',
-        loanAmount: '',
-        allowanceOption:'',
-        startDate: startDate?._d||'',
-        endDate:endDate?._d||''
+        amount: '',
     }
-    useEffect(() => {
-        formik.setValues({...formik.values,startDate:startDate?._d})
-    },[startDate])
-    useEffect(() => {
-        formik.setValues({...formik.values,endDate:endDate?._d})
-    },[endDate])
 
     const formik = useFormik({
         initialValues: initialValues,
         validate: (values) =>{},
-        onSubmit: ()=>onSubmit
-    });
-
+        onSubmit: onSubmit
+      });
     return (
         <form onSubmit={formik.handleSubmit}>
                <Grid container spacing={3}>
@@ -47,12 +47,12 @@ const Loanform = ({ onSubmit }) => {
                     </Grid>
                     <Grid  item xs={12}>
                         <TextField
-                            label="Loan Option"
+                            label="Deduction Option"
                             variant="outlined"
                             fullWidth
                             select
                             onChange={formik.handleChange}
-                            name="allowanceOption"
+                            name="deductionOption"
                         >
                             {option&&option.map((option) => (
                                 <MenuItem key={option.id} value={option.value}>
@@ -72,50 +72,25 @@ const Loanform = ({ onSubmit }) => {
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
-                            label="Loan Amount"
+                            label="Amount"
                             variant="outlined"
                             fullWidth
                             onChange={formik.handleChange}
-                            name="loanAmount"
+                            name="amount"
                             />
                     </Grid>
-                    <Grid item xs={12}>
-                        <KeyboardDatePicker
-                                disableToolbar
-                                    autoOk
-                                name ='startDate'
-                                variant="inline"
-                                format="dd/MM/yyyy"
-                                label="Start Date"
-                                fullWidth
-                                value={startDate}
-                               onChange={(value) => {setStartDate(value)}}
-                            />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <KeyboardDatePicker
-                                disableToolbar
-                                autoOk
-                                name ='endDate'
-                                variant="inline"
-                                format="dd/MM/yyyy"
-                                label="End Date"
-                                fullWidth
-                                value={endDate}
-                                onChange={(value) => {setEndDate(value)}}
-                            />
-                    </Grid>
+                 
                     <Grid item xs={12}>
 
                         <Button
                         type="submit"
                         variant="contained"
-                        disabled=
-                        {!(formik.values.allowanceOption!=''  &&
+                        disabled={!(
+                            formik.values.amount!='' &&
+                            formik.values.deductionOption!='' &&
                             formik.values.employeeName!='' &&
-                            formik.values.endDate!=''&& formik.values.loanAmount!='' 
-                            && formik.values.loanOption!='' &&
-                            formik.values.startDate!='' )}
+                            formik.values.title!=''
+                        )}
                         >
                         Submit
                         </Button>
@@ -126,4 +101,4 @@ const Loanform = ({ onSubmit }) => {
                 )
 }
 
-export default Loanform
+export default SaturationDeduction

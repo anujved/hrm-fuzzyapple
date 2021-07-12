@@ -1,75 +1,101 @@
-import React from 'react'
+import React from "react";
 import { useFormik } from "formik";
-import {Button, MenuItem, TextField} from "@material-ui/core";
+import { Button, MenuItem, TextField, Grid } from "@material-ui/core";
 
-const AllowanceForm = () => {
+const AllowanceForm = ({onSubmit}) => {
+  let option = [
+    {
+      id: 1,
+      value: "taxables",
+      name: "Taxables",
+    },
+    {
+      id: 2,
+      value: "taxables",
+      name: "Tax not ables",
+    },
+    
+  ];
 
-    let option = [{
-        id: 1,
-        value: 'taxables',
-        name:'Taxables'
-    }]
+  const initialValues = {
+    employeeName: "",
+    title: "",
+    allowanceOption: "",
+    amount: "",
+  };
 
-    const initialValues = {
-        employeeName: '',
-        title: '',
-        allowanceOption:'',
-        amount:''
-    }
+  const formik = useFormik({
+    initialValues: initialValues,
+    validate: (values) => {},
+    onSubmit:onSubmit
+  });
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <TextField
+            label="Employee Name"
+            variant="outlined"
+            fullWidth
+            onChange={formik.handleChange}
+            name="employeeName"
+          />
+        </Grid>
+        <Grid item xs={12}> 
+          <TextField
+            label="Allowance Option"
+            variant="outlined"
+            fullWidth
+            select
+            onChange={formik.handleChange}
+            name="allowanceOption"
+          >
+            {option &&
+              option.map((option) => (
+                <MenuItem key={option.id} value={option.value}>
+                  {option.name}
+                </MenuItem>
+              ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Title"
+            variant="outlined"
+            fullWidth
+            onChange={formik.handleChange}
+            name="title"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Amount"
+            variant="outlined"
+            fullWidth
+            onChange={formik.handleChange}
+            name="amount"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button type="submit"
+            variant="contained"
+            disabled={
+              !(formik.values.allowanceOption != '' &&
+                formik.values.amount != '' &&
+                formik.values.employeeName != '' &&
+                formik.values.title != '')
+            
+            }
+          >
+        Submit
+      </Button>
+        </Grid>
+              
+      </Grid>
 
-    const formik = useFormik({
-        initialValues: initialValues,
-        validate: (values) =>{},
-        onSubmit: (values) => {},
-        
-      });
-    return (
-        <div>
-            <form onSubmit={formik.handleSubmit}>
-            <TextField
-                label="Employee Name"
-                variant="outlined"
-                fullWidth
-                onChange={formik.handleChange}
-                name="employeeName"
-            />
-            <TextField
-                label="Allowance Option"
-                variant="outlined"
-                fullWidth
-                select
-                onChange={formik.handleChange}
-                name="allowanceOption"
-            >
-                {option&&option.map((option) => (
-                    <MenuItem key={option.id} value={option.value}>
-                    {option.name}
-                    </MenuItem>
-                ))}
-            </TextField>
-            <TextField
-                label="Title"
-                variant="outlined"
-                fullWidth
-                onChange={formik.handleChange}
-                name="title"
-            />
-            <TextField
-                label="Amount"
-                variant="outlined"
-                fullWidth
-                onChange={formik.handleChange}
-                name="amount"
-                />
-                <Button
-                      type="submit"
-                      variant="contained"
-                >
-                Submit
-                </Button>
-            </form>
-        </div>
-    )
-}
+   
+    </form>
+  );
+};
 
-export default AllowanceForm
+export default AllowanceForm;

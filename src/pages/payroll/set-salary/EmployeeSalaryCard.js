@@ -5,13 +5,12 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TablePagination,
   TableRow,
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import { SetSallaryContext } from "../setSalarayContext";
-import AllowanceForm from './components/AllowanceForm'
+import {SetSallaryContext} from "./components/setSalarayContext"
+import EmployeeSalaryForm from "./components/EmployeeSalaryForm" 
 
 const employeeSalaries = [
   {
@@ -24,7 +23,7 @@ const employeeSalaries = [
 const EmployeeSalaryCard = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const {OpenDialogWithForm} = useContext(SetSallaryContext);
+  const {OpenDialogWithForm, EmployeeSetSalaryHanlder} = useContext(SetSallaryContext);
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
@@ -38,7 +37,7 @@ const EmployeeSalaryCard = (props) => {
       <CardHeader
         title="Employee Salary"
         buttonLabel="create"
-        onClickListener={OpenDialogWithForm.bind(this,[AllowanceForm,'Nagaraj'] )}
+        onClickListener={OpenDialogWithForm.bind(this,[<EmployeeSalaryForm onSubmit={EmployeeSetSalaryHanlder}  /> ,'Add Employee set Salary'])}
       />
       <PerfectScrollbar>
         <Table>

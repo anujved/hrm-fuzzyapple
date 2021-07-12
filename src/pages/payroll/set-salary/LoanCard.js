@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Card,
   Table,
@@ -10,6 +10,12 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
+import { SetSallaryContext } from "./components/setSalarayContext"
+import LoanForm from "./components/LoanForm";
+
+
+
+
 
 const loans = [
   {
@@ -26,6 +32,8 @@ const loans = [
 const LoanCard = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const {OpenDialogWithForm, LoanSubmitHandler} = useContext(SetSallaryContext);
+
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -40,7 +48,7 @@ const LoanCard = (props) => {
       <CardHeader
         title="Loan"
         buttonLabel="create"
-        onClickListener={() => {}}
+        onClickListener={OpenDialogWithForm.bind(this,[<LoanForm onSubmit={LoanSubmitHandler}  /> ,'Add Loan'])}
       />
       <PerfectScrollbar>
         <Table>

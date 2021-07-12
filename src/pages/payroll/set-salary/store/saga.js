@@ -3,13 +3,15 @@ import { get } from "lodash";
 import {
   FETCH_EMPLOYEE_REQUEST,
   FETCH_EMPLOYEE_SUCCESS,
-  FETCH_EMPLOYEE_FAILED,
+ 
   CREATE_EMPLOYEE_CREATE_SALARY_REQUEST,
-  CREATE_EMPLOYEE_CREATE_SALARY_SUCCESS,
-  CREATE_EMPLOYEE_CREATE_SALARY_FAILED,
   CREATE_EMPLOYEE_CREATE_ALLOWANCE_REQUEST,
-  CREATE_EMPLOYEE_CREATE_ALLOWANCE_SUCCESS,
-  CREATE_EMPLOYEE_CREATE_ALLOWANCE_FAILED
+  ADD_EMPLOYEE_COMMISSION_REQUEST,
+  ADD_EMPLOYEE_lOAN_REQUEST,
+  ADD_EMPLOYEE_SATURATION_DEDUCTION_REQUEST,
+  ADD_EMPLOYEE_OVERTIME_REQUEST,
+  ADD_EMPLOYEE_OTHER_REQUEST,
+
   } from "./constants";
   import {fetchEmployee} from "./ajax"
 
@@ -17,22 +19,95 @@ import {
 function* fetchEmployeeSaga() {
   try {
 
-    let response = yield call(fetchEmployee);
-
-    yield put({type:FETCH_EMPLOYEE_SUCCESS, payload:response})
+   
     
   } catch (e) {
     
-    console.log(e);
-    // yield put({type:FETCH_EMPLOYEE_FAILED, payload:e})
+   
+  }
+}
+function* createEmployeeSaga() {
+  try {
 
+  
+  } catch (e) {
+    
+    
+  }
+}
+function* addAllowanceSaga() {
+  try {
 
+  
+    
+  } catch (e) {
+    
+   
+  
+  }
+}
+function* addCommissionSaga() {
+  try {
+
+  
+    
+  } catch (e) {
+    
+   
+    
+  }
+}
+function* addLoanSaga() {
+  try {
+
+   
+    
+  } catch (e) {
+    
+    
+  }
+}
+function* addSaturationSaga() {
+  try {
+
+  } catch (e) {
+    
+  
+  }
+}
+function* addOtherSaga() {
+  try {
+
+  
+    
+  } catch (e) {
+    
+  
+  }
+}
+function* addOvertimeSaga() {
+  try {
+
+   
+    
+  } catch (e) {
+    
+   
   }
 }
 
 
 export default function* Employee() {
   
+  yield takeLatest(FETCH_EMPLOYEE_REQUEST, fetchEmployeeSaga);
+
+  yield takeLatest(CREATE_EMPLOYEE_CREATE_SALARY_REQUEST, createEmployeeSaga);
+  yield takeLatest(CREATE_EMPLOYEE_CREATE_ALLOWANCE_REQUEST, addAllowanceSaga);
+  yield takeLatest(ADD_EMPLOYEE_COMMISSION_REQUEST, addCommissionSaga);
+  yield takeLatest(ADD_EMPLOYEE_lOAN_REQUEST, addLoanSaga);
+  yield takeLatest(ADD_EMPLOYEE_SATURATION_DEDUCTION_REQUEST, addSaturationSaga);
+  yield takeLatest(ADD_EMPLOYEE_OVERTIME_REQUEST, addOvertimeSaga);
+  yield takeLatest(ADD_EMPLOYEE_OTHER_REQUEST, addOtherSaga);
   yield takeLatest(FETCH_EMPLOYEE_REQUEST, fetchEmployeeSaga);
 
 }
