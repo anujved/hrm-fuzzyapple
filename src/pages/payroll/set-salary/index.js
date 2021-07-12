@@ -27,13 +27,13 @@ const SetSalary = (props) => {
   const [showModal, setShowModal] = React.useState(false);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  // const {useSelector}  = useSelector()
+  const {data,loading,firstTime,error,message, firstLoading}  = useSelector((state)=>state.Employee)
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(()=>{
     
-    dispatch(fetchEmployee());
+    !firstLoading && dispatch(fetchEmployee());
 
   },[])
 
@@ -87,7 +87,7 @@ const SetSalary = (props) => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {employeeSalries.slice(0, limit).map((employeeSalary) => (
+                      {data.slice(0, limit).map((employeeSalary) => (
                         <TableRow
                           hover
                           key={employeeSalary.id}
@@ -113,7 +113,7 @@ const SetSalary = (props) => {
               </PerfectScrollbar>
               <TablePagination
                 component="div"
-                count={employeeSalries.length}
+                count={data.length}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleLimitChange}
                 page={page}

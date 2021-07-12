@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect, useMemo} from "react";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import {
@@ -17,16 +17,30 @@ import SaturationDeductionCard from "./set-salary/SaturationDeductionCard";
 import OtherPaymentCard from "./set-salary/OtherPaymentCard";
 import OvertimeCard from "./set-salary/OvertimeCard";
 import { SetSallaryProvider } from "./set-salary/components/setSalarayContext"
+import {useDispatch, useSelector} from "react-redux"
+import {fetchEmployee} from "./set-salary/store/actions"
+import { filter, findIndex, get } from "lodash";
 
 const SalaryDetailView = (props) => {
   const [showModal, setShowModal] = React.useState(false);
+  const {data,loading,firstTime,error,message, firstLoading}  = useSelector((state)=>state.Employee)
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    
+    !firstLoading && dispatch(fetchEmployee());
+
+  },[])
 
   const { id } = useParams();
-  console.log("----ID----", id);
-
   const onClickListener = () => {
     setShowModal(!showModal);
   };
+  const currentEmployee =  useMemo(()=>{
+    let index = findIndex(data,allId=>allId.id===id);
+    if(index !== -1){
+      return data[index]
+    }
+  },[data,id])
 
   return (
     <React.Fragment>
@@ -48,25 +62,25 @@ const SalaryDetailView = (props) => {
           <PerfectScrollbar>
             <Grid container mt={3} spacing={2}>
               <Grid item xs={12} md={6}>
-                <EmployeeSalaryCard />
+                <EmployeeSalaryCard payrollType={get(currentEmployee,'payrollType')} salary={get(currentEmployee,'salary')} id={get(currentEmployee,'id')} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <AllowanceCard />
+                <AllowanceCard name={get(currentEmployee,'name')} salary={get(currentEmployee,'salary')} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CommissionCard />
+                <CommissionCard payrollType={get(currentEmployee,'payrollType')} salary={get(currentEmployee,'salary')} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <LoanCard />
+                <LoanCard payrollType={get(currentEmployee,'payrollType')} salary={get(currentEmployee,'salary')} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <SaturationDeductionCard />
+                <SaturationDeductionCard payrollType={get(currentEmployee,'payrollType')} salary={get(currentEmployee,'salary')} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <OtherPaymentCard />
+                <OtherPaymentCard payrollType={get(currentEmployee,'payrollType')} salary={get(currentEmployee,'salary')} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <OvertimeCard />
+                <OvertimeCard payrollType={get(currentEmployee,'payrollType')} salary={get(currentEmployee,'salary')} />
               </Grid>
             </Grid>
           </PerfectScrollbar>
