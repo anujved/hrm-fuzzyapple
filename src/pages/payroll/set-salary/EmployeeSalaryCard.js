@@ -10,21 +10,14 @@ import {
 } from "@material-ui/core";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
-import {SetSallaryContext} from "./components/setSalarayContext"
-import AllowanceForm from "./components/AllowanceForm"
+import { SetSallaryContext } from "./components/setSalarayContext";
+import AllowanceForm from "./components/AllowanceForm";
 
-const employeeSalaries = [
-  {
-    id: 1,
-    payslipType: "Payslip Type",
-    salary: 10000,
-  },
-];
-
-const EmployeeSalaryCard = (props) => {
+const EmployeeSalaryCard = ({ payrollType, salary, id }) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const {OpenDialogWithForm, AllowanceSubmitHandler} = useContext(SetSallaryContext);
+  const { OpenDialogWithForm, AllowanceSubmitHandler } =
+    useContext(SetSallaryContext);
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
@@ -32,13 +25,16 @@ const EmployeeSalaryCard = (props) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
-  
+
   return (
     <Card>
       <CardHeader
         title="Employee Salary"
         buttonLabel="create"
-        onClickListener={OpenDialogWithForm.bind(this,[<AllowanceForm onSubmit={AllowanceSubmitHandler}  /> ,'Allowance Edit'])}
+        onClickListener={OpenDialogWithForm.bind(this, [
+          <AllowanceForm onSubmit={AllowanceSubmitHandler} />,
+          "Allowance Edit",
+        ])}
       />
       <PerfectScrollbar>
         <Table>
@@ -49,16 +45,10 @@ const EmployeeSalaryCard = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {employeeSalaries.slice(0, limit).map((employeeSalary) => (
-              <TableRow
-                hover
-                key={employeeSalary.id}
-                //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-              >
-                <TableCell>{employeeSalary.payslipType}</TableCell>
-                <TableCell>{employeeSalary.salary}</TableCell>
-              </TableRow>
-            ))}
+            <TableRow hover key={id}>
+              <TableCell>{payrollType}</TableCell>
+              <TableCell>{salary}</TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </PerfectScrollbar>
