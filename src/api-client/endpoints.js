@@ -215,4 +215,4 @@ export const UPDATE_LEAVES = "/updates-leave";
 
 
 // ****Employee****
-export const EMPLOYEE = "/employee";
+export const EMPLOYEE = "/employees";

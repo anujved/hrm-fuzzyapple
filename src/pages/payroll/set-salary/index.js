@@ -22,6 +22,7 @@ import VisibilityRoundedIcon from '@material-ui/icons/VisibilityRounded';
 import { useNavigate } from 'react-router-dom';
 import {fetchEmployee} from "./store/actions"
 import {useDispatch, useSelector} from "react-redux"
+import {get, has} from "lodash";
 
 const SetSalary = (props) => {
   const [showModal, setShowModal] = React.useState(false);
@@ -50,8 +51,14 @@ const SetSalary = (props) => {
   };
 
   const onClickViewSalaryListener = salary => {
-    navigate(`/payroll/set-salary/${salary.id}`);
+    navigate(`/payroll/set-salary/${salary._id}`);
   }
+
+  if(error){
+      return null
+  }
+
+
 
   return (
     <React.Fragment>
@@ -93,11 +100,12 @@ const SetSalary = (props) => {
                           key={employeeSalary.id}
                           //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
-                          <TableCell>{employeeSalary.employeeId}</TableCell>
-                          <TableCell>{employeeSalary.name}</TableCell>
-                          <TableCell>{employeeSalary.payrollType}</TableCell>
-                          <TableCell>{employeeSalary.salary}</TableCell>
-                          <TableCell>{employeeSalary.netSalary}</TableCell>
+                          <TableCell>{get(employeeSalary,'employeeId')}</TableCell>
+                          <TableCell>{get(employeeSalary,'personalDetail.employeeName')}</TableCell>
+                          <TableCell>{get(employeeSalary,'salary.payslipType')}</TableCell>
+                          <TableCell>{get(employeeSalary,'salary.salary')}</TableCell>
+                          <TableCell>{get(employeeSalary,'salary.salary')}</TableCell>
+                          {/* employeeSalary.netSalary */}
                           <TableCell>
                           <Tooltip title="View" placement="top" arrow>
                               <IconButton onClick={()=> onClickViewSalaryListener(employeeSalary)}>

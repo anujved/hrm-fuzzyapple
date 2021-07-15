@@ -29,7 +29,6 @@ function* fetchEmployeeSaga() {
   try {
 
     let response = yield call(fetchEmployee);
-
     yield put({type:FETCH_EMPLOYEE_SUCCESS, payload:response})
     
   } catch (e) {
