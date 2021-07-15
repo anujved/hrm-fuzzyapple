@@ -9,6 +9,12 @@ const AllowanceForm = ({onSubmit}) => {
       value: "taxables",
       name: "Taxables",
     },
+    {
+      id: 2,
+      value: "taxables",
+      name: "Tax not ables",
+    },
+    
   ];
 
   const initialValues = {
@@ -25,8 +31,8 @@ const AllowanceForm = ({onSubmit}) => {
   });
   return (
     <form onSubmit={formik.handleSubmit}>
-      <Grid container>
-        <Grid item>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
           <TextField
             label="Employee Name"
             variant="outlined"
@@ -35,7 +41,7 @@ const AllowanceForm = ({onSubmit}) => {
             name="employeeName"
           />
         </Grid>
-        <Grid>
+        <Grid item xs={12}>
           <TextField
             label="Allowance Option"
             variant="outlined"
@@ -52,7 +58,7 @@ const AllowanceForm = ({onSubmit}) => {
               ))}
           </TextField>
         </Grid>
-        <Grid>
+        <Grid item xs={12}>
           <TextField
             label="Title"
             variant="outlined"
@@ -61,7 +67,7 @@ const AllowanceForm = ({onSubmit}) => {
             name="title"
           />
         </Grid>
-        <Grid>
+        <Grid item xs={12}>
           <TextField
             label="Amount"
             variant="outlined"
@@ -70,11 +76,24 @@ const AllowanceForm = ({onSubmit}) => {
             name="amount"
           />
         </Grid>
-      </Grid>
-
-      <Button type="submit" variant="contained">
+        <Grid item xs={12}>
+          <Button type="submit"
+            variant="contained"
+            disabled={
+              !(formik.values.allowanceOption != '' &&
+                formik.values.amount != '' &&
+                formik.values.employeeName != '' &&
+                formik.values.title != '')
+            
+            }
+          >
         Submit
       </Button>
+        </Grid>
+              
+      </Grid>
+
+   
     </form>
   );
 };
