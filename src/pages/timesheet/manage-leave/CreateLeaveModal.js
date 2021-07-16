@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Dialog from "@material-ui/core/Dialog";
 import {
   Grid,
@@ -13,23 +13,24 @@ import {
 import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
+import { get,map } from "lodash";
 
 const leaveTypes = [
   { id: 1, option: "Casual Leave" },
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClickListener }) => {
+const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClickListener,editRow }) => {
 
   const [startDate, setStartDate] = React.useState(Date.now);
   const [endDate, setEndDate] = React.useState(Date.now);
 
   const formik = useFormik({
     initialValues: {
-      employee: "",
-      leaveType: "",
-      leaveReason: "",
-      remark: "",
+      employee: get(editRow,'employee.employeeId',""),
+      leaveType: get(editRow,'leaveType',""),
+      leaveReason: get(editRow,'leaveReason',""),
+      remark: get(editRow,'remark',""),
     },
     validate: (values) => {
       const errors = {};
@@ -55,6 +56,14 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
     validateOnChange: false,
   });
 
+  const employeesOption = useMemo(()=>{
+    return map(employees, (option, index) => (
+      <MenuItem key={`${index}_${get(option,'personalDetail.employeeName')}`} value={option.employeeId}>
+      {option.personalDetail.employeeName}
+    </MenuItem>))
+  
+  },[employees])
+
 
   return (
     <div>
@@ -66,7 +75,9 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
         <Box py={2} px={4}>
         <form onSubmit={formik.handleSubmit} autoComplete="off">
           <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New TimeSheet</Typography>
+            {
+              !!editRow? <Typography>Update TimeSheet</Typography>:<Typography>Create New TimeSheet</Typography> 
+            }
             <IconButton onClick={onCloseClickListener}>
               <CancelIcon />
             </IconButton>
@@ -75,20 +86,16 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
             <Grid item xs={12} md={12}>
               <TextField
                 label="Employee"
+                id="Employee"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                onChange={formik.handleChange}
                 name="employee"
+                value={formik.values.employee}
+                onChange={formik.handleChange}
                 select
               >
               {
-                employees && employees.map((option, index) => (
-                  <MenuItem key={index} value={option}>
-                  {option.personalDetail.employeeName}
-                </MenuItem>
-                ))
+               employeesOption
               }
               </TextField>
             </Grid>
@@ -97,10 +104,9 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
                 label="Leave Type"
                 variant="outlined"
                 fullWidth
-                // helperText={formik.errors.nameError && "Invalid Name"}
-                // error={formik.errors.nameError && true}
-                onChange={formik.handleChange}
                 name="leaveType"
+                value={formik.values.leaveType}
+                onChange={formik.handleChange}
                 select
               >
                   {leaveTypes &&
@@ -120,6 +126,7 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
                 label="Start Date"
                 value={startDate}
                 fullWidth
+                
                 onChange={(value) => setStartDate(value)}
               />
             </Grid>
@@ -140,6 +147,7 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
                 label="Leave Reason"
                 variant="outlined"
                 fullWidth
+                value={formik.values.leaveReason}
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
                 onChange={formik.handleChange}
@@ -152,6 +160,7 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
                 label="Remark"
                 variant="outlined"
                 fullWidth
+                value={formik.values.remark}
                 // helperText={formik.errors.nameError && "Invalid Name"}
                 // error={formik.errors.nameError && true}
                 onChange={formik.handleChange}
@@ -161,7 +170,9 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
             </Grid>
             <Grid item xs={12} md={12}>
               <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
+                {
+                  !!editRow ?'update':'Create'
+                }
               </Button>
               <Button>Cancel</Button>
             </Grid>
