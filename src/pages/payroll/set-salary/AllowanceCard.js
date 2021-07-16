@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Card,
   Table,
@@ -19,9 +19,13 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import { useSelector } from "react-redux";
 
 
 const AllowanceCard = ({ name, allowanceOption, title, amount, id }) => {
+
+  const {data,loading,firstTime,error,message, firstLoading}  = useSelector((state)=>state.Employee)
+
   
   const [allowanceData,setAllowanceData ]= useState(
     [
@@ -40,6 +44,9 @@ const AllowanceCard = ({ name, allowanceOption, title, amount, id }) => {
         id :2
       },
     ])
+  
+  
+
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   
@@ -221,7 +228,10 @@ const AllowanceCard = ({ name, allowanceOption, title, amount, id }) => {
    
     </form>
         </CommonDialog>
-    <Card>
+    
+      
+      
+      <Card>
       <CardHeader
         title="Allowance"
         buttonLabel="create"

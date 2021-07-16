@@ -33,7 +33,6 @@ const SetSalary = (props) => {
   const navigate = useNavigate();
 
   useEffect(()=>{
-    
     !firstLoading && dispatch(fetchEmployee());
 
   },[])
