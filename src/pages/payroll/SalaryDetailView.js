@@ -37,6 +37,8 @@ const SalaryDetailView = (props) => {
     }
   }, [data, id]);
 
+  console.log(data,'some data')
+
   return (
     <React.Fragment>
       <Helmet>Employee Set Salary</Helmet>

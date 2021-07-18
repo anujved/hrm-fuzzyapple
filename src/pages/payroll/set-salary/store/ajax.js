@@ -6,11 +6,12 @@ export const fetchEmployee = async () => {
     return data
 }
 
-export const addAllowance = async () => {
-    
-
-
-    return 
+export const addAllowance = async (payload,id) => {
+    SERVER.post('https://api.driftacademy.in/update-employee-allowance/'+id, JSON.stringify({
+        allowance: {
+           ...payload
+       }
+    }))
 }
 export const addCommission = async () => {
     

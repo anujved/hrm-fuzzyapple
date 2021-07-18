@@ -20,13 +20,14 @@ import CardHeader from "./CardHeader";
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
 import { useSelector } from "react-redux";
+import {addAllowance} from './store/actions'
 
 
-const AllowanceCard = ({ name, allowanceOption, title, amount, id }) => {
+const AllowanceCard = (props) => {
 
   const {data,loading,firstTime,error,message, firstLoading}  = useSelector((state)=>state.Employee)
 
-  
+  console.log(props,'some props')
   const [allowanceData,setAllowanceData ]= useState(
     [
       {
@@ -120,6 +121,7 @@ const AllowanceCard = ({ name, allowanceOption, title, amount, id }) => {
           id :values.id
           };
           setAllowanceData(updateData);
+          addAllowance()
           formik.setValues(formik.initialValues)
           setIsopen(false)
         }
