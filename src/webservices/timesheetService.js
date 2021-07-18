@@ -37,8 +37,8 @@ export default class TimesheetService {
         return await ApiClient.call(ApiClient.requestMethod.DELETE, endpoint, null, null, null, false);
     }
     
-    static updateLeave = async (params) => {
+    static updateLeave = async ({data, params}) => {
         const endpoint = `${UPDATE_LEAVES}/${params}`;
-        return await ApiClient.call(ApiClient.requestMethod.DELETE, endpoint, null, null, null, false);
+        return await ApiClient.call(ApiClient.requestMethod.PUT, endpoint, data, null, null, false);
     }
 }

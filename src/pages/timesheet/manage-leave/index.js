@@ -30,6 +30,7 @@ import EmployeeService from "src/webservices/employeeService";
 import { CatchingPokemonSharp } from "@material-ui/icons";
 import TimesheetService from "src/webservices/timesheetService";
 import ConfirmDialog from "src/common/confirm-dialog";
+import { get } from "lodash";
 
 const ManageTimesheet = (props) => {
   const navigate = useNavigate();
@@ -37,13 +38,15 @@ const ManageTimesheet = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
-  const [openLeaveActionDialog, setOpenLeaveActionDialog] = React.useState(false);
+  const [openLeaveActionDialog, setOpenLeaveActionDialog] =
+    React.useState(false);
   const [leaveData, setLeaveData] = React.useState(null);
   const [employees, setEmployees] = React.useState([]);
   const [leaves, setLeaves] = React.useState([]);
   const [leave, setLeave] = React.useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [currenSelecteRow, setCurrenSelecteRow] = React.useState(null);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -59,16 +62,29 @@ const ManageTimesheet = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
-  }
+    setCurrenSelecteRow(null);
+  };
 
   const onSubmitClickListener = async (data) => {
-    try{
-      const response = await TimesheetService.createLeave(data);
-      setOpenDialog(false);
-      getLeaves();
-    } catch(error){
+    try {
+      if (currenSelecteRow) {
+         TimesheetService.updateLeave({
+          data: {
+            ...data,
+            employeeId: get(currenSelecteRow, "employee.employeeId"),
+          },
+          params: get(currenSelecteRow, "_id"),
+        }).then((r)=>submitSucces(r))
+      } else {
+        TimesheetService.createLeave(data).then(r=>submitSucces(r))
+      }
+    } catch (error) {
       console.log(error);
     }
+  };
+  const submitSucces = (response) =>{
+    setOpenDialog(false);
+    getLeaves();
   }
 
   const onLeaveActionClickListener = (data) => {
@@ -79,30 +95,27 @@ const ManageTimesheet = (props) => {
   const onLeaveActionDialogCloseClickListener = () => {
     setLeaveData(null);
     setOpenLeaveActionDialog(false);
-  }
+  };
 
   const getEmployees = async () => {
-    try{
+    try {
       const response = await EmployeeService.fetchAllEmployee();
       setEmployees(response);
-    }
-    catch(error){
-    }
-  }
+    } catch (error) {}
+  };
 
   const getLeaves = async () => {
-    try{
+    try {
       const response = await TimesheetService.fetchAllLeave();
       setLeaves(response);
-    } catch(error){
-    }
-  }
+    } catch (error) {}
+  };
 
   /**
    * Listener to delete a ticket
    * @param {*} ticket - to delete
-  */
-   const onDeleteClickListener = (leave) => {
+   */
+  const onDeleteClickListener = (leave) => {
     console.log("delete listener");
     setLeave(leave);
     setOpenConfirmDialog(true);
@@ -127,11 +140,20 @@ const ManageTimesheet = (props) => {
     console.log("cancel listener");
     setOpenConfirmDialog(false);
   };
-  
+
   React.useEffect(() => {
     getEmployees();
     getLeaves();
-  },[]);
+  }, []);
+
+  /**
+   *
+   * @param {Object} currentRow select Current row
+   */
+  const editHandler = (currentRow) => {
+    setCurrenSelecteRow(currentRow);
+    setOpenDialog(true);
+  };
 
   return (
     <React.Fragment>
@@ -166,61 +188,68 @@ const ManageTimesheet = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {leaves && leaves.slice(0, limit).map((leave) => (
-                      <TableRow
-                        hover
-                        key={leave.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
-                      >
-                        <TableCell>{leave?.employee?.personalDetail?.employeeName}</TableCell>
-                        <TableCell>{leave.leaveType}</TableCell>
-                        <TableCell>{leave.startDate}</TableCell>
-                        <TableCell>{leave.endDate}</TableCell>
-                        <TableCell>{leave.leaveReason}</TableCell>
-                        <TableCell>{leave.remark}</TableCell>
-                        <TableCell>
-                          <Grid container>
-                            <Grid>
-                              <Tooltip
-                                title="Leave Action"
-                                placement="top"
-                                arrow
-                              >
-                                <IconButton
-                                  style={{ float: "right", color: "green" }}
-                                  onClick={() => onLeaveActionClickListener(leave)}
-                                  color="primary"
+                    {leaves &&
+                      leaves.slice(0, limit).map((leave) => (
+                        <TableRow
+                          hover
+                          key={leave.id}
+                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        >
+                          <TableCell>
+                            {leave?.employee?.personalDetail?.employeeName}
+                          </TableCell>
+                          <TableCell>{leave.leaveType}</TableCell>
+                          <TableCell>{leave.startDate}</TableCell>
+                          <TableCell>{leave.endDate}</TableCell>
+                          <TableCell>{leave.leaveReason}</TableCell>
+                          <TableCell>{leave.remark}</TableCell>
+                          <TableCell>
+                            <Grid container>
+                              <Grid>
+                                <Tooltip
+                                  title="Leave Action"
+                                  placement="top"
+                                  arrow
                                 >
-                                  <PlayCircleFilledOutlinedIcon />
-                                </IconButton>
-                              </Tooltip>
+                                  <IconButton
+                                    style={{ float: "right", color: "green" }}
+                                    onClick={() =>
+                                      onLeaveActionClickListener(leave)
+                                    }
+                                    color="primary"
+                                  >
+                                    <PlayCircleFilledOutlinedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={editHandler.bind(this, leave)}
+                                    color="primary"
+                                  >
+                                    <EditRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <IconButton
+                                    style={{ float: "right" }}
+                                    onClick={() => {
+                                      onDeleteClickListener(leave);
+                                    }}
+                                    color="secondary"
+                                  >
+                                    <DeleteForeverRoundedIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {}}
-                                  color="primary"
-                                >
-                                  <EditRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                            <Grid>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <IconButton
-                                  style={{ float: "right" }}
-                                  onClick={() => {onDeleteClickListener(leave)}}
-                                  color="secondary"
-                                >
-                                  <DeleteForeverRoundedIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </Box>
@@ -237,18 +266,26 @@ const ManageTimesheet = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateLeaveModal 
-        open={openDialog} 
-        employees={employees} 
-        onSubmitClickListener={onSubmitClickListener} 
-        onCloseClickListener={onDialogCloseClickListener} 
-      />
+      {
+        openDialog && <CreateLeaveModal
+        open={openDialog}
+        employees={employees}
+        onSubmitClickListener={onSubmitClickListener}
+        onCloseClickListener={onDialogCloseClickListener}
+        editRow={currenSelecteRow}
+      /> 
+      }
+      
       <ConfirmDialog
         open={openConfirmDialog}
         onConfirmClickListener={onConfirmClickListener}
         onCancelClickListener={onCancelClickListener}
       />
-      <LeaveActionModal open={openLeaveActionDialog} onCloseClickListener={onLeaveActionDialogCloseClickListener} data={leaveData} />
+      <LeaveActionModal
+        open={openLeaveActionDialog}
+        onCloseClickListener={onLeaveActionDialogCloseClickListener}
+        data={leaveData}
+      />
     </React.Fragment>
   );
 };
