@@ -19,8 +19,8 @@ import { filter, findIndex, get } from "lodash";
 
 const SalaryDetailView = (props) => {
   const [showModal, setShowModal] = React.useState(false);
-  const { data, loading, firstTime, error, message, firstLoading } =
-    useSelector((state) => state.Employee);
+  const { data, loading, firstTime, error, message, firstLoading } = useSelector((state) => state.Employee);
+  
   const dispatch = useDispatch();
   useEffect(() => {
     !firstLoading && dispatch(fetchEmployee());
@@ -31,13 +31,14 @@ const SalaryDetailView = (props) => {
     setShowModal(!showModal);
   };
   const currentEmployee = useMemo(() => {
-    let index = findIndex(data, (allId) => allId.id === id);
+    
+    let index = data.findIndex((data)=>data._id== id);
     if (index !== -1) {
       return data[index];
     }
   }, [data, id]);
+  console.log(currentEmployee,'current employes')
 
-  console.log(data,'some data')
 
   return (
     <React.Fragment>
@@ -64,15 +65,14 @@ const SalaryDetailView = (props) => {
                     payrollType={get(currentEmployee, "payrollType")}
                     salary={get(currentEmployee, "salary")}
                     id={get(currentEmployee, "id")}
+                    name={get(currentEmployee,'personalDetail.employeeName')}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <AllowanceCard
-                    name={get(currentEmployee, "name")}
-                    allowanceOption={get(currentEmployee, "allowanceOption")}
-                    amount={get(currentEmployee, "amount")}
-                    title={get(currentEmployee, "title")}
-                    id={get(currentEmployee, "id")}
+                    name={get(currentEmployee,'personalDetail.employeeName')}
+                    CurrentData={get(currentEmployee, 'allowance')}
+                    id={get(currentEmployee,'_id')}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>

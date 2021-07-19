@@ -53,19 +53,19 @@ const EmployeeSalaryCard = ({ payrollType, salary, id }) => {
   let option = [
     {
     id: 1,
-    value: 'type1',
-    name:'type1'
+    value: 'monthly',
+    name:'monthly'
 },
     {
     id: 2,
-    value: 'type2',
-    name:'type2'
+    value: 'weekly',
+    name:'weekly'
   },
     
     {
     id: 3,
-    value: 'type3',
-    name:'type2'
+    value: 'yearly',
+    name:'yearly'
 },
 ]
 

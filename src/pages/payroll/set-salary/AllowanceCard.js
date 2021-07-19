@@ -19,32 +19,17 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
-import { useSelector } from "react-redux";
-import {addAllowance} from './store/actions'
+import { useDispatch, useSelector } from "react-redux";
+import {addAllowance,deleteAllowance} from './store/ajax'
+import { fetchEmployee } from "./store/actions";
 
 
-const AllowanceCard = (props) => {
+const AllowanceCard = ({CurrentData=[],name,id}) => {
 
-  const {data,loading,firstTime,error,message, firstLoading}  = useSelector((state)=>state.Employee)
+  console.log(CurrentData, 'current Data')
+  const dispatch = useDispatch()
 
-  console.log(props,'some props')
-  const [allowanceData,setAllowanceData ]= useState(
-    [
-      {
-        name: 'nagaraj',
-        allowanceOption: 'type',
-        title: 'some title',
-        amount: 500,
-        id :1
-      },
-      {
-        name: 'nagaraj',
-        allowanceOption: 'type',
-        title: 'some title',
-        amount: 500,
-        id :2
-      },
-    ])
+  const allowanceData = CurrentData
   
   
 
@@ -65,7 +50,9 @@ const AllowanceCard = (props) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
-
+  const EmployeeLoad = () => {
+    dispatch(fetchEmployee())
+ }
  
     let option = [
       {
@@ -84,9 +71,9 @@ const AllowanceCard = (props) => {
     let initialValues = {
       employeeName: "",
       title: "",
-      allowanceOption: "",
+      allowance_option: "",
       amount: "",
-      id: Math.random(),
+      id: Math.random().toString().slice(2,11),
       edit:false
       
     };
@@ -95,51 +82,40 @@ const AllowanceCard = (props) => {
       initialValues: initialValues,
       validate: (values) => {},
       onSubmit: (values) => {
-        console.log(values)
         if (!values.edit) {
-          let newAllowance = allowanceData
-          newAllowance.push({
-            name:values.employeeName,
-            allowanceOption:values.allowanceOption,
-            title:values.title,
-            amount:values.amount,
-            id: Math.random()
+          addAllowance({
+            title: values.title,
+            amount: values.amount,
+            allowance_option:values.allowance_option
+          }, id).then((data) => {
+            EmployeeLoad()
           })
-          setAllowanceData(newAllowance)
-          formik.setValues(formik.initialValues)
-          setIsopen(false)
         }
         else {
-
-          let reqIndex = allowanceData.findIndex((data) => data.id == values.id)
-          let updateData = allowanceData;
-          updateData[reqIndex] = {
-          name: values.employeeName,
-          allowanceOption: values.allowanceOption,
-          title: values.title,
-          amount: values.amount,
-          id :values.id
-          };
-          setAllowanceData(updateData);
-          addAllowance()
-          formik.setValues(formik.initialValues)
-          setIsopen(false)
+          addAllowance({
+            title: values.title,
+            amount: values.amount,
+            allowance_option:values.allowance_option
+          },id)
         }
+  
+      
+      
       }
     });
   
   const editHandler = (id) => {
-    let reqIndex = allowanceData.findIndex((data) => data.id == id)
+    let reqIndex = allowanceData.findIndex((data) => data._id == id)
     let reqData = allowanceData[reqIndex];
     console.log(reqData)
 
     formik.setValues({
       ...formik.values,
-      employeeName: reqData.name,
+      employeeName: name,
       title: reqData.title,
-      allowanceOption: reqData.allowanceOption,
+      allowance_option: reqData.allowance_option,
       amount: reqData.amount,
-      id: reqData.id,
+      id: reqData._id,
       edit:true
     })
 
@@ -148,9 +124,13 @@ const AllowanceCard = (props) => {
   }
 
   const deleteHandler = (id) => {
-    let filteredArray = allowanceData.filter(data => data.id != id)
-    setAllowanceData(filteredArray)
+    console.log(id)
+    // deleteAllowance(id).then((data) => {
+    //   console.log(data);
+    //   EmployeeLoad()
+    // })
   }
+
   
   
   return (
@@ -166,7 +146,7 @@ const AllowanceCard = (props) => {
           <TextField
             label="Employee Name"
                 variant="outlined"
-                value={formik.values.employeeName}
+                value={name}
             fullWidth
             onChange={formik.handleChange}
             name="employeeName"
@@ -177,10 +157,10 @@ const AllowanceCard = (props) => {
             label="Allowance Option"
             variant="outlined"
                 fullWidth
-                value={formik.values.allowanceOption}
+                value={formik.values.allowance_option}
             select
             onChange={formik.handleChange}
-            name="allowanceOption"
+            name="allowance_option"
           >
             {option &&
               option.map((option) => (
@@ -214,9 +194,8 @@ const AllowanceCard = (props) => {
           <Button type="submit"
             variant="contained"
             disabled={
-              !(formik.values.allowanceOption != '' &&
+              !(formik.values.allowance_option != '' &&
                 formik.values.amount != '' &&
-                formik.values.employeeName != '' &&
                 formik.values.title != '')
             
             }
@@ -251,25 +230,24 @@ const AllowanceCard = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-              {
-                allowanceData&&allowanceData?.map((data, index) => (
+              {allowanceData?.map((data, index) => (
                   <TableRow
                 hover
-                key={data.id}
+                key={data._id}
               >
-                <TableCell>{data.name}</TableCell>
-                <TableCell>{data.allowanceOption}</TableCell>
+                <TableCell>{name}</TableCell>
+                <TableCell>{data.allowance_option}</TableCell>
                 <TableCell>{data.title}</TableCell>
                 <TableCell>{data.amount}</TableCell>
                 <TableCell>
                   <Grid container>
                     <Grid item>
-                      <IconButton onClick={()=>editHandler(data.id)}> 
+                      <IconButton onClick={()=>editHandler(data._id)}> 
                         <EditRoundedIcon />
                       </IconButton>
                     </Grid>
                     <Grid item>
-                      <IconButton onClick={()=>{deleteHandler(data.id)}}>
+                      <IconButton onClick={()=>{deleteHandler(data._id)}}>
                         <DeleteForeverRoundedIcon style={{color: 'red'}} />
                       </IconButton>
                     </Grid>

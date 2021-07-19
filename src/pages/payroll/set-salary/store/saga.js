@@ -51,8 +51,7 @@ function* createEmployeeSaga() {
 }
 function* addAllowanceSaga() {
   try {
-    const data= yield(addAllowance)
-    console.log(data)
+ 
   } catch (e) {
     console.log(e)
   }
