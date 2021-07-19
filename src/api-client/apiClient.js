@@ -23,11 +23,11 @@ export default class ApiClient {
         headers = this.addCommonHeaders(headers);
         const token = '';
 
-        if(isAuthTokenRequired) {
+        if (isAuthTokenRequired) {
             headers["Authorization"] = "Bearer " + token;
         }
 
-        let axiosInstance = axios.create({baseURL: "https://api.driftacademy.in"});
+        let axiosInstance = axios.create({ baseURL: "https://api.driftacademy.in" });
 
         try {
             let response = await axiosInstance.request({

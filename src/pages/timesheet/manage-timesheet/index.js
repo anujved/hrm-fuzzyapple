@@ -74,7 +74,9 @@ const ManageTimesheet = (props) => {
   const fetchTimesheets = async () => {
     try {
       const response = await TimesheetService.fetchAllTimesheet();
-      setTimesheets(response);
+      setTimesheets(Object.entries(response));
+      // console.log(typeof(response))
+      // console.log(Object.entries(response))
     } catch (error) { }
   };
 
@@ -89,9 +91,16 @@ const ManageTimesheet = (props) => {
   };
 
   const handleEdit = (id, e) => {
-    const { date, employee, hours, remark } = timesheets.find(obj => obj._id === id)
+    // console.log(timesheets)
+    const data = timesheets.find(obj => obj[1]._id === id && obj[1])
+    const { created_at, employee, hours, remark } = data[1]
+    console.log(data[1])
+    console.log(created_at)
+    console.log(employee)
+    console.log(hours)
+    console.log(remark)
     const updateTimesheetObject = {
-      initialValues: { date: date.valueOf(), employee, hours, remark },
+      initialValues: { date: created_at.valueOf(), employee, hours, remark },
       onUpdate: async () => {
         try {
           // const response = await TimesheetService.updateTimeSheet(values);
@@ -131,47 +140,50 @@ const ManageTimesheet = (props) => {
   }
 
   const getTimeSheets = async () => {
-    try{
+    try {
       const response = await TimesheetService.fetchAllTimesheet();
       setTimesheets(response);
     }
-    catch(error){}
+    catch (error) { }
   }
 
-    /**
-   * Listener to delete a ticket
-   * @param {*} ticket - to delete
-  */
-     const onDeleteClickListener = (timesheet) => {
-      console.log("delete listener");
-      setTimesheet(timesheet);
-      setOpenConfirmDialog(true);
-    };
-  
-    const onConfirmClickListener = async () => {
-      console.log("confirm listener");
-      setOpenConfirmDialog(false);
-      setOpenBackdrop(true);
-      try {
-        const result = await TimesheetService.deleteTimesheet(timesheet._id);
-        console.log("--Delete-Result--", result);
-        setOpenBackdrop(false);
-        getTimeSheets();
-      } catch (error) {
-        console.log("--Delete-Error--", error);
-        setOpenBackdrop(false);
-      }
-    };
-  
-    const onCancelClickListener = () => {
-      console.log("cancel listener");
-      setOpenConfirmDialog(false);
-    };
+  /**
+ * Listener to delete a ticket
+ * @param {*} ticket - to delete
+*/
+  const onDeleteClickListener = (timesheet) => {
+    console.log("delete listener");
+    // console.log(timesheet)
+    setTimesheet(timesheet);
+    setOpenConfirmDialog(true);
+  };
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await TimesheetService.deleteTimesheet(timesheet._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getTimeSheets();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
 
   React.useEffect(() => {
     fetchEmployees();
     fetchTimesheets();
   }, []);
+
+  // console.log(timesheets)
 
   return (
     <React.Fragment>
@@ -208,38 +220,41 @@ const ManageTimesheet = (props) => {
                     </TableHead>
                     <TableBody>
                       {timesheets &&
-                        timesheets.slice(0, limit).map((timesheet, index) => (
-                          <TableRow hover key={index}>
-                            <TableCell>{timesheet.employee}</TableCell>
-                            <TableCell>
-                              {moment(timesheet.created_at).format("DD/MM/YYYY")}
-                            </TableCell>
-                            <TableCell>{timesheet.hours}</TableCell>
-                            <TableCell>{timesheet.remark}</TableCell>
-                            <TableCell>
-                              <Grid container>
-                                <Grid>
-                                  <IconButton
-                                    style={{ float: "right" }}
-                                    onClick={handleEdit.bind(this, timesheet._id)}
-                                    color="primary"
-                                  >
-                                    <EditRoundedIcon />
-                                  </IconButton>
+                        timesheets.slice(0, limit).map((timesheet, index) => {
+                          {/* console.log(timesheet) */ }
+                          return (
+                            <TableRow hover key={index}>
+                              <TableCell>{timesheet.employee}</TableCell>
+                              <TableCell>
+                                {moment(timesheet[1].created_at).format("DD/MM/YYYY")}
+                              </TableCell>
+                              <TableCell>{timesheet[1].hours}</TableCell>
+                              <TableCell>{timesheet[1].remark}</TableCell>
+                              <TableCell>
+                                <Grid container>
+                                  <Grid>
+                                    <IconButton
+                                      style={{ float: "right" }}
+                                      onClick={handleEdit.bind(this, timesheet[1]._id)}
+                                      color="primary"
+                                    >
+                                      <EditRoundedIcon />
+                                    </IconButton>
+                                  </Grid>
+                                  <Grid>
+                                    <IconButton
+                                      style={{ float: "right" }}
+                                      onClick={() => onDeleteClickListener(timesheet[1])}
+                                      color="secondary"
+                                    >
+                                      <DeleteForeverRoundedIcon />
+                                    </IconButton>
+                                  </Grid>
                                 </Grid>
-                                <Grid>
-                                  <IconButton
-                                    style={{ float: "right" }}
-                                    onClick={() => onDeleteClickListener(timesheet)}
-                                    color="secondary"
-                                  >
-                                    <DeleteForeverRoundedIcon />
-                                  </IconButton>
-                                </Grid>
-                              </Grid>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
                     </TableBody>
                   </Table>
                 </Box>

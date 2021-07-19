@@ -64,15 +64,15 @@ const SalaryDetailView = (props) => {
                   <EmployeeSalaryCard
                     payrollType={get(currentEmployee, "payrollType")}
                     salary={get(currentEmployee, "salary")}
-                    id={get(currentEmployee, "id")}
-                    name={get(currentEmployee,'personalDetail.employeeName')}
+                    userId={get(currentEmployee, "_id")}
+                    name={get(currentEmployee, 'personalDetail.employeeName')}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <AllowanceCard
                     name={get(currentEmployee,'personalDetail.employeeName')}
                     CurrentData={get(currentEmployee, 'allowance')}
-                    id={get(currentEmployee,'_id')}
+                    userId={get(currentEmployee, '_id')}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -81,7 +81,8 @@ const SalaryDetailView = (props) => {
                     allowanceOption={get(currentEmployee, "allowanceOption")}
                     amount={get(currentEmployee, "amount")}
                     title={get(currentEmployee, "title")}
-                    id={get(currentEmployee, "id")}
+                    userId={get(currentEmployee, "_id")}
+                    CurrentData={get(currentEmployee, "commission")}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -92,34 +93,38 @@ const SalaryDetailView = (props) => {
                     startDate={get(currentEmployee, "startDate")}
                     endDate={get(currentEmployee, "endDate")}
                     title={get(currentEmployee, "title")}
-                    id={get(currentEmployee, "id")}
+                    userId={get(currentEmployee, "_id")}
+                    CurrentData={get(currentEmployee, "loan")}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <SaturationDeductionCard
-                    id={get(currentEmployee, "id")}
+                    userId={get(currentEmployee, "_id")}
                     name={get(currentEmployee, "name")}
                     title={get(currentEmployee, "title")}
                     amount={get(currentEmployee, "amount")}
                     deductionOption={get(currentEmployee, "deductionOption")}
+                    CurrentData={get(currentEmployee, "saturation_deduction")}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <OtherPaymentCard
-                    id={get(currentEmployee, "id")}
+                    userId={get(currentEmployee, "_id")}
                     name={get(currentEmployee, "name")}
                     title={get(currentEmployee, "title")}
                     amount={get(currentEmployee, "amount")}
+                    CurrentData={get(currentEmployee, "other_payments")}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <OvertimeCard
-                    id={get(currentEmployee, "id")}
+                    userId={get(currentEmployee, "_id")}
                     name={get(currentEmployee, "name")}
                     overtimeTitle={get(currentEmployee, "overtimeTitle")}
                     numberOfDays={get(currentEmployee, "numberOfDays")}
                     hours={get(currentEmployee, "hours")}
                     rate={get(currentEmployee, "rate")}
+                    CurrentData={get(currentEmployee, "overtime")}
                   />
                 </Grid>
               </Grid>

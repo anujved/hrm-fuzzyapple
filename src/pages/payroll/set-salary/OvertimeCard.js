@@ -20,6 +20,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import CardHeader from "./CardHeader";
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import { addOvertime, deleteOvertime } from "./store/ajax";
+import { fetchEmployee } from "./store/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 
 const OvertimeCard = ({
@@ -29,33 +32,21 @@ const OvertimeCard = ({
   numberOfDays,
   hours,
   rate,
+  userId,
+  CurrentData = []
 }) => {
 
-  const [overTimeData, setOverTimeData] = useState([
-    {
-      id:1,
-      name:'nagraj',
-      overtimeTitle:'this is the title',
-      numberOfDays:25,
-      hours:12,
-      rate:150,
-    },
-    {
-      id:2,
-      name:'nagraj',
-      overtimeTitle:'this is the title',
-      numberOfDays:25,
-      hours:12,
-      rate:150,
-    },
-  ])
+  // const [overTimeData, setOverTimeData] = useState(CurrentData)
+  const overTimeData = CurrentData
+
+  const dispatch = useDispatch()
 
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [isOpen, setIsopen] = useState(false);
   const CloseDialogWithForm = () => {
     setIsopen(false);
-    formik.setValues({...formik.values,edit:false})
+    formik.setValues({ ...formik.values, edit: false })
   };
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -65,7 +56,9 @@ const OvertimeCard = ({
     setPage(newPage);
   };
 
-  
+  const EmployeeLoad = () => {
+    dispatch(fetchEmployee())
+  }
 
   let option = [
     {
@@ -78,35 +71,42 @@ const OvertimeCard = ({
       value: "taxabless",
       name: "Tax not ables",
     },
-    
+
   ];
 
   const initialValues = {
     employeeName: '',
-    overtimeTitle:'',
+    overtimeTitle: '',
     days: '',
     hours: '',
     rate: '',
     edit: false,
-    id:Math.random()
-}
+    id: Math.random()
+  }
 
   const formik = useFormik({
     initialValues: initialValues,
-    validate: (values) => {},
+    validate: (values) => { },
     onSubmit: (values) => {
       console.log(values)
       if (!values.edit) {
-        let newOverTimeData= overTimeData
+        let newOverTimeData = overTimeData
         newOverTimeData.push({
-          id:Math.random(),
-          name:values.employeeName,
-          overtimeTitle:values.overtimeTitle,
-          numberOfDays:values.days,
-          hours:values.hours,
-          rate:values.rate,
+          id: Math.random(),
+          name: values.employeeName,
+          overtimeTitle: values.overtimeTitle,
+          numberOfDays: values.days,
+          hours: values.hours,
+          rate: values.rate,
         })
-        setOverTimeData(newOverTimeData)
+        addOvertime({
+          overtime_title: values.overtimeTitle,
+          rate: values.rate,
+          no_of_days: values.days,
+          hours: values.hours
+        }, userId)
+        EmployeeLoad()
+        // setOverTimeData(newOverTimeData)
         formik.setValues(formik.initialValues)
         setIsopen(false)
       }
@@ -116,178 +116,187 @@ const OvertimeCard = ({
         let updateData = overTimeData;
         updateData[reqIndex] = {
           employeeName: values.employeeName,
-          overtimeTitle:values.overtimeTitle,
+          overtimeTitle: values.overtimeTitle,
           days: values.days,
           hours: values.hours,
           rate: values.rate,
-          edit:false
+          edit: false
         };
-        setOverTimeData(updateData);
+        addOvertime({
+          overtime_title: values.overtimeTitle,
+          rate: values.rate,
+          no_of_days: values.days,
+          hours: values.hours
+        }, userId)
+        EmployeeLoad()
+        // setOverTimeData(updateData);
         formik.setValues(formik.initialValues)
         setIsopen(false)
       }
     }
   });
 
-const editHandler = (id) => {
-  let reqIndex = overTimeData.findIndex((data) => data.id == id)
-  let reqData = overTimeData[reqIndex];
+  const editHandler = (id) => {
+    let reqIndex = overTimeData.findIndex((data) => data.id == id)
+    let reqData = overTimeData[reqIndex];
 
-  formik.setValues({
-    ...formik.values,
-    employeeName: reqData.employeeName,
-    overtimeTitle:reqData.overtimeTitle,
-    days: reqData.numberOfDays,
-    hours: reqData.hours,
-    rate: reqData.rate,
-    edit:true
-  })
+    formik.setValues({
+      ...formik.values,
+      employeeName: reqData.employeeName,
+      overtimeTitle: reqData.overtimeTitle,
+      days: reqData.numberOfDays,
+      hours: reqData.hours,
+      rate: reqData.rate,
+      edit: true
+    })
 
-  setIsopen(true)
+    setIsopen(true)
 
-}
+  }
 
-const deleteHandler = (id) => {
-  let filteredArray = overTimeData.filter(data => data.id != id)
-  setOverTimeData(filteredArray)
-}
-console.log(formik.values)
+  const deleteHandler = (id) => {
+    // let filteredArray = overTimeData.filter(data => data.id != id)
+    // setOverTimeData(filteredArray)
+    deleteOvertime(userId, id)
+    EmployeeLoad()
+  }
+  console.log(formik.values)
   return (
     <>
-                   <CommonDialog
-          open={isOpen}
-          onCloseClickListener={CloseDialogWithForm}
-          title='Add allowance to employee'
-        >
-           <form onSubmit={formik.handleSubmit}>
-               <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Employee Name"
-                            variant="outlined"
-                            fullWidth
+      <CommonDialog
+        open={isOpen}
+        onCloseClickListener={CloseDialogWithForm}
+        title='Add allowance to employee'
+      >
+        <form onSubmit={formik.handleSubmit}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                label="Employee Name"
+                variant="outlined"
+                fullWidth
                 onChange={formik.handleChange}
                 value={formik.values.employeeName}
 
-                            name="employeeName"
-                        />
-                    </Grid>
-                  
-                    <Grid item xs={12}>
-                         <TextField
-                                value={formik.values.overtimeTitle}
+                name="employeeName"
+              />
+            </Grid>
 
-                            label="Overtime Title"
-                            variant="outlined"
-                            fullWidth
-                            onChange={formik.handleChange}
-                            name="overtimeTitle"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Days"
-                            variant="outlined"
-                            fullWidth
-                            onChange={formik.handleChange}
+            <Grid item xs={12}>
+              <TextField
+                value={formik.values.overtimeTitle}
+
+                label="Overtime Title"
+                variant="outlined"
+                fullWidth
+                onChange={formik.handleChange}
+                name="overtimeTitle"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Days"
+                variant="outlined"
+                fullWidth
+                onChange={formik.handleChange}
                 name="days"
                 value={formik.values.days}
 
-                            />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Hours"
-                            variant="outlined"
-                            fullWidth
-                            onChange={formik.handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Hours"
+                variant="outlined"
+                fullWidth
+                onChange={formik.handleChange}
                 name="hours"
                 value={formik.values.hours}
 
-                            />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Rate"
-                            variant="outlined"
-                            fullWidth
-                            onChange={formik.handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Rate"
+                variant="outlined"
+                fullWidth
+                onChange={formik.handleChange}
                 name="rate"
                 value={formik.values.rate}
-                            />
-                    </Grid>
-                 
-                    
-                    <Grid item xs={12}>
-
-                        <Button
-                        type="submit"
-                        variant="contained"
-                        disabled={!(
-                            formik.values.days !=''&&
-                            formik.values.employeeName!='' &&
-                            formik.values.hours !=''&&
-                            formik.values.overtimeTitle!='' &&
-                            formik.values.rate!=''
-                        )}
-                        >
-                        Submit
-                        </Button>
-                    </Grid>
-
+              />
             </Grid>
-            </form>
+
+
+            <Grid item xs={12}>
+
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!(
+                  formik.values.days != '' &&
+                  formik.values.employeeName != '' &&
+                  formik.values.hours != '' &&
+                  formik.values.overtimeTitle != '' &&
+                  formik.values.rate != ''
+                )}
+              >
+                Submit
+              </Button>
+            </Grid>
+
+          </Grid>
+        </form>
       </CommonDialog>
-   
-   
-    <Card>
-      <CardHeader
-        title="Overtime"
-        buttonLabel="create"
-        onClickListener={()=>setIsopen(true)}
-      />
-      <PerfectScrollbar>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Employee Name</TableCell>
-              <TableCell>Overtime Title</TableCell>
-              <TableCell>Number of days</TableCell>
-              <TableCell>Hours</TableCell>
-              <TableCell>Rate</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
+
+
+      <Card>
+        <CardHeader
+          title="Overtime"
+          buttonLabel="create"
+          onClickListener={() => setIsopen(true)}
+        />
+        <PerfectScrollbar>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Employee Name</TableCell>
+                <TableCell>Overtime Title</TableCell>
+                <TableCell>Number of days</TableCell>
+                <TableCell>Hours</TableCell>
+                <TableCell>Rate</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
             <TableBody>
               {overTimeData.map((data, i) => (
                 <TableRow hover key={data.id}>
-                <TableCell>{data.name}</TableCell>
-                <TableCell>{data.overtimeTitle}</TableCell>
-                <TableCell>{data.numberOfDays}</TableCell>
-                <TableCell>{data.hours}</TableCell>
-                <TableCell>{data.rate}</TableCell>
-                <TableCell>
-                  <Grid container>
-                    <Grid item>
-                      <IconButton onClick={()=>{editHandler(data.id)}}  >
-                        <EditRoundedIcon />
-                      </IconButton>
+                  <TableCell>{data.name}</TableCell>
+                  <TableCell>{data.overtime_title}</TableCell>
+                  <TableCell>{data.no_of_days}</TableCell>
+                  <TableCell>{data.hours}</TableCell>
+                  <TableCell>{data.rate}</TableCell>
+                  <TableCell>
+                    <Grid container>
+                      <Grid item>
+                        <IconButton onClick={() => { editHandler(data._id) }}  >
+                          <EditRoundedIcon />
+                        </IconButton>
+                      </Grid>
+                      <Grid item>
+                        <IconButton onClick={() => { deleteHandler(data._id) }} >
+                          <DeleteForeverRoundedIcon style={{ color: "red" }} />
+                        </IconButton>
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <IconButton onClick={()=>{deleteHandler(data.id)}} >
-                        <DeleteForeverRoundedIcon style={{ color: "red" }} />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </TableCell>
-              </TableRow>
+                  </TableCell>
+                </TableRow>
               ))}
-            
-          </TableBody>
-        </Table>
-      </PerfectScrollbar>
+
+            </TableBody>
+          </Table>
+        </PerfectScrollbar>
       </Card>
-      </>
+    </>
   );
 };
 

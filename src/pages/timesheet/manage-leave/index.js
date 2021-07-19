@@ -68,21 +68,22 @@ const ManageTimesheet = (props) => {
   const onSubmitClickListener = async (data) => {
     try {
       if (currenSelecteRow) {
-         TimesheetService.updateLeave({
+        TimesheetService.updateLeave({
           data: {
-            ...data,
-            employeeId: get(currenSelecteRow, "employee.employeeId"),
+            // ...data,
+            "leave_action": "approved"
+            // employeeId: get(currenSelecteRow, "employee.employeeId"),
           },
           params: get(currenSelecteRow, "_id"),
-        }).then((r)=>submitSucces(r))
+        }).then((r) => submitSucces(r))
       } else {
-        TimesheetService.createLeave(data).then(r=>submitSucces(r))
+        TimesheetService.createLeave(data).then(r => submitSucces(r))
       }
     } catch (error) {
       console.log(error);
     }
   };
-  const submitSucces = (response) =>{
+  const submitSucces = (response) => {
     setOpenDialog(false);
     getLeaves();
   }
@@ -101,14 +102,14 @@ const ManageTimesheet = (props) => {
     try {
       const response = await EmployeeService.fetchAllEmployee();
       setEmployees(response);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const getLeaves = async () => {
     try {
       const response = await TimesheetService.fetchAllLeave();
       setLeaves(response);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   /**
@@ -151,6 +152,7 @@ const ManageTimesheet = (props) => {
    * @param {Object} currentRow select Current row
    */
   const editHandler = (currentRow) => {
+    console.log(currentRow)
     setCurrenSelecteRow(currentRow);
     setOpenDialog(true);
   };
@@ -193,7 +195,7 @@ const ManageTimesheet = (props) => {
                         <TableRow
                           hover
                           key={leave.id}
-                          //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                         >
                           <TableCell>
                             {leave?.employee?.personalDetail?.employeeName}
@@ -268,14 +270,14 @@ const ManageTimesheet = (props) => {
       </Box>
       {
         openDialog && <CreateLeaveModal
-        open={openDialog}
-        employees={employees}
-        onSubmitClickListener={onSubmitClickListener}
-        onCloseClickListener={onDialogCloseClickListener}
-        editRow={currenSelecteRow}
-      /> 
+          open={openDialog}
+          employees={employees}
+          onSubmitClickListener={onSubmitClickListener}
+          onCloseClickListener={onDialogCloseClickListener}
+          editRow={currenSelecteRow}
+        />
       }
-      
+
       <ConfirmDialog
         open={openConfirmDialog}
         onConfirmClickListener={onConfirmClickListener}
