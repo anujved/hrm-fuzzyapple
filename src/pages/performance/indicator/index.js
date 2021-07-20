@@ -43,6 +43,7 @@ const Indicator = (props) => {
   const [indicator, setIndicator] = React.useState([]);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -50,6 +51,7 @@ const Indicator = (props) => {
 
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
+    // setEditModalData(null);
   }
 
   const handlePageChange = (event, newPage) => {
@@ -66,32 +68,32 @@ const Indicator = (props) => {
     }
   };
 
-  const getIndicators  = async() => {
-    try{
+  const getIndicators = async () => {
+    try {
       const response = await PerformanceService.getIndicator();
       setIndicators(response);
-    } catch(error){}
+    } catch (error) { }
   }
 
   const getBranches = async () => {
-    try{
+    try {
       const response = await ConstantService.fetchAllBranch();
       setBranches(response);
-    }catch(error){}
+    } catch (error) { }
   }
 
-  const getDepartments = async() => {
-    try{
+  const getDepartments = async () => {
+    try {
       const response = await ConstantService.fetchAllDepartment();
       setDepartments(response);
-    } catch(error){}
+    } catch (error) { }
   }
 
-  const getDesignations = async() => {
-    try{
+  const getDesignations = async () => {
+    try {
       const response = await ConstantService.fetchAllDesignation();
       setDesignations(response);
-    } catch(error){}
+    } catch (error) { }
   }
 
   const handleLimitChange = (event) => {
@@ -99,42 +101,48 @@ const Indicator = (props) => {
   };
 
 
-    /**
-   * Listener to delete a ticket
-   * @param {*} ticket - to delete
-   */
-     const onDeleteClickListener = (indicator) => {
-      console.log("delete listener");
-      setIndicator(indicator);
-      setOpenConfirmDialog(true);
-    };
-  
-    const onConfirmClickListener = async () => {
-      console.log("confirm listener");
-      setOpenConfirmDialog(false);
-      setOpenBackdrop(true);
-      try {
-        const result = await PerformanceService.deleteIndicator(indicator._id);
-        console.log("--Delete-Result--", result);
-        setOpenBackdrop(false);
-        getIndicators();
-      } catch (error) {
-        console.log("--Delete-Error--", error);
-        setOpenBackdrop(false);
-      }
-    };
-  
-    const onCancelClickListener = () => {
-      console.log("cancel listener");
-      setOpenConfirmDialog(false);
-    };
+  /**
+ * Listener to delete a ticket
+ * @param {*} ticket - to delete
+ */
+  const onDeleteClickListener = (indicator) => {
+    console.log("delete listener");
+    setIndicator(indicator);
+    setOpenConfirmDialog(true);
+  };
+  const onEditClickListener = (indicator) => {
+    // console.log(indicator)
+    // setEditModalData(indicator)
 
-  React.useEffect(()=> {
+    // setOpenDialog(true);
+  }
+
+  const onConfirmClickListener = async () => {
+    console.log("confirm listener");
+    setOpenConfirmDialog(false);
+    setOpenBackdrop(true);
+    try {
+      const result = await PerformanceService.deleteIndicator(indicator._id);
+      console.log("--Delete-Result--", result);
+      setOpenBackdrop(false);
+      getIndicators();
+    } catch (error) {
+      console.log("--Delete-Error--", error);
+      setOpenBackdrop(false);
+    }
+  };
+
+  const onCancelClickListener = () => {
+    console.log("cancel listener");
+    setOpenConfirmDialog(false);
+  };
+
+  React.useEffect(() => {
     getBranches();
     getDepartments();
     getDesignations();
     getIndicators();
-  },[]);
+  }, []);
 
   return (
     <React.Fragment>
@@ -172,7 +180,7 @@ const Indicator = (props) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    { indicators && indicators.slice(0, limit).map((indicator) => (
+                    {indicators && indicators.slice(0, limit).map((indicator) => (
                       <TableRow
                         key={indicator.id}
                       >
@@ -194,7 +202,7 @@ const Indicator = (props) => {
                               >
                                 <IconButton
                                   style={{ float: "right", color: "green" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <VisibilityRoundedIcon />
@@ -205,8 +213,9 @@ const Indicator = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
+                                  onClick={() => { onEditClickListener(indicator) }}
                                 >
                                   <EditRoundedIcon />
                                 </IconButton>
@@ -216,7 +225,7 @@ const Indicator = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {onDeleteClickListener(indicator)}}
+                                  onClick={() => { onDeleteClickListener(indicator) }}
                                   color="secondary"
                                 >
                                   <DeleteForeverRoundedIcon />
@@ -243,15 +252,16 @@ const Indicator = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateIndicatorModal 
-        open={openDialog} 
-        onCloseClickListener={onDialogCloseClickListener} 
+      <CreateIndicatorModal
+        open={openDialog}
+        onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
         branches={branches}
         designations={designations}
         departments={departments}
-        />
-        <ConfirmDialog
+        // editModalData={editModalData}
+      />
+      <ConfirmDialog
         open={openConfirmDialog}
         onConfirmClickListener={onConfirmClickListener}
         onCancelClickListener={onCancelClickListener}
