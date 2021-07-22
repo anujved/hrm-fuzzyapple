@@ -67,6 +67,7 @@ const Expense = (props) => {
   const [expense, setExpense] = React.useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -88,30 +89,38 @@ const Expense = (props) => {
     try {
       const response = await FinanceService.fetchAllAccountList();
       setAccounts(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const getPayees = async () => {
     try {
       const response = await FinanceService.fetchAllPayee();
       setPayees(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const getExpenses = async () => {
     try {
       const response = await FinanceService.fetchAllExpenses();
       setExpenses(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
-    try {
-      const response = await FinanceService.createExpense(data);
-      //TODO: send email to respetive employee, branch and department here
-      getExpenses();
-    } catch (error) {}
+    if (editModalData._id) {
+      try {
+        const response = await FinanceService.updateExpense(data, editModalData._id);
+        //TODO: send email to respetive employee, branch and department here
+        getExpenses();
+      } catch (error) { }
+    } else {
+      try {
+        const response = await FinanceService.createExpense(data);
+        //TODO: send email to respetive employee, branch and department here
+        getExpenses();
+      } catch (error) { }
+    }
   };
 
   /**
@@ -136,6 +145,12 @@ const Expense = (props) => {
       setOpenBackdrop(false);
     }
   };
+  const onEditClickListener = (expense) => {
+    console.log(expense)
+    setEditModalData(expense)
+
+    setOpenDialog(true);
+  }
 
   const onCancelClickListener = () => {
     setOpenConfirmDialog(false);
@@ -146,6 +161,7 @@ const Expense = (props) => {
     getPayees();
     getExpenses();
   }, []);
+  console.log(expenses)
 
   return (
     <React.Fragment>
@@ -198,8 +214,9 @@ const Expense = (props) => {
                                 <Tooltip title="Edit" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={() => { }}
                                     color="primary"
+                                    onClick={onEditClickListener.bind(this, expense)}
                                   >
                                     <EditRoundedIcon />
                                   </IconButton>
@@ -244,6 +261,7 @@ const Expense = (props) => {
         onSubmitClickListener={onSubmitClickListener}
         accounts={accounts}
         payees={payees}
+        editModalData = {editModalData}
       />
       <ConfirmDialog
         open={openConfirmDialog}

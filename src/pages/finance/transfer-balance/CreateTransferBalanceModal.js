@@ -19,7 +19,7 @@ const leaveTypes = [
   { id: 2, option: "Medical Leave" },
 ];
 
-const CreateTransferBalanceModal = ({ open, onCloseClickListener, onSubmitClickListener, fromAccounts, toAccounts }) => {
+const CreateTransferBalanceModal = ({ open, onCloseClickListener, onSubmitClickListener, fromAccounts, toAccounts, editModalData}) => {
   const [transferDate, setTransferDate] = React.useState(Date.now);
 
   const formik = useFormik({
@@ -68,6 +68,30 @@ const CreateTransferBalanceModal = ({ open, onCloseClickListener, onSubmitClickL
     },
     validateOnChange: false,
   });
+
+
+  const editHandler = () => {
+    console.log(editModalData)
+    formik.setValues({
+      ...formik.values,
+      fromAccount: editModalData.from_account,
+      toAccount: editModalData.to_account,
+      amount: editModalData.amount,
+      paymentMethod: editModalData.payment_method,
+      RefNumber: editModalData.ref_number,
+      description: editModalData.description,
+      transfer_date: transferDate._d,
+    })
+    // console.log("edit")
+    // console.log(editModalData)
+    // console.log(formik.values)
+  }
+  // if()
+  React.useEffect(() => {
+    if (editModalData) {
+      editHandler()
+    }
+  }, [editModalData])
 
   
   return (

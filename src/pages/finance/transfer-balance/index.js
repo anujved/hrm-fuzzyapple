@@ -58,6 +58,7 @@ const TransferBalance = (props) => {
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(0);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -66,10 +67,32 @@ const TransferBalance = (props) => {
   const onDialogCloseClickListener = () => {
     setOpenDialog(false);
   }
+  const onSubmitClickListener = async (data) => {
+    setOpenDialog(false);
+    // if (editModalData._id) {
+    //   try {
+    //     const response = await FinanceService.updatePayer(data, editModalData._id);
+    //     //TODO: send email to respetive employee, branch and department here
+    //     getPayers();
+    //   } catch (error) { }
+    // } else {
+    //   try {
+    //     const response = await FinanceService.createPayer(data);
+    //     //TODO: send email to respetive employee, branch and department here
+    //     getPayers();
+    //   } catch (error) { }
+    // }
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
+  const onEditClickListener = (expense) => {
+    console.log(expense)
+    setEditModalData(expense)
+
+    setOpenDialog(true);
+  }
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -115,7 +138,7 @@ const TransferBalance = (props) => {
                       <TableRow
                         hover
                         key={payslip.id}
-                        //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
+                      //   selected={selectedBranchIds.indexOf(branch.id) !== -1}
                       >
                         <TableCell>{payslip.name}</TableCell>
                         <TableCell>{payslip.leaveType}</TableCell>
@@ -131,7 +154,7 @@ const TransferBalance = (props) => {
                               <Tooltip title="Edit" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="primary"
                                 >
                                   <EditRoundedIcon />
@@ -142,8 +165,9 @@ const TransferBalance = (props) => {
                               <Tooltip title="Delete" placement="top" arrow>
                                 <IconButton
                                   style={{ float: "right" }}
-                                  onClick={() => {}}
+                                  onClick={() => { }}
                                   color="secondary"
+                                  //  onClick={() => onDeleteClickListener(payer)}
                                 >
                                   <DeleteForeverRoundedIcon />
                                 </IconButton>
@@ -169,7 +193,7 @@ const TransferBalance = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateTransferBalanceModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} />
+      <CreateTransferBalanceModal open={openDialog} onCloseClickListener={onDialogCloseClickListener} onSubmitClickListener={onSubmitClickListener} editModalData={editModalData} />
     </React.Fragment>
   );
 };

@@ -65,6 +65,7 @@ const Payees = (props) => {
   const [payee, setPayee] = React.useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -91,11 +92,19 @@ const Payees = (props) => {
 
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
-    try {
-      const response = await FinanceService.createPayee(data);
-      //TODO: send email to respetive employee, branch and department here
-      getPayees();
-    } catch (error) {}
+    if (editModalData._id) {
+      try {
+        const response = await FinanceService.updatePayee(data, editModalData._id);
+        //TODO: send email to respetive employee, branch and department here
+        getPayees();
+      } catch (error) { }
+    } else {
+      try {
+        const response = await FinanceService.createPayee(data);
+        //TODO: send email to respetive employee, branch and department here
+        getPayees();
+      } catch (error) { }
+    }
   };
 
   /**
@@ -120,6 +129,12 @@ const Payees = (props) => {
       setOpenBackdrop(false);
     }
   };
+  const onEditClickListener = (expense) => {
+    console.log(expense)
+    setEditModalData(expense)
+
+    setOpenDialog(true);
+  }
 
   const onCancelClickListener = () => {
     setOpenConfirmDialog(false);
@@ -172,6 +187,7 @@ const Payees = (props) => {
                                     style={{ float: "right" }}
                                     onClick={() => {}}
                                     color="primary"
+                                    onClick={onEditClickListener.bind(this, payee)}
                                   >
                                     <EditRoundedIcon />
                                   </IconButton>
@@ -212,6 +228,7 @@ const Payees = (props) => {
         open={openDialog}
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
+        editModalData = {editModalData}
       />
       <ConfirmDialog
         open={openConfirmDialog}

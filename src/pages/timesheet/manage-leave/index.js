@@ -70,8 +70,8 @@ const ManageTimesheet = (props) => {
       if (currenSelecteRow) {
         TimesheetService.updateLeave({
           data: {
-            // ...data,
-            "leave_action": "approved"
+            ...data,
+            "leave_action": "approved",
             // employeeId: get(currenSelecteRow, "employee.employeeId"),
           },
           params: get(currenSelecteRow, "_id"),

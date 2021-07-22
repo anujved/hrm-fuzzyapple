@@ -111,10 +111,10 @@ const Indicator = (props) => {
     setOpenConfirmDialog(true);
   };
   const onEditClickListener = (indicator) => {
-    // console.log(indicator)
-    // setEditModalData(indicator)
+    console.log(indicator)
+    setEditModalData(indicator)
 
-    // setOpenDialog(true);
+    setOpenDialog(true);
   }
 
   const onConfirmClickListener = async () => {
@@ -184,9 +184,9 @@ const Indicator = (props) => {
                       <TableRow
                         key={indicator.id}
                       >
-                        <TableCell>{indicator.branch.branchName}</TableCell>
-                        <TableCell>{indicator.department.name}</TableCell>
-                        <TableCell>{indicator.designation.name}</TableCell>
+                        <TableCell>{indicator.branch?.branchName}</TableCell>
+                        <TableCell>{indicator.department?.name}</TableCell>
+                        <TableCell>{indicator.designation?.name}</TableCell>
                         {/* <TableCell>{indicator.startDate}</TableCell>
                         <TableCell>{indicator.endDate}</TableCell>
                         <TableCell>{indicator.totalDays}</TableCell>
@@ -215,7 +215,7 @@ const Indicator = (props) => {
                                   style={{ float: "right" }}
                                   onClick={() => { }}
                                   color="primary"
-                                  onClick={() => { onEditClickListener(indicator) }}
+                                  onClick={onEditClickListener.bind(this, indicator)}
                                 >
                                   <EditRoundedIcon />
                                 </IconButton>
@@ -259,7 +259,7 @@ const Indicator = (props) => {
         branches={branches}
         designations={designations}
         departments={departments}
-        // editModalData={editModalData}
+        editModalData={editModalData}
       />
       <ConfirmDialog
         open={openConfirmDialog}

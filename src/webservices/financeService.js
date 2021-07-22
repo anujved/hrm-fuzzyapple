@@ -2,18 +2,23 @@ import ApiClient from '../api-client/apiClient';
 import { 
     CREATE_ACCOUNTLIST,
     FETCH_ACCOUNTS,
+    UPDATE_ACCOUNTLIST,
     DELETE_ACCOUNT,
     CREATE_PAYEE,
     FETCH_PAYEES,
+    UPDATE_PAYEE,
     DELETE_PAYEE,
     CREATE_PAYER,
     FETCH_PAYERS,
+    UPDATE_PAYERS,
     DELETE_PAYER,
     CREATE_DEPOSIT,
     FETCH_DEPOSITS,
+    UPDATE_DEPOSITS,
     DELETE_DEPOSIT,
     CREATE_EXPENSE,
     FETCH_EXPENSES,
+    UPDATE_EXPENSE,
     DELETE_EXPENSE,
  } from 'src/api-client/endpoints';
 
@@ -28,9 +33,13 @@ export default class FinanceService {
         return await ApiClient.call(ApiClient.requestMethod.GET, FETCH_ACCOUNTS, null, null, null, false);
     }
 
+    static updateAccountList = async (data, params) => {
+        const updatedURL = `${UPDATE_ACCOUNTLIST}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.PUT, updatedURL, data, null, null, false);
+    }
     static deleteAccountList = async (params) => {
-        const updatedURL = `${DELETE_ACCOUNT}/${params}`;
-        return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);
+        const deleteURL = `${DELETE_ACCOUNT}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.DELETE, deleteURL, null, null, null, false);
     }
 
     // Payees
@@ -42,6 +51,10 @@ export default class FinanceService {
         return await ApiClient.call(ApiClient.requestMethod.GET, FETCH_PAYEES, null, null, null, false);
     }
 
+    static updatePayee = async (data ,params) => {
+        const updatedURL = `${UPDATE_PAYEE}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.PUT, updatedURL, data, null, null, false);
+    }
     static deletePayee = async (params) => {
         const updatedURL = `${DELETE_PAYEE}/${params}`;
         return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);
@@ -56,9 +69,13 @@ export default class FinanceService {
         return await ApiClient.call(ApiClient.requestMethod.GET, FETCH_PAYERS, null, null, null, false);
     }
 
+    static updatePayer = async (data , params) => {
+        const updatedURL = `${UPDATE_PAYERS}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.PUT, updatedURL, data, null, null, false);
+    }
     static deletePayer = async (params) => {
-        const updatedURL = `${DELETE_PAYER}${params}`;
-        return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);
+        const deletedURL = `${DELETE_PAYER}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.DELETE, deletedURL, null, null, null, false);
     }
 
      // Deposit
@@ -68,6 +85,10 @@ export default class FinanceService {
 
     static fetchAllDeposits = async () => {
         return await ApiClient.call(ApiClient.requestMethod.GET, FETCH_DEPOSITS, null, null, null, false);
+    }
+    static updateDeposit = async (data, params) => {
+        const updatedURL = `${UPDATE_DEPOSITS}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.PUT, updatedURL, data, null, null, false);
     }
 
     static deleteDeposit = async (params) => {
@@ -84,6 +105,11 @@ export default class FinanceService {
         return await ApiClient.call(ApiClient.requestMethod.GET, FETCH_EXPENSES, null, null, null, false);
     }
 
+
+    static updateExpense = async (data , params) => {
+        const updatedURL = `${UPDATE_EXPENSE}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.PUT, updatedURL, data, null, null, false);
+    }
     static deleteExpense = async (params) => {
         const updatedURL = `${DELETE_EXPENSE}${params}`;
         return await ApiClient.call(ApiClient.requestMethod.DELETE, updatedURL, null, null, null, false);

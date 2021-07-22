@@ -11,7 +11,7 @@ import {
 import CancelIcon from "@material-ui/icons/Cancel";
 import { useFormik } from "formik";
 
-const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener }) => {
+const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener, editModalData }) => {
 
   const formik = useFormik({
     initialValues: {
@@ -19,7 +19,7 @@ const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener 
       initialBalance: "",
       accountNumber: "",
       branchCode: "",
-      bankBranch: ""
+      bankBranch: "",
     },
     validate: (values) => {
       const errors = {};
@@ -53,7 +53,25 @@ const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener 
     },
     validateOnChange: false,
   });
-
+  const editHandler = () => {
+    formik.setValues({
+      ...formik.values,
+      accountName: editModalData.account_name,
+      initialBalance: editModalData.initial_balance,
+      accountNumber: editModalData.account_number,
+      branchCode: editModalData.branch_code,
+      bankBranch: editModalData.bank_branch,
+    })
+    // console.log("edit")
+    // console.log(editModalData)
+    // console.log(formik.values)
+  }
+  // if()
+  React.useEffect(() => {
+    if (editModalData) {
+      editHandler()
+    }
+  }, [editModalData])
   return (
     <div>
       <Dialog
@@ -62,76 +80,81 @@ const CreateAccountModal = ({ open, onCloseClickListener, onSubmitClickListener 
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Account</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Account Name"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.accountNameError}
-                error={formik.errors.accountNameError && true}
-                onChange={formik.handleChange}
-                name="accountName"
-              />
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Account</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Initial Balance"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.initialBalanceError}
-                error={formik.errors.initialBalanceError && true}
-                onChange={formik.handleChange}
-                name="initialBalance"
-              />
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Account Name"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.accountNameError}
+                  error={formik.errors.accountNameError && true}
+                  value={formik.values.accountName}
+                  onChange={formik.handleChange}
+                  name="accountName"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Initial Balance"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.initialBalanceError}
+                  error={formik.errors.initialBalanceError && true}
+                  onChange={formik.handleChange}
+                  value={formik.values.initialBalance}
+                  name="initialBalance"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Account Number"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.accountNumberError}
+                  error={formik.errors.accountNumberError && true}
+                  onChange={formik.handleChange}
+                  value={formik.values.accountNumber}
+                  name="accountNumber"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Branch Code"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.branchCodeError}
+                  error={formik.errors.branchCodeError && true}
+                  onChange={formik.handleChange}
+                  value={formik.values.branchCode}
+                  name="branchCode"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Bank Branch"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.bankBranchError}
+                  error={formik.errors.bankBranchError && true}
+                  onChange={formik.handleChange}
+                  value={formik.values.bankBranch}
+                  name="bankBranch"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Account Number"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.accountNumberError}
-                error={formik.errors.accountNumberError && true}
-                onChange={formik.handleChange}
-                name="accountNumber"
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Branch Code"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.branchCodeError}
-                error={formik.errors.branchCodeError && true}
-                onChange={formik.handleChange}
-                name="branchCode"
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Bank Branch"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.bankBranchError}
-                error={formik.errors.bankBranchError && true}
-                onChange={formik.handleChange}
-                name="bankBranch"
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button onClick={onCloseClickListener}>Cancel</Button>
-            </Grid>
-          </Grid>
           </form>
         </Box>
       </Dialog>

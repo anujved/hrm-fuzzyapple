@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { useFormik } from "formik";
+import { get, map } from "lodash";
 
 const technicalCompentencies = [
   { id: 1, option: "None" },
@@ -50,6 +51,7 @@ const CreateIndicatorModal = ({
       attendance: "",
       edit: false
     },
+    // attendance
     validate: (values) => {
       const errors = {};
       // if (values.branch.length === 0) {
@@ -57,13 +59,13 @@ const CreateIndicatorModal = ({
       // }
       return errors;
     },
-    validateOnChange: false,
+    // validateOnChange: false,
     onSubmit: (values) => {
       console.log('---values---', values);
       const data = {
-        department: values.department,
-        branch: values.branch,
-        designation: values.designation,
+        department: values.department._id,
+        branch: values.branch._id,
+        designation: values.designation._id,
         Administration: values.administration,
         customer_experience: values.customer_experience,
         marketing: values.marketing,
@@ -71,34 +73,42 @@ const CreateIndicatorModal = ({
         integrity: values.integrity,
         attendance: values.attendance,
       };
-      // onSubmitClickListener(data);
+      onSubmitClickListener(data);
+      // setTimeout(() => {
+      //   onCloseClickListener();
+      // }, 1000);
       console.log(data)
     },
     validateOnChange: false,
   });
-  // const editHandler = () => {
-  //   formik.setValues({
-  //     ...formik.values,
-  //     department: editModalData.department,
-  //     branch: editModalData.branch,
-  //     designation: editModalData.designation,
-  //     administration: editModalData.Administration,
-  //     customer_experience: editModalData.customer_experience,
-  //     marketing: editModalData.marketing,
-  //     professionalism: editModalData.professional,
-  //     integrity: editModalData.integrity,
-  //     attendance: editModalData.attendance,
-  //   })
-  //   // console.log("edit")
-  //   // console.log(editModalData)
-  //   console.log(formik.values)
-  // }
-  // // if()
-  // React.useEffect(() => {
-  //   if (editModalData) {
-  //     editHandler()
-  //   }
-  // }, [editModalData])
+  const editHandler = () => {
+    formik.setValues({
+      ...formik.values,
+      department: editModalData.department._id,
+      branch: editModalData.branch._id,
+      designation: editModalData.designation._id,
+      administration: editModalData.Administration,
+      customer_experience: editModalData.customer_experience,
+      marketing: editModalData.marketing,
+      professional: editModalData.professionalism,
+      integrity: editModalData.integrity,
+      attendance: editModalData.attendance,
+    })
+    // console.log("edit")
+    // console.log(editModalData)
+    console.log(formik.values)
+  }
+  // if()
+  React.useEffect(() => {
+    if (editModalData) {
+      editHandler()
+    }
+  }, [editModalData])
+
+  console.log(get(editModalData, "branch"))
+  console.log(get(editModalData, "branch._id"))
+  console.log(departments)
+  console.log(branches)
 
 
   return (
@@ -124,13 +134,14 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.branch}
                   onChange={formik.handleChange}
                   name="branch"
                   select
                 >
                   {branches &&
                     branches.map((option, index) => (
-                      <MenuItem key={index} value={option}>
+                      <MenuItem key={index} value={option._id}>
                         {option.branchName}
                       </MenuItem>
                     ))}
@@ -143,13 +154,14 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.department}
                   onChange={formik.handleChange}
                   name="department"
                   select
                 >
                   {departments &&
                     departments.map((option, index) => (
-                      <MenuItem key={index} value={option}>
+                      <MenuItem key={index} value={option._id}>
                         {option.name}
                       </MenuItem>
                     ))}
@@ -162,13 +174,14 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.designation}
                   onChange={formik.handleChange}
                   name="designation"
                   select
                 >
                   {designations &&
                     designations.map((option, index) => (
-                      <MenuItem key={index} value={option}>
+                      <MenuItem key={index} value={option._id}>
                         {option.name}
                       </MenuItem>
                     ))}
@@ -190,6 +203,7 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.customer_experience}
                   onChange={formik.handleChange}
                   name="customer_experience"
                   select
@@ -209,6 +223,7 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.marketing}
                   onChange={formik.handleChange}
                   name="marketing"
                   select
@@ -228,6 +243,7 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.administration}
                   onChange={formik.handleChange}
                   name="administration"
                   select
@@ -256,6 +272,7 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.professional}
                   onChange={formik.handleChange}
                   name="professional"
                   select
@@ -275,6 +292,7 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.integrity}
                   onChange={formik.handleChange}
                   name="integrity"
                   select
@@ -294,6 +312,7 @@ const CreateIndicatorModal = ({
                   fullWidth
                   // helperText={formik.errors.nameError && "Invalid Name"}
                   // error={formik.errors.nameError && true}
+                  value={formik.values.attendance}
                   onChange={formik.handleChange}
                   name="attendance"
                   select

@@ -30,12 +30,13 @@ const CreateDepositModal = ({
   onSubmitClickListener,
   accounts,
   payers,
+  editModalData
 }) => {
   const [depositDate, setDepositDate] = React.useState(Date.now);
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      account: "",
       amount: "",
       category: "",
       payer: "",
@@ -45,7 +46,7 @@ const CreateDepositModal = ({
     },
     validate: (values) => {
       const errors = {};
-     
+
       if (values.amount.length === 0) {
         errors.amountError = "required";
       }
@@ -59,7 +60,7 @@ const CreateDepositModal = ({
     },
     onSubmit: (values) => {
       const data = {
-        account: values.name,
+        account: values.account,
         amount: values.amount,
         category: values.category,
         payment_method: values.paymentMethod,
@@ -74,6 +75,32 @@ const CreateDepositModal = ({
     },
     validateOnChange: false,
   });
+  const editHandler = () => {
+    formik.setValues({
+      ...formik.values,
+      account: editModalData.account._id,
+      amount: editModalData.amount,
+      category: editModalData.category,
+      paymentMethod: editModalData.payment_method,
+      payer: editModalData.Payer._id,
+      RefNumber: editModalData.ref,
+      description: editModalData.description,
+      date: depositDate._d,
+    })
+    // console.log("edit")
+    // console.log(editModalData)
+    // console.log(formik.values)
+  }
+  // if()
+  React.useEffect(() => {
+    if (editModalData) {
+      editHandler()
+    }
+  }, [editModalData])
+  console.log(accounts)
+  console.log(categories)
+  console.log(payers)
+  console.log(editModalData)
 
   return (
     <div>
@@ -83,133 +110,143 @@ const CreateDepositModal = ({
         aria-labelledby="form-dialog-title"
       >
         <Box py={2} px={4}>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography>Create New Deposit</Typography>
-            <IconButton onClick={onCloseClickListener}>
-              <CancelIcon />
-            </IconButton>
-          </Grid>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Account"
-                variant="outlined"
-                fullWidth
-                onChange={formik.handleChange}
-                name="name"
-                select
-              >
-                {accounts &&
-                  accounts.map((option) => (
-                    <MenuItem key={option.id} value={option}>
-                      {option.account_name}
-                    </MenuItem>
-                  ))}
-              </TextField>
+          <form onSubmit={formik.handleSubmit} autoComplete="off">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography>Create New Deposit</Typography>
+              <IconButton onClick={onCloseClickListener}>
+                <CancelIcon />
+              </IconButton>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Amount"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.amountError}
-                error={formik.errors.amountError && true}
-                onChange={formik.handleChange}
-                name="amount"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <KeyboardDatePicker
-                disableToolbar
-                autoOk
-                variant="inline"
-                format="DD/MM/yyyy"
-                label="Deposit Date"
-                value={depositDate}
-                fullWidth
-                onChange={(value) => setDepositDate(value)}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Category"
-                variant="outlined"
-                fullWidth
-                name="category"
-                select
-              >
-                {categories &&
-                  categories.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Payer"
-                variant="outlined"
-                fullWidth
-                name="payer"
-                select
-              >
-                {payers &&
-                  payers.map((option) => (
-                    <MenuItem key={option._id} value={option}>
-                      {option.payer_name}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Payment Method"
-                variant="outlined"
-                fullWidth
-                name="paymentMethod"
-                select
-              >
-                {paymentMethods &&
-                  paymentMethods.map((option) => (
-                    <MenuItem key={option.id} value={option.option}>
-                      {option.option}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Grid>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Account"
+                  variant="outlined"
+                  fullWidth
+                  value={formik.values.account}
+                  onChange={formik.handleChange}
+                  name="account"
+                  select
+                >
+                  {accounts &&
+                    accounts.map((option) => (
+                      <MenuItem key={option.id} value={option._id}>
+                        {option.account_name}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Amount"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.amountError}
+                  error={formik.errors.amountError && true}
+                  value={formik.values.amount}
+                  onChange={formik.handleChange}
+                  name="amount"
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  autoOk
+                  variant="inline"
+                  format="DD/MM/yyyy"
+                  label="Deposit Date"
+                  value={depositDate}
+                  fullWidth
+                  onChange={(value) => setDepositDate(value)}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Category"
+                  variant="outlined"
+                  fullWidth
+                  value={formik.values.category}
+                  onChange={formik.handleChange}
+                  name="category"
+                  select
+                >
+                  {categories &&
+                    categories.map((option) => (
+                      <MenuItem key={option.id} value={option.option}>
+                        {option.option}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Payer"
+                  variant="outlined"
+                  fullWidth
+                  value={formik.values.payer}
+                  onChange={formik.handleChange}
+                  name="payer"
+                  select
+                >
+                  {payers &&
+                    payers.map((option) => (
+                      <MenuItem key={option._id} value={option._id}>
+                        {option.payer_name}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Payment Method"
+                  variant="outlined"
+                  fullWidth
+                  value={formik.values.paymentMethod}
+                  onChange={formik.handleChange}
+                  name="paymentMethod"
+                  select
+                >
+                  {paymentMethods &&
+                    paymentMethods.map((option) => (
+                      <MenuItem key={option.id} value={option.option}>
+                        {option.option}
+                      </MenuItem>
+                    ))}
+                </TextField>
+              </Grid>
 
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Ref#"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.RefNumberError}
-                error={formik.errors.RefNumberError && true}
-                onChange={formik.handleChange}
-                name="RefNumber"
-              />
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Ref#"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.RefNumberError}
+                  error={formik.errors.RefNumberError && true}
+                  onChange={formik.handleChange}
+                  value={formik.values.RefNumber}
+                  name="RefNumber"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  fullWidth
+                  helperText={formik.errors.descriptionError}
+                  error={formik.errors.descriptionError && true}
+                  onChange={formik.handleChange}
+                  value={formik.values.description}
+                  name="description"
+                  multiline
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
+                  Create
+                </Button>
+                <Button onClick={onCloseClickListener}>Cancel</Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                helperText={formik.errors.descriptionError}
-                error={formik.errors.descriptionError && true}
-                onChange={formik.handleChange}
-                name="description"
-                multiline
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button type="submit" variant="contained" style={{ marginRight: 10 }}>
-                Create
-              </Button>
-              <Button onClick={onCloseClickListener}>Cancel</Button>
-            </Grid>
-          </Grid>
           </form>
         </Box>
       </Dialog>

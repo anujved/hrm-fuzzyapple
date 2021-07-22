@@ -63,6 +63,7 @@ const Account = (props) => {
   const [account, setAccount] = React.useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -84,16 +85,28 @@ const Account = (props) => {
     try {
       const response = await FinanceService.fetchAllAccountList();
       setAccounts(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
-    try {
-      const response = await FinanceService.createAccountList(data);
-      //TODO: send email to respetive employee, branch and department here
-      getAccounts();
-    } catch (error) {}
+    console.log(data)
+    if (editModalData._id) {
+      try {
+        const response = await FinanceService.updateAccountList(data, editModalData._id);
+        setEditModalData(null)
+        //TODO: send email to respetive employee, branch and department here
+        getAccounts();
+      } catch (error) {
+        setEditModalData(null)
+      }
+    } else {
+      try {
+        const response = await FinanceService.createAccountList();
+        //TODO: send email to respetive employee, branch and department here
+        getAccounts();
+      } catch (error) { }
+    }
   };
 
   /**
@@ -118,6 +131,12 @@ const Account = (props) => {
       setOpenBackdrop(false);
     }
   };
+  const onEditClickListener = (account) => {
+    console.log(account)
+    setEditModalData(account)
+
+    setOpenDialog(true);
+  }
 
   const onCancelClickListener = () => {
     setOpenConfirmDialog(false);
@@ -175,8 +194,9 @@ const Account = (props) => {
                                 <Tooltip title="Edit" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={() => { }}
                                     color="primary"
+                                    onClick={onEditClickListener.bind(this, account)}
                                   >
                                     <EditRoundedIcon />
                                   </IconButton>
@@ -213,11 +233,13 @@ const Account = (props) => {
           </Card>
         </Container>
       </Box>
-      <CreateAccountModal
+      {openDialog && <CreateAccountModal
         open={openDialog}
         onCloseClickListener={onDialogCloseClickListener}
         onSubmitClickListener={onSubmitClickListener}
-      />
+        editModalData={editModalData}
+      />}
+
       <ConfirmDialog
         open={openConfirmDialog}
         onConfirmClickListener={onConfirmClickListener}

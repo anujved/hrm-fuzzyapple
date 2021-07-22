@@ -27,7 +27,7 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
 
   const formik = useFormik({
     initialValues: {
-      employee: get(editRow, 'employee.employeeId', ""),
+      employee: get(editRow, 'employee._id', ""),
       leaveType: get(editRow, 'leaveType', ""),
       leaveReason: get(editRow, 'leaveReason', ""),
       remark: get(editRow, 'remark', ""),
@@ -71,7 +71,7 @@ const CreateLeaveModal = ({ open, employees, onCloseClickListener, onSubmitClick
 
   }, [employees])
 
-
+  console.log(editRow)
   return (
     <div>
       <Dialog

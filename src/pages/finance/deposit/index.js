@@ -40,6 +40,7 @@ const Deposit = (props) => {
   const [deposit, setDeposit] = React.useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const onClickListener = () => {
     setOpenDialog(true);
@@ -61,30 +62,38 @@ const Deposit = (props) => {
     try {
       const response = await FinanceService.fetchAllAccountList();
       setAccounts(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const getPayers = async () => {
     try {
       const response = await FinanceService.fetchAllPayers();
       setPayers(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const getDeposits = async () => {
     try {
       const response = await FinanceService.fetchAllDeposits();
       setDeposits(response);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
-    try {
-      const response = await FinanceService.createDeposit(data);
-      //TODO: send email to respetive employee, branch and department here
-      getDeposits();
-    } catch (error) {}
+    if (editModalData._id) {
+      try {
+        const response = await FinanceService.updateDeposit(data, editModalData._id);
+        //TODO: send email to respetive employee, branch and department here
+        getDeposits();
+      } catch (error) { }
+    } else {
+      try {
+        const response = await FinanceService.createDeposit(data);
+        //TODO: send email to respetive employee, branch and department here
+        getDeposits();
+      } catch (error) { }
+    }
   };
 
   /**
@@ -109,6 +118,12 @@ const Deposit = (props) => {
       setOpenBackdrop(false);
     }
   };
+  const onEditClickListener = (deposit) => {
+    console.log(deposit)
+    setEditModalData(deposit)
+
+    setOpenDialog(true);
+  }
 
   const onCancelClickListener = () => {
     setOpenConfirmDialog(false);
@@ -171,8 +186,9 @@ const Deposit = (props) => {
                                 <Tooltip title="Edit" placement="top" arrow>
                                   <IconButton
                                     style={{ float: "right" }}
-                                    onClick={() => {}}
+                                    onClick={() => { }}
                                     color="primary"
+                                    onClick={onEditClickListener.bind(this, deposit)}
                                   >
                                     <EditRoundedIcon />
                                   </IconButton>
@@ -217,6 +233,7 @@ const Deposit = (props) => {
         payers={payers}
         accounts={accounts}
         onSubmitClickListener={onSubmitClickListener}
+        editModalData={editModalData}
       />
       <ConfirmDialog
         open={openConfirmDialog}

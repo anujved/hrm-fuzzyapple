@@ -123,22 +123,27 @@ export const DELETE_HOLIDAY = "/delete-holiday";
 // ****** Account List *********
 export const CREATE_ACCOUNTLIST = "/create-account-list";
 export const FETCH_ACCOUNTS = "/account-list";
+export const UPDATE_ACCOUNTLIST = "/update-account"
 export const DELETE_ACCOUNT = "/delete-account";
 
 export const CREATE_PAYEE = "/create-payee";
 export const FETCH_PAYEES = "/payee-list";
+export const UPDATE_PAYEE = "/update-payee"
 export const DELETE_PAYEE = "/delete-payee";
 
 export const CREATE_PAYER = "/create-payer";
 export const FETCH_PAYERS = "/payer-list";
+export const UPDATE_PAYERS = "/update-payer"
 export const DELETE_PAYER = "/delete-payer/";
 
 export const CREATE_DEPOSIT = "/create-deposit";
 export const FETCH_DEPOSITS = "/Deposits";
+export const UPDATE_DEPOSITS = "/update-deposit";
 export const DELETE_DEPOSIT = "/delete-deposit/";
 
 export const CREATE_EXPENSE = "/create-expense";
 export const FETCH_EXPENSES = "/expenses";
+export const UPDATE_EXPENSE = "/update-expense"
 export const DELETE_EXPENSE = "/delete-expense/";
 
 export const CREATE_TRANSFER_BALANCE = "/create-transfer";
@@ -216,3 +221,12 @@ export const UPDATE_LEAVES = "/updates-leave";
 
 // ****Employee****
 export const EMPLOYEE = "/employees";
+
+// Payroll
+
+// ****Pay Slip****
+
+export const FETCH_PAYSLIP = "/payslips";
+export const CREATE_PAYSLIP = "/create-payslip";
+export const UPDATE_PAYSLIP = "/update-payslip/:id";
+export const DELETE_PAYSLIP = "/delete-payslip/:id";

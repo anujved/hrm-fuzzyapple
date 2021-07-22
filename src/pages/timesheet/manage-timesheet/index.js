@@ -94,11 +94,11 @@ const ManageTimesheet = (props) => {
     // console.log(timesheets)
     const data = timesheets.find(obj => obj[1]._id === id && obj[1])
     const { created_at, employee, hours, remark } = data[1]
-    console.log(data[1])
-    console.log(created_at)
-    console.log(employee)
-    console.log(hours)
-    console.log(remark)
+    // console.log(data[1])
+    // console.log(created_at)
+    // console.log(employee)
+    // console.log(hours)
+    // console.log(remark)
     const updateTimesheetObject = {
       initialValues: { date: created_at.valueOf(), employee, hours, remark },
       onUpdate: async () => {
@@ -139,13 +139,13 @@ const ManageTimesheet = (props) => {
     }
   }
 
-  const getTimeSheets = async () => {
-    try {
-      const response = await TimesheetService.fetchAllTimesheet();
-      setTimesheets(response);
-    }
-    catch (error) { }
-  }
+  // const getTimeSheets = async () => {
+  //   try {
+  //     const response = await TimesheetService.fetchAllTimesheet();
+  //     setTimesheets(response);
+  //   }
+  //   catch (error) { }
+  // }
 
   /**
  * Listener to delete a ticket
@@ -166,7 +166,8 @@ const ManageTimesheet = (props) => {
       const result = await TimesheetService.deleteTimesheet(timesheet._id);
       console.log("--Delete-Result--", result);
       setOpenBackdrop(false);
-      getTimeSheets();
+      // getTimeSheets();
+      fetchTimesheets();
     } catch (error) {
       console.log("--Delete-Error--", error);
       setOpenBackdrop(false);
@@ -226,16 +227,16 @@ const ManageTimesheet = (props) => {
                             <TableRow hover key={index}>
                               <TableCell>{timesheet.employee}</TableCell>
                               <TableCell>
-                                {moment(timesheet[1].created_at).format("DD/MM/YYYY")}
+                                {timesheet[1] && moment(timesheet[1].created_at).format("DD/MM/YYYY")}
                               </TableCell>
-                              <TableCell>{timesheet[1].hours}</TableCell>
-                              <TableCell>{timesheet[1].remark}</TableCell>
+                              <TableCell>{timesheet[1] && timesheet[1].hours}</TableCell>
+                              <TableCell>{timesheet[1] && timesheet[1].remark}</TableCell>
                               <TableCell>
                                 <Grid container>
                                   <Grid>
                                     <IconButton
                                       style={{ float: "right" }}
-                                      onClick={handleEdit.bind(this, timesheet[1]._id)}
+                                      onClick={handleEdit.bind(this, timesheet[1]?._id)}
                                       color="primary"
                                     >
                                       <EditRoundedIcon />
