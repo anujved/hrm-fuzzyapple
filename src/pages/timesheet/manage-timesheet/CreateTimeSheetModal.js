@@ -13,7 +13,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { useFormik } from "formik";
 
-const CreateTimeSheetModal = ({ open, onCloseClickListener, employees, onSubmitClickListener, updateTimeSheet }) => {
+const CreateTimeSheetModal = ({ open, onCloseClickListener, employees, onSubmitClickListener, updateTimeSheet, editModalData }) => {
 
   const [date, setDate] = useState(Date.now);
 
@@ -23,13 +23,13 @@ const CreateTimeSheetModal = ({ open, onCloseClickListener, employees, onSubmitC
     remark: "",
   }
 
-  const handleSubmit = (data) => {
-    if (updateTimeSheet) {
-      updateTimeSheet.onUpdate(data)
-    } else {
-      onSubmitClickListener(data)
-    }
-  }
+  // const handleSubmit = (data) => {
+  //   if (updateTimeSheet) {
+  //     updateTimeSheet.onUpdate(data)
+  //   } else {
+  //     onSubmitClickListener(data)
+  //   }
+  // }
 
   const formik = useFormik({
     initialValues: formikInitialValues,
@@ -52,7 +52,8 @@ const CreateTimeSheetModal = ({ open, onCloseClickListener, employees, onSubmitC
         ...values,
         date: date._d,
       };
-      handleSubmit(data);
+      console.log(data)
+      onSubmitClickListener(data)
     },
     validateOnChange: false,
   });
@@ -64,6 +65,25 @@ const CreateTimeSheetModal = ({ open, onCloseClickListener, employees, onSubmitC
     onCloseClickListener()
   }
 
+  const editHandler = () => {
+    formik.setValues({
+      ...formik.values,
+      employee: editModalData.employee._id,
+      hours: editModalData.hours,
+      remark: editModalData.remark,
+      date: date._d,
+    })
+    // console.log("edit")
+    // console.log(editModalData)
+    // console.log(formik.values)
+  }
+  // if()
+  React.useEffect(() => {
+    if (editModalData) {
+      editHandler()
+    }
+  }, [editModalData])
+  console.log(editModalData)
 
   return (
     <div>

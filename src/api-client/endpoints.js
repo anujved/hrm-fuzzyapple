@@ -53,6 +53,7 @@ export const DELETE_TICKET = "/delete-ticket/";
 // ****** Timesheet *********
 export const CREATE_TIMESHEET = "/create-timesheet";
 export const FETCH_TIMESHEET = "/timesheets";
+export const UPDATE_TIMESHEET = "/update-timesheet"
 export const DELETE_TIMESHEET = "/delete-timesheet";
 
 // ****** Meeting *********

@@ -44,6 +44,7 @@ const ManageTimesheet = (props) => {
   const [updateTimeSheet, setUpdateTimeSheet] = React.useState(null);
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [editModalData, setEditModalData] = React.useState(null);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -82,62 +83,73 @@ const ManageTimesheet = (props) => {
 
   const onSubmitClickListener = async (values) => {
     setOpenDialog(false);
-    try {
-      const response = await TimesheetService.createTimesheet(values);
-      fetchTimesheets();
-    } catch (error) {
-      console.log("-Create-Error-", error);
+    if (editModalData) {
+      try {
+        const response = await TimesheetService.updateTimesheet(values, editModalData._id);
+        setEditModalData(null)
+        //TODO: send email to respetive employee, branch and department here
+        fetchTimesheets();
+      } catch (error) {
+        setEditModalData(null)
+      }
+    } else {
+      try {
+        const response = await TimesheetService.createTimesheet(values);
+        fetchTimesheets();
+      } catch (error) {
+        console.log("-Create-Error-", error);
+      }
     }
   };
 
-  const handleEdit = (id, e) => {
-    // console.log(timesheets)
-    const data = timesheets.find(obj => obj[1]._id === id && obj[1])
-    const { created_at, employee, hours, remark } = data[1]
-    // console.log(data[1])
-    // console.log(created_at)
-    // console.log(employee)
-    // console.log(hours)
-    // console.log(remark)
-    const updateTimesheetObject = {
-      initialValues: { date: created_at.valueOf(), employee, hours, remark },
-      onUpdate: async () => {
-        try {
-          // const response = await TimesheetService.updateTimeSheet(values);
-          const response = null
-          // setTimesheets(response)
-          console.log("submitting the form")
+  // const handleEdit = (id, e) => {
+  //   // console.log(timesheets)
+  //   const data = timesheets.find(obj => obj[1]._id === id && obj[1])
+  //   const { created_at, employee, hours, remark } = data[1]
+  //   // console.log(data[1])
+  //   // console.log(created_at)
+  //   // console.log(employee)
+  //   // console.log(hours)
+  //   // console.log(remark)
+  //   const updateTimesheetObject = {
+  //     initialValues: { date: created_at.valueOf(), employee, hours, remark },
+  //     onUpdate: async () => {
+  //       try {
+  //         // const response = await TimesheetService.updateTimeSheet(values);
+  //         const response = null
+  //         // setTimesheets(response)
+  //         console.log("submitting the form")
 
-        } catch (error) {
-          console.log("-Create-Error-", error);
-        } finally {
-          setUpdateTimeSheet(null)
-        }
+  //       } catch (error) {
+  //         console.log("-Create-Error-", error);
+  //       } finally {
+  //         setUpdateTimeSheet(null)
+  //       }
 
-      },
-      onClose: () => {
-        setUpdateTimeSheet(null)
-      }
-    }
-    setUpdateTimeSheet(updateTimesheetObject)
-    setOpenDialog(true);
-  }
+  //     },
+  //     onClose: () => {
+  //       setUpdateTimeSheet(null)
+  //     }
+  //   }
+  //   setUpdateTimeSheet(updateTimesheetObject)
+  //   setOpenDialog(true);
+  // }
 
-  const handleDelete = async (id, e) => {
-    try {
-      const response = await TimesheetService.deleteTimesheet({ id: id });
-      if (response.ok) {
-        setTimesheets((pre) => {
-          const filteredArray = pre.filter(obj => obj._id !== id)
-          return filteredArray
-        })
-      } else {
-        throw new Error("Error occured!")
-      }
-    } catch (error) {
-      console.log("-delete-Error-", error);
-    }
-  }
+  // const handleDelete = async (id, e) => {
+  //   try {
+  //     const response = await TimesheetService.deleteTimesheet({ id: id });
+  //     if (response.ok) {
+  //       setTimesheets((pre) => {
+  //         const filteredArray = pre.filter(obj => obj._id !== id)
+  //         return filteredArray
+  //       })
+  //     } else {
+  //       throw new Error("Error occured!")
+  //     }
+  //   } catch (error) {
+  //     console.log("-delete-Error-", error);
+  //   }
+  // }
 
   // const getTimeSheets = async () => {
   //   try {
@@ -173,6 +185,12 @@ const ManageTimesheet = (props) => {
       setOpenBackdrop(false);
     }
   };
+  const onEditClickListener = (timesheet) => {
+    console.log(timesheet)
+    setEditModalData(timesheet)
+
+    setOpenDialog(true);
+  }
 
   const onCancelClickListener = () => {
     console.log("cancel listener");
@@ -236,7 +254,7 @@ const ManageTimesheet = (props) => {
                                   <Grid>
                                     <IconButton
                                       style={{ float: "right" }}
-                                      onClick={handleEdit.bind(this, timesheet[1]?._id)}
+                                      onClick={onEditClickListener.bind(this, timesheet[1])}
                                       color="primary"
                                     >
                                       <EditRoundedIcon />
@@ -279,6 +297,7 @@ const ManageTimesheet = (props) => {
         employees={employees}
         onSubmitClickListener={onSubmitClickListener}
         updateTimeSheet={updateTimeSheet}
+        editModalData={editModalData}
       />
       <ConfirmDialog
         open={openConfirmDialog}

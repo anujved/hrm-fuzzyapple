@@ -2,6 +2,7 @@ import ApiClient from '../api-client/apiClient';
 import {
     CREATE_TIMESHEET,
     FETCH_TIMESHEET,
+    UPDATE_TIMESHEET,
     DELETE_TIMESHEET,
     CREATE_MANAGE_LEAVE,
     FETCH_LEAVES,
@@ -19,6 +20,10 @@ export default class TimesheetService {
         return await ApiClient.call(ApiClient.requestMethod.GET, FETCH_TIMESHEET, null, null, null, false);
     }
 
+    static updateTimesheet = async (data , params) => {
+        const endpoint = `${UPDATE_TIMESHEET}/${params}`;
+        return await ApiClient.call(ApiClient.requestMethod.PUT, endpoint, data, null, null, false);
+    }
     static deleteTimesheet = async (params) => {
         const endpoint = `${DELETE_TIMESHEET}/${params}`;
         return await ApiClient.call(ApiClient.requestMethod.DELETE, endpoint, null, null, null, false);

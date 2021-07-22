@@ -91,7 +91,7 @@ const Account = (props) => {
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
     console.log(data)
-    if (editModalData._id) {
+    if (editModalData) {
       try {
         const response = await FinanceService.updateAccountList(data, editModalData._id);
         setEditModalData(null)
@@ -145,6 +145,7 @@ const Account = (props) => {
   React.useEffect(() => {
     getAccounts();
   }, []);
+  console.log(accounts)
 
   return (
     <React.Fragment>

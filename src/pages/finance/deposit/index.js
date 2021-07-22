@@ -81,7 +81,7 @@ const Deposit = (props) => {
 
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
-    if (editModalData._id) {
+    if (editModalData) {
       try {
         const response = await FinanceService.updateDeposit(data, editModalData._id);
         //TODO: send email to respetive employee, branch and department here

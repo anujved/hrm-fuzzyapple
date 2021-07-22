@@ -108,7 +108,7 @@ const Expense = (props) => {
 
   const onSubmitClickListener = async (data) => {
     setOpenDialog(false);
-    if (editModalData._id) {
+    if (editModalData) {
       try {
         const response = await FinanceService.updateExpense(data, editModalData._id);
         //TODO: send email to respetive employee, branch and department here
